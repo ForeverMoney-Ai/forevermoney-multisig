@@ -1,0 +1,166 @@
+# AI Contributor Guidelines
+
+This repository is the Safe{Wallet} monorepo, containing both web and mobile applications for Safe (formerly Gnosis Safe), a multi-signature smart contract wallet on Ethereum and other EVM chains. The repository uses a Yarn 4 workspace-based monorepo structure. Follow these rules when proposing changes via an AI agent.
+
+## Nested guidance
+
+This monorepo uses nested AGENTS.md files. Agents working in a subtree automatically load the nearest one — for Claude Code this works via a one-line pointer `CLAUDE.md` next to each AGENTS.md, so every new AGENTS.md needs one. Start at root for cross-cutting rules, then drop into the relevant subtree:
+
+| Subtree                | File                                                           | Covers                                                                                 |
+| ---------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `apps/web/`            | [apps/web/AGENTS.md](apps/web/AGENTS.md)                       | Feature architecture, variants/styling, web testing, web pitfalls                      |
+| `apps/web/e2e/`        | [apps/web/e2e/AGENTS.md](apps/web/e2e/AGENTS.md)               | **Playwright E2E — all new tests go here**                                             |
+| `apps/web/cypress/`    | [apps/web/cypress/AGENTS.md](apps/web/cypress/AGENTS.md)       | Cypress E2E (legacy — maintenance only)                                                |
+| `apps/web/.storybook/` | [apps/web/.storybook/AGENTS.md](apps/web/.storybook/AGENTS.md) | Storybook config; story authoring: [storybook-guide](apps/web/docs/storybook-guide.md) |
+| `apps/web-tanstack/`   | [apps/web-tanstack/AGENTS.md](apps/web-tanstack/AGENTS.md)     | TanStack Router + Vite migration runtime — reuses `apps/web/src`                       |
+| `apps/tx-builder/`     | [apps/tx-builder/AGENTS.md](apps/tx-builder/AGENTS.md)         | Safe App (iframe), **MUI v6 + Vite — web styling rules do not apply**                  |
+| `apps/mobile/`         | [apps/mobile/AGENTS.md](apps/mobile/AGENTS.md)                 | Expo + Tamagui                                                                         |
+| `packages/`            | [packages/AGENTS.md](packages/AGENTS.md)                       | Shared packages: verification, codegen, dual env vars, theme workflow                  |
+| `config/`              | [config/AGENTS.md](config/AGENTS.md)                           | Shared test workspace (`@safe-global/test`): MSW fixtures/scenarios, verify caveat     |
+
+When adding new guidance, place it in the most-specific subtree it applies to. When a workspace, script, generated path, test framework, or architecture boundary changes, update the nearest AGENTS.md in the same PR — and prefer replacing old rules over appending exceptions.
+
+## Quick Start
+
+`yarn install` (Yarn 4 via corepack) — also runs `after-install` for web, which generates TypeScript types from contract ABIs. Per-workspace `dev`/`start`/`test` scripts follow the usual names in each workspace's package.json.
+
+Workspace-scoped scripts (`pw:*`, `test:scaffold`, `css-vars`, `storybook`, …) must be run via `yarn workspace @safe-global/<name> …`; the root package.json only adds `verify:*`, `knip`, `prettier:fix`, and the Turborepo-backed `lint`/`type-check`/`test`.
+
+## Turborepo
+
+Root-level `lint`, `type-check`, and `test` run through [Turborepo](https://turborepo.com). Tasks are cached by input hash and re-used on subsequent runs — locally and in CI.
+
+```bash
+yarn type-check                                        # all workspaces (cached)
+yarn turbo run type-check --filter=@safe-global/web    # scoped
+yarn turbo run test --filter=...@safe-global/utils     # package + dependents
+```
+
+Cache directory is `.turbo/` (gitignored). Task definitions live in `turbo.json`. Remote-cache setup (one-time, per team): [docs/turbo-remote-cache.md](docs/turbo-remote-cache.md).
+
+## Architecture Overview
+
+- **apps/web** – the main app (Next.js)
+- **apps/web-tanstack** – second runtime for the same code: reuses `apps/web/src` via Vite aliases
+- **apps/mobile** – Expo/React Native
+- **apps/tx-builder** – Safe App running in an iframe — MUI v6, not shadcn
+- **packages/** – `store`, `theme`, `utils` shared by web **and** mobile
+- **config/**, `expo-plugins/*`, `tools/codemods/*` – shared config and tooling workspaces
+
+Subtree-specific caveats live in the Nested guidance table above.
+
+### Key Entry Points
+
+Stable architectural landmarks for fast orientation:
+
+| Area           | Path                                         | Purpose                                              |
+| -------------- | -------------------------------------------- | ---------------------------------------------------- |
+| Web app entry  | `apps/web/src/pages/_app.tsx`                | Next.js app bootstrap, providers, `InitApp`          |
+| Redux store    | `apps/web/src/store/index.ts`                | `makeStore()`, middleware, RTK Query APIs            |
+| RTK Query APIs | `apps/web/src/store/api/gateway/`            | CGW API endpoints (balances, transactions, etc.)     |
+| Feature system | `apps/web/src/features/__core__/`            | `createFeatureHandle`, `useLoadFeature`, proxy stubs |
+| Page layout    | `apps/web/src/components/common/PageLayout/` | Main app layout, sidebar, header                     |
+| Safe info hook | `apps/web/src/hooks/useSafeInfo.ts`          | Current Safe address, owners, threshold              |
+| Chain config   | `packages/store/src/gateway/chains/`         | RTK Query chains endpoint with retry logic           |
+| Theme package  | `packages/theme/src/`                        | Palettes, spacing, typography tokens                 |
+| Mobile entry   | `apps/mobile/src/app/_layout.tsx`            | Expo Router root layout                              |
+
+### Code search
+
+For "who uses this symbol?" questions, prefer the `LSP` tool (`findReferences`, `goToDefinition`) — it follows imports and re-exports across the monorepo. For structural patterns ("every `useMemo` with `chainId` in deps"), use `ast-grep`. Plain `grep` is fine for strings, comments, config, and UI copy. Full guide, examples, and the default-export gotcha: [docs/ai/code-navigation.md](docs/ai/code-navigation.md).
+
+## Unified Theme System
+
+`@safe-global/theme` is the single source of truth for all design tokens (colors, spacing, typography, radius) across web and mobile — always use theme tokens instead of hard-coded values. Web consumes the theme as CSS variables (→ Tailwind utilities), not a JS theme object; read a palette in JS (`@safe-global/theme/palettes`) only for non-CSS consumers (canvas, QR codes, meta tags, third-party widgets). Mobile consumes Tamagui tokens. Token rules and the modification workflow: [packages/AGENTS.md](packages/AGENTS.md).
+
+## General Principles
+
+- Never use the `any` type!
+- **Comments are tech debt — default to writing none.** AI agents habitually over-comment; this codebase already carries too many long comments. Write a comment only for what the code cannot express (a non-obvious why, an invariant, a workaround and its reason) and keep it to one line — never narrate what the next line does, restate the diff, justify a change to the reviewer, or write multi-paragraph comment blocks.
+- **Use sentence case for UI text** – Buttons, headings, labels, warnings, and other UI copy should use sentence case (e.g., "Add new owner") not Title Case (e.g., "Add New Owner")
+- **Extract a function only for a reason** – reuse, a dedicated test, or isolating a responsibility; never just to name a single built-in call. Full rules: [docs/ai/when-to-extract-a-function.md](docs/ai/when-to-extract-a-function.md)
+
+Web-specific principles live in [apps/web/AGENTS.md](apps/web/AGENTS.md); mobile-specific ones in [apps/mobile/AGENTS.md](apps/mobile/AGENTS.md).
+
+## Testing Requirements
+
+Every behavioral change must include tests — each platform's file defines the exact matrix and exemptions (see the Test Decision Matrix in [apps/web/AGENTS.md](apps/web/AGENTS.md) for web). Suggest developer-owned tests (unit / component / integration) before reaching for QA automation — the full rule lives in the Web Testing section of [apps/web/AGENTS.md](apps/web/AGENTS.md). Before writing or changing any test, read the cross-cutting conventions in [docs/ai/testing-conventions.md](docs/ai/testing-conventions.md); web templates and mock patterns: [apps/web/docs/TESTING.md](apps/web/docs/TESTING.md).
+
+## Workflow
+
+### Fast Feedback Loop
+
+Verify your changes with the repo's `verify` scripts before committing — running them is your responsibility:
+
+1. **Scoped check**: `yarn verify:changed` type-checks, lints, prettier-checks and tests changed files — **for `apps/web/` only. It does not auto-detect the workspace**: it defaults to web and silently skips files outside `apps/<workspace>/`, so a mobile-, web-tanstack-, packages-, or config-only change gets a false green pass. Other workspaces: `node scripts/verify.mjs --changed --workspace=mobile|web-tanstack|tx-builder`. For `packages/` changes see [packages/AGENTS.md](packages/AGENTS.md); for `config/` changes see [config/AGENTS.md](config/AGENTS.md). (`SKIP_VERIFY=1` skips verify entirely — only with the user's explicit say-so.)
+
+2. **Full check**: Run `yarn verify:web` for a full check before committing.
+
+3. **Test scaffolding**: Run `yarn workspace @safe-global/web test:scaffold <file>` to generate a test skeleton with the correct imports, mocks, and structure.
+
+**Rules for agents:**
+
+- Run the scoped check for the workspace you changed and fix all errors before moving on
+- If a significant code change has no colocated unit test, write one before committing
+- Do NOT run type-check, lint, prettier, and test separately — `verify` runs them all; it only **checks** formatting (never writes), so if it reports formatting errors, run `yarn prettier:fix` once and re-check. **CI rejects unformatted code.**
+- Do NOT commit without a clean scoped-check pass
+
+### Pre-implementation regression checklist (REQUIRED)
+
+Before writing code for any non-trivial change (anything beyond a typo, doc tweak, or single-line local fix), you MUST produce a regression checklist and include it in your response to the user. Optimise for **impact analysis**, not diff completion: a change to a shared hook, selector, component, slice, or API endpoint touches many user journeys, and plain text search is not enough to find them.
+
+**Build the checklist in this order:**
+
+1. **Map the surface.** Identify what you are touching: the primary file(s), plus any shared hooks, components, selectors, Redux slices, RTK Query endpoints, feature flags, routes, or persisted state involved.
+2. **Find consumers with symbol-aware search** — LSP `findReferences`, not plain text search (see [Code search](#code-search) above).
+3. **Translate consumers into flows.** For each consumer, name the user journey it belongs to (create / edit / delete / retry / empty / error / offline / permission / feature-flag-off / mobile variant).
+4. **List tests to add or run.** Happy path, each neighbouring flow, regression-sensitive paths, and invariant properties. Prefer targeted tests around shared contracts over broad E2E sweeps.
+5. **State what you will NOT verify.** Be explicit. This exposes false confidence.
+
+**Required checklist format (paste into your response before implementing):**
+
+```
+### Regression checklist
+
+**Primary flow changed:** <one sentence>
+
+**Surfaces touched:**
+- <shared hook / component / selector / slice / endpoint / flag / route>
+
+**Neighbouring flows to verify:**
+- <flow A> — <why it could be affected>
+- <flow B> — <why it could be affected>
+
+**Tests to add/run:**
+- <test name or description>
+
+**Not verified (risks):**
+- <what you are skipping and why>
+```
+
+**Rules:**
+
+- Do NOT start editing code until this checklist exists in the conversation. For small, strictly local changes, a one-line "local change, no shared surfaces touched" note is sufficient.
+- When you open the PR, carry the relevant lines into the "Affected flows", "Blast radius", and "Risks / not checked" fields of the PR template.
+- If the checklist reveals that a shared abstraction has many unknown consumers, slow down and investigate before coding — that is the signal this process is designed to surface.
+
+### Commit and PR conventions
+
+Before committing, pushing, opening a PR, or reviewing one, read [docs/ai/git-conventions.md](docs/ai/git-conventions.md) first — pre-commit/pre-push hooks, commit-message prefixes, how to fill the PR template, the required visual summary, and PR citation rules live there. Do not commit or open a PR without having read it.
+
+## Security & Safe Wallet Patterns
+
+Safe is a smart contract wallet requiring M-of-N owner signatures (the **threshold**) to execute transactions.
+
+- **Chain-Specific Safes** – Safe addresses are unique per chain; always include chainId when referencing a Safe
+- **Transaction Building** – Use the Safe SDK (`@safe-global/protocol-kit`, `@safe-global/api-kit`) for transaction creation; validate addresses with ethers.js `isAddress`
+- **Never hardcode private keys or sensitive data** – Use environment variables and secure key management
+
+## Common Pitfalls
+
+Cross-cutting mistakes to avoid. Web-specific pitfalls live in [apps/web/AGENTS.md](apps/web/AGENTS.md#web-specific-common-pitfalls); mobile-specific ones in [apps/mobile/AGENTS.md](apps/mobile/AGENTS.md#mobile-specific-common-pitfalls).
+
+1. **Breaking mobile when changing shared code** – `packages/**` affects both web and mobile, and app verify scripts don't cover it — see [packages/AGENTS.md](packages/AGENTS.md).
+2. **Modifying generated files** – never hand-edit generated files under `packages/` (contract types, `AUTO_GENERATED/`); regeneration commands in [packages/AGENTS.md](packages/AGENTS.md).
+3. **Not handling chain-specific logic** – Always consider multi-chain scenarios.
+4. **Incomplete error handling** – Always handle loading, error, and empty states in UI components.

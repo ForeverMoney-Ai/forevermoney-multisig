@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`./SecuritySafesTable.stories MultichainSafe 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 0px;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="bg-card rounded-lg p-4"
+    />
+  </div>
+</div>
+`;
+
+exports[`./SecuritySafesTable.stories Scanning 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 0px;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="bg-card rounded-lg p-4"
+    />
+  </div>
+</div>
+`;
+
+exports[`./SecuritySafesTable.stories SingleChainSafes 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 0px;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="bg-card rounded-lg p-4"
+    />
+  </div>
+</div>
+`;

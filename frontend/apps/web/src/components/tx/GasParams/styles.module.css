@@ -1,0 +1,64 @@
+/* Restores the pre-shadcn MuiAccordion look (border, green hover/expanded states) for this
+   accordion */
+.container :global [data-slot='accordion-item'] {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition:
+    background 0.2s,
+    border 0.2s;
+}
+
+.container :global [data-slot='accordion-trigger'] {
+  border-radius: 0;
+}
+
+.container:not(.error) :global [data-slot='accordion-item']:hover {
+  border-color: var(--color-secondary-light);
+}
+
+.container:not(.error) :global [data-slot='accordion-item']:hover [data-slot='accordion-trigger'],
+.container:not(.error) :global [data-slot='accordion-trigger'][aria-expanded='true'] {
+  background-color: var(--color-background-light);
+}
+
+.error :global [data-slot='accordion-item'] {
+  border-color: var(--color-error-light);
+}
+
+.error :global [data-slot='accordion-trigger'][aria-expanded='true'] {
+  background-color: var(--color-error-background);
+  border-bottom: 1px solid var(--color-error-light);
+}
+
+.feeContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.feeAmount {
+  font-weight: 600;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
+.noFeeCampaignTag {
+  background: linear-gradient(90deg, #b0ffc9 0%, #d7f6ff 99.5%);
+  color: black;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.remainingCounter {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
+}

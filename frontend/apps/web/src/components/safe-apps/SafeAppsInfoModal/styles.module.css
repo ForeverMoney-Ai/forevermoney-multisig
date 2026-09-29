@@ -1,0 +1,40 @@
+.sliderContainer {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.sliderInner {
+  position: relative;
+  display: flex;
+  min-width: 100%;
+  min-height: 426px;
+  transform: translateX(0);
+  transition: transform 0.5s ease;
+}
+
+.sliderItem {
+  min-width: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.domainIcon {
+  padding-right: 4px;
+}
+
+.domainText {
+  display: flex;
+  font-size: 12px;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+  background-color: var(--color-background-light);
+  padding: 10px 15px;
+  border-radius: 8px;
+  max-width: 75%;
+}

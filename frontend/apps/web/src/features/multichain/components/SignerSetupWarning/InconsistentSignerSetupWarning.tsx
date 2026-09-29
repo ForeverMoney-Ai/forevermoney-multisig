@@ -1,0 +1,103 @@
+import { useIsMultichainSafe } from '../../hooks/useIsMultichainSafe'
+import useChains, { useCurrentChain } from '@/hooks/useChains'
+import { Alert, AlertTitle, AlertDescription, AlertSeverityIcon } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { trackEvent } from '@/services/analytics'
+import useSafeAddress from '@/hooks/useSafeAddress'
+import { useAppSelector } from '@/store'
+import { selectCurrency, selectUndeployedSafes, useGetMultipleSafeOverviewsQuery } from '@/store/slices'
+import { useAllSafesGrouped } from '@/hooks/safes'
+import { sameAddress } from '@safe-global/utils/utils/addresses'
+import { useMemo } from 'react'
+import { getDeviatingSetups, getSafeSetups } from '../../utils'
+import { Typography } from '@/components/ui/typography'
+import { useRouter } from 'next/router'
+import { AppRoutes } from '@/config/routes'
+import ChainIndicator from '@/components/common/ChainIndicator'
+import { ATTENTION_PANEL_EVENTS } from '@/services/analytics/events/attention-panel'
+
+/**
+ * ChainIndicatorList component displays a list of chains with their logos and names
+ * Used in address book and other contexts where chain visualization is needed
+ */
+export const ChainIndicatorList = ({ chainIds }: { chainIds: string[] }) => {
+  const { configs } = useChains()
+
+  return (
+    <>
+      {chainIds.map((chainId, index) => {
+        const chain = configs.find((chain) => chain.chainId === chainId)
+        return (
+          <div key={chainId} className="relative top-[5px] inline-flex flex-wrap">
+            <ChainIndicator responsive key={chainId} chainId={chainId} showUnknown={false} onlyLogo={true} />
+            <Typography className="relative top-[2px] mx-1">
+              {chain && chain.chainName}
+              {index === chainIds.length - 1 ? '.' : ','}
+            </Typography>
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
+export const InconsistentSignerSetupWarning = () => {
+  const router = useRouter()
+  const isMultichainSafe = useIsMultichainSafe()
+  const safeAddress = useSafeAddress()
+  const currentChain = useCurrentChain()
+  const currency = useAppSelector(selectCurrency)
+  const undeployedSafes = useAppSelector(selectUndeployedSafes)
+  const { allMultiChainSafes } = useAllSafesGrouped()
+
+  const multiChainGroupSafes = useMemo(
+    () => allMultiChainSafes?.find((account) => sameAddress(safeAddress, account.safes[0].address))?.safes ?? [],
+    [allMultiChainSafes, safeAddress],
+  )
+  const deployedSafes = useMemo(
+    () => multiChainGroupSafes.filter((safe) => undeployedSafes[safe.chainId]?.[safe.address] === undefined),
+    [multiChainGroupSafes, undeployedSafes],
+  )
+  const { data: safeOverviews } = useGetMultipleSafeOverviewsQuery({ safes: deployedSafes, currency })
+
+  const safeSetups = useMemo(
+    () => getSafeSetups(multiChainGroupSafes, safeOverviews ?? [], undeployedSafes),
+    [multiChainGroupSafes, safeOverviews, undeployedSafes],
+  )
+  const deviatingSetups = getDeviatingSetups(safeSetups, currentChain?.chainId)
+  const deviatingChainIds = deviatingSetups.map((setup) => setup?.chainId)
+
+  if (!isMultichainSafe || !deviatingChainIds.length) return
+
+  const handleReviewSigners = () => {
+    router.push({
+      pathname: AppRoutes.settings.setup,
+      query: { safe: router.query.safe },
+    })
+  }
+
+  return (
+    <Alert variant="warning" outlined={false}>
+      <AlertSeverityIcon variant="warning" />
+      <AlertTitle className="font-bold">You have different signers across different networks.</AlertTitle>
+      <AlertDescription>
+        This could break approvals and you may risk losing control of this Safe. First, switch to the affected network
+        and review the signer setup for this Safe.
+        <div className="mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-foreground"
+            data-testid="review-signers-btn"
+            onClick={() => {
+              trackEvent(ATTENTION_PANEL_EVENTS.REVIEW_SIGNERS)
+              handleReviewSigners()
+            }}
+          >
+            Review signers
+          </Button>
+        </div>
+      </AlertDescription>
+    </Alert>
+  )
+}

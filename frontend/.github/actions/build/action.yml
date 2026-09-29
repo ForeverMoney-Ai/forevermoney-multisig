@@ -1,0 +1,72 @@
+name: 'Build'
+
+description: 'Build the app'
+
+inputs:
+  prod: # id of input
+    description: 'Production build flag'
+    required: false
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Restore Next.js Build Cache & Cypress cache
+      id: restore-nc
+      uses: ./.github/actions/cache-deps
+      with:
+        mode: restore-nc
+
+    - name: Build
+      shell: bash
+      # NEXT_PUBLIC_* vars come from the calling workflow's `env:` block on the
+      # step that uses this action. New secrets must be added there.
+      run: |
+        source apps/web/scripts/github/resolve-web-build-env.sh
+        yarn workspace @safe-global/web build
+      env:
+        NEXT_PUBLIC_IS_PRODUCTION: ${{ inputs.prod }}
+        PROD: ${{ inputs.prod }}
+        COMMIT_SHA: ${{ github.sha }}
+
+    - name: Upload source maps to Datadog
+      shell: bash
+      working-directory: apps/web
+      run: |
+        if [ -z "${DATADOG_API_KEY:-}" ]; then
+          echo "No DATADOG_API_KEY provided, skipping sourcemap upload"
+          exit 0
+        fi
+        source ./scripts/github/resolve-web-build-env.sh
+        export DATADOG_SITE="${NEXT_PUBLIC_DATADOG_RUM_SITE:-datadoghq.eu}"
+        RELEASE_VERSION="${NEXT_PUBLIC_COMMIT_HASH:-}"
+        DATADOG_SERVICE="${NEXT_PUBLIC_DATADOG_RUM_SERVICE:-safe-wallet-web}"
+        echo "Uploading Datadog sourcemaps:"
+        echo "- env: ${NEXT_PUBLIC_DATADOG_RUM_ENV:-unset}"
+        echo "- service: $DATADOG_SERVICE"
+        echo "- release-version: $RELEASE_VERSION"
+        echo "- minified-path-prefix: /_next/static"
+        echo "- sourcemaps-dir: ./out/_next/static"
+        npx @datadog/datadog-ci sourcemaps upload ./out/_next/static \
+          --service="$DATADOG_SERVICE" \
+          --release-version="$RELEASE_VERSION" \
+          --minified-path-prefix=/_next/static
+      env:
+        PROD: ${{ inputs.prod }}
+        COMMIT_SHA: ${{ github.sha }}
+    - name: Generate SRI for static scripts
+      shell: bash
+      # Skip SRI for Cypress test builds (NODE_ENV=cypress)
+      run: |
+        if [ "$NODE_ENV" != "cypress" ]; then
+          yarn workspace @safe-global/web integrity
+        else
+          echo "Skipping SRI generation for Cypress test environment"
+        fi
+
+    - name: Save Next.js Build Cache & Cypress cache
+      if: steps.restore-nc.outputs.cache-hit-nc != 'true'
+      uses: ./.github/actions/cache-deps
+      with:
+        mode: save-nc
+        key: ${{ steps.restore-nc.outputs.computed-cache-key-nc }}

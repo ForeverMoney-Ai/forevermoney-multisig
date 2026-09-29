@@ -1,0 +1,6 @@
+.dot {
+  width: 2px;
+  height: 2px;
+  background-color: var(--color-border-main);
+  border-radius: 50%;
+}

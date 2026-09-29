@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`./QRCode.stories Default 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="rounded-lg bg-card p-4"
+    >
+      <canvas
+        aria-label="QR code"
+        height="150"
+        role="img"
+        style="height: 150px; width: 150px;"
+        width="150"
+      />
+      <img
+        src="/images/safe-logo-green.png"
+        style="display: none;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./QRCode.stories LargeSize 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="rounded-lg bg-card p-4"
+    >
+      <canvas
+        aria-label="QR code"
+        height="250"
+        role="img"
+        style="height: 250px; width: 250px;"
+        width="250"
+      />
+      <img
+        src="/images/safe-logo-green.png"
+        style="display: none;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./QRCode.stories Loading 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="rounded-lg bg-card p-4"
+    >
+      <div
+        class="bg-muted animate-pulse rounded-none"
+        data-slot="skeleton"
+        style="width: 150px; height: 150px;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./QRCode.stories LongValue 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="rounded-lg bg-card p-4"
+    >
+      <canvas
+        aria-label="QR code"
+        height="200"
+        role="img"
+        style="height: 200px; width: 200px;"
+        width="200"
+      />
+      <img
+        src="/images/safe-logo-green.png"
+        style="display: none;"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./QRCode.stories SmallSize 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="rounded-lg bg-card p-4"
+    >
+      <canvas
+        aria-label="QR code"
+        height="100"
+        role="img"
+        style="height: 100px; width: 100px;"
+        width="100"
+      />
+      <img
+        src="/images/safe-logo-green.png"
+        style="display: none;"
+      />
+    </div>
+  </div>
+</div>
+`;

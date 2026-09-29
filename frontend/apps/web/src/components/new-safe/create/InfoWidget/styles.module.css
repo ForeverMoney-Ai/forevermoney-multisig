@@ -1,0 +1,17 @@
+.title {
+  width: fit-content;
+  padding: 4px var(--space-1);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.titleIcon {
+  font-size: 12px;
+}
+
+/* The tips sit directly on the card's tinted surface rather than on the Accordion's own background. */
+.tipAccordion {
+  background-color: inherit;
+}

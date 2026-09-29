@@ -1,0 +1,29 @@
+import type { NativeStakingValidatorsExitTransactionInfo } from '@safe-global/store/gateway/AUTO_GENERATED/transactions'
+import { SafeListItem } from '@/src/components/SafeListItem'
+import { TokenIcon } from '@/src/components/TokenIcon'
+import { maybePlural } from '@safe-global/utils/utils/formatters'
+import { Text } from 'tamagui'
+import { SafeListItemProps } from '@/src/components/SafeListItem/SafeListItem'
+
+type StakingTxExitCardProps = {
+  info: NativeStakingValidatorsExitTransactionInfo
+  onPress: () => void
+} & Partial<SafeListItemProps>
+
+export const StakingTxExitCard = ({ info, onPress, ...rest }: StakingTxExitCardProps) => {
+  return (
+    <SafeListItem
+      label={`Withdraw`}
+      icon="transaction-stake"
+      type={'Stake'}
+      onPress={onPress}
+      {...rest}
+      rightNode={
+        <Text color="$color" fontWeight={600} textAlign="right">
+          {info.numValidators} Validator{maybePlural(info.numValidators)}
+        </Text>
+      }
+      leftNode={<TokenIcon logoUri={info.tokenInfo.logoUri} accessibilityLabel={info.tokenInfo.symbol} size="$8" />}
+    />
+  )
+}

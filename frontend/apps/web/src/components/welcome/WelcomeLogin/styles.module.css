@@ -1,0 +1,83 @@
+.loginCard {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-2);
+  background: #fff;
+}
+
+.loginContent {
+  display: flex;
+  width: 320px;
+  gap: var(--space-1);
+  color: #000;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loginDescription {
+  color: var(--color-backdrop-main);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* The login panel is intentionally theme-static white (see WalletLogin's walletBtnStatic),
+   so the watch-account button is pinned to static colors too — the themed default variant
+   would turn Safe-green on the white panel in dark mode. */
+.watchViewAccountLink button {
+  background-color: #121312;
+  color: #fff;
+}
+
+.watchViewAccountLink button:hover {
+  background-color: #3c3c3c;
+}
+
+.orDivider::after {
+  background-color: #dcdee0;
+}
+.orDivider::before {
+  background-color: #dcdee0;
+}
+
+.walletBtnPrimary {
+  color: var(--color-text-contrast);
+  background-color: var(--color-primary-main);
+  min-height: 42px;
+}
+
+.walletBtnPrimary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.walletBtnSecondary {
+  background-color: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: none;
+  min-height: 48px;
+  gap: var(--space-1);
+}
+
+.walletBtnSecondary:hover {
+  background-color: color-mix(in oklab, var(--sidebar-primary) 90%, transparent);
+}
+
+.walletBtnStatic {
+  color: #fff;
+  background-color: #121312;
+  min-height: 42px;
+}
+
+.walletBtnStatic:hover {
+  background-color: #121312;
+}

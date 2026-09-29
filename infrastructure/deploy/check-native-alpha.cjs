@@ -1,0 +1,36 @@
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),{createRequire}=require('module');
+const req=createRequire('/app/apps/web/package.json'),ts=req('typescript');
+function compile(file,loader=req){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('/overrides/'+file,'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2020,module:ts.ModuleKind.CommonJS}}).outputText,{exports,require:loader,TextEncoder,Uint8Array,BigInt});return exports}
+const tao=compile('finney-tao.ts');const a=compile('finney-alpha.ts',id=>id.includes('finney-tao')?tao:req(id));
+const recipient='5DXq7SMZQXQrsLhXfLZoRE8JYbzkNdfHrEruZQN4i7LvH6tK',hotkey='0x06ee4f6ae37569097680a092d6307661481ffe9c92b7bfb5c4e8b94a9bed1d29';
+const tx=a.alphaTransfer('964',recipient,hotkey,10,'0.418946583');
+assert.equal(tx.value,'0');assert.equal(tx.operation,0);
+const decoded=a.decodeAlphaTransfer('964',tx.to,tx.data,tx.value,tx.operation);
+assert.equal(decoded.amount,'418946583');assert.equal(decoded.netuid,10);assert.equal(decoded.recipient,recipient);
+for(const value of ['0','-1','1e3','0.0000000001','18446744074','NaN',''])assert.throws(()=>a.alphaAmount(value));
+for(const patch of [{chain:'1'},{operation:1},{value:'1'},{data:tx.data+'00'},{to:'0x0000000000000000000000000000000000000800'}])assert.equal(a.decodeAlphaTransfer(patch.chain||'964',patch.to||tx.to,patch.data||tx.data,patch.value||tx.value,patch.operation??0),undefined);
+const iface=new (req('ethers').Interface)(a.ALPHA_ABI);
+const cross=iface.encodeFunctionData('transferStake',[tao.decodeFinneyAddress(recipient),hotkey,10,80,1]);
+assert.equal(a.decodeAlphaTransfer('964',tx.to,cross,'0',0),undefined);
+assert.throws(()=>a.alphaTransfer('1',recipient,hotkey,10,'1'));
+assert.throws(()=>a.alphaTransfer('964',recipient,hotkey,0,'1'));
+assert.equal(a.alphaTransfer('964','0x814cfC546b8667efeACb3910C149aD3053708f8E',hotkey,10,'1').data,a.alphaTransfer('964',recipient,hotkey,10,'1').data);
+assert.equal(tao.encodeFinneyAddress(a.evmColdkey('0x4816aF10706d7F1472837215fdD8f28CFa9A81ad')),'5HCiqveWdMteyv3jkPKAsuxm8wGokKSimNhwK7sY73JDPRnv');
+console.log('PASS: exact alpha units, recipient decoding, native call construction, subnet boundaries, malformed inputs, cross-subnet and delegatecall rejection.');
+(async()=>{const start=Date.now();const provider=new (req('ethers').JsonRpcProvider)('https://lite.chain.opentensor.ai');try{const result=await a.readAlphaPositions(provider,'0x4816aF10706d7F1472837215fdD8f28CFa9A81ad');assert(Array.isArray(result.positions));for(const p of result.positions){const exact=await new (req('ethers').Contract)(a.STAKING_PRECOMPILE,a.ALPHA_ABI,provider).getStake(p.hotkey,a.evmColdkey('0x4816aF10706d7F1472837215fdD8f28CFa9A81ad'),p.netuid,{blockTag:result.block});assert.equal(exact.toString(),p.amount)};console.log('Read latency ms:',Date.now()-start);console.log('PASS: live discovery found',result.positions.length,'native positions at block',result.block,JSON.stringify(result.positions));}finally{provider.destroy()}})().catch(e=>{console.error(e.message);process.exitCode=1});
+const shield=compile('finney-shield.ts',id=>id.includes('finney-alpha')?a:id.includes('finney-tao')?tao:id.includes('safe-shield/types')?{Severity:{INFO:'INFO'},ContractStatus:{VERIFICATION_UNAVAILABLE:'VERIFICATION_UNAVAILABLE'},StatusGroup:{CONTRACT_VERIFICATION:'CONTRACT_VERIFICATION'}}:req(id));
+const result={[a.STAKING_PRECOMPILE]:{CONTRACT_VERIFICATION:[{type:'VERIFICATION_UNAVAILABLE',severity:'WARN'}],OTHER:[{severity:'CRITICAL'}]}};
+const explained=shield.explainFinneyTransfer('964',{data:tx},result);
+assert.equal(explained[a.STAKING_PRECOMPILE].CONTRACT_VERIFICATION[0].severity,'INFO');
+assert.equal(explained[a.STAKING_PRECOMPILE].OTHER[0].severity,'CRITICAL');
+assert.equal(shield.explainFinneyTransfer('964',{data:{...tx,data:cross}},result),result);
+console.log('PASS: alpha extension notice is informational only for exact same-subnet transfers; unrelated risks retained.');
+
+const cold=a.evmColdkey('0x4816aF10706d7F1472837215fdD8f28CFa9A81ad');
+const compact=n=>{n=BigInt(n);if(n<64n)return Buffer.from([Number(n<<2n)]);if(n<16384n){let b=Buffer.alloc(2);b.writeUInt16LE(Number((n<<2n)|1n));return b}let b=Buffer.alloc(4);b.writeUInt32LE(Number((n<<2n)|2n));return b};
+const row=(net,hot,amount)=>Buffer.concat([Buffer.from(hot.slice(2),'hex'),Buffer.from(cold.slice(2),'hex'),compact(net),compact(amount),Buffer.from([0,0,0,0,1])]);
+const fixture='0x'+Buffer.concat([compact(3),row(10,hotkey,418946583),row(10,'0x'+'11'.repeat(32),200000000),row(80,'0x'+'22'.repeat(32),100)]).toString('hex');
+const rows=a.decodeStakeInfo(fixture,cold);assert.equal(rows.length,3);assert.equal(rows[1].amount,'200000000');assert.equal(rows[2].netuid,80);
+for(const bad of [fixture.slice(0,-2),fixture+'00','0x',fixture.replace(cold.slice(2),'00'.repeat(32))]) assert.throws(()=>a.decodeStakeInfo(bad,cold));
+assert.equal(a.decodeStakeInfo('0x00',cold).length,0);
+console.log('PASS: all-subnet multi-validator runtime decoding; malformed and wrong-owner responses rejected');

@@ -1,0 +1,122 @@
+[
+  {
+    "deployment": "address-resolver",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "address-resolver",
+        "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6"
+      }
+    ]
+  },
+  {
+    "deployment": "cfg",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "cfg",
+        "image": "safeglobal/safe-config-service:v2.91.0@sha256:ec5ac71cce837a1030773590022a5a61afe1b3d065199e8edc21487f5a0edad3"
+      }
+    ]
+  },
+  {
+    "deployment": "cgw",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "cgw",
+        "image": "safeglobal/safe-client-gateway-nest:v1.101.0@sha256:b8bf3dc3ebc4a905a5a4b24cad0fad68395b75b2b6d754807ebd6b3c38e3ce7a"
+      }
+    ]
+  },
+  {
+    "deployment": "governance-sync",
+    "replicas": 0,
+    "containers": [
+      {
+        "name": "sync",
+        "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6"
+      }
+    ]
+  },
+  {
+    "deployment": "postgres",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "postgres",
+        "image": "postgres:16.10-alpine"
+      }
+    ]
+  },
+  {
+    "deployment": "price-proxy",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "price-proxy",
+        "image": "python:3.12-alpine"
+      }
+    ]
+  },
+  {
+    "deployment": "redis",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "redis",
+        "image": "redis:7.4.6-alpine"
+      }
+    ]
+  },
+  {
+    "deployment": "scheduler",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "scheduler",
+        "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6"
+      }
+    ]
+  },
+  {
+    "deployment": "txs",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "txs",
+        "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6"
+      }
+    ]
+  },
+  {
+    "deployment": "ui",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "ui",
+        "image": "nginx:1.28-alpine"
+      }
+    ]
+  },
+  {
+    "deployment": "worker",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "worker",
+        "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6"
+      }
+    ]
+  },
+  {
+    "deployment": "worker-live",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "worker",
+        "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6"
+      }
+    ]
+  }
+]

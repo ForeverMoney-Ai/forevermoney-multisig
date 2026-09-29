@@ -1,0 +1,192 @@
+volumes:
+  nginx-shared-txs:
+  nginx-shared-cfg:
+
+x-healthcheck-db-template: &pghealthcheck
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U postgres"]
+    interval: 30s
+    timeout: 30s
+    retries: 3
+
+x-healthcheck-redis-template: &redishealthcheck
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 30s
+    timeout: 30s
+    retries: 3
+
+x-healthcheck-celery-template: &celeryhealthcheck
+  healthcheck:
+    test: ["CMD", "celery", "inspect", "ping"]
+    interval: 30s
+    timeout: 30s
+    retries: 3
+
+services:
+  # Common nginx and database
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "${REVERSE_PROXY_PORT}:8000"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx-shared-txs:/nginx-txs
+      - nginx-shared-cfg:/nginx-cfg
+    depends_on:
+      - txs-web
+      - cfg-web
+      - cgw-web
+      - events-web
+      - ui
+
+  txs-db:
+    image: postgres:14-alpine
+    command: -c 'max_connections=250'
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/txs-db:/var/lib/postgresql/data
+    <<: *pghealthcheck
+
+  cfg-db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/cfg-db:/var/lib/postgresql/data
+    <<: *pghealthcheck
+
+  events-db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/events-db:/var/lib/postgresql/data
+    <<: *pghealthcheck
+
+  cgw-db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/cgw-db:/var/lib/postgresql/data
+    <<: *pghealthcheck
+
+  # Safe Transaction Service
+  txs-redis:
+    image: redis:alpine
+    <<: *redishealthcheck
+
+  txs-rabbitmq:
+    image: rabbitmq:alpine
+
+  txs-worker-indexer: &txs-worker
+    image: ghcr.io/safe-global/safe-transaction-service:${TXS_VERSION}
+    env_file:
+      - container_env_files/txs.env
+    environment:
+      - ETHEREUM_NODE_URL=${RPC_NODE_URL}
+      - RUN_MIGRATIONS=1
+      - WORKER_QUEUES=default,indexing,processing
+    depends_on:
+      txs-db:
+        condition: service_healthy
+      txs-redis:
+        condition: service_healthy
+    command: docker/web/celery/worker/run.sh
+    <<: *celeryhealthcheck
+
+  txs-worker-contracts-tokens:
+    <<: *txs-worker
+    environment:
+      - WORKER_QUEUES=contracts,tokens
+      - ETHEREUM_NODE_URL=${RPC_NODE_URL}
+    depends_on:
+      txs-worker-indexer:
+        condition: service_healthy
+
+  txs-worker-notifications-webhooks:
+    <<: *txs-worker
+    environment:
+      - WORKER_QUEUES=notifications,webhooks
+      - ETHEREUM_NODE_URL=${RPC_NODE_URL}
+    depends_on:
+      txs-worker-indexer:
+        condition: service_healthy
+
+  txs-web:
+    image: ghcr.io/safe-global/safe-transaction-service:${TXS_VERSION}
+    env_file:
+      - container_env_files/txs.env
+    environment:
+      - ETHEREUM_NODE_URL=${RPC_NODE_URL}
+    depends_on:
+      txs-worker-indexer:
+        condition: service_healthy
+    working_dir: /app
+    volumes:
+      - nginx-shared-txs:/nginx
+    command: docker/web/run_web.sh
+
+  txs-scheduler:
+    <<: *txs-worker
+    depends_on:
+      txs-db:
+        condition: service_healthy
+      txs-redis:
+        condition: service_healthy
+    command: docker/web/celery/scheduler/run.sh
+
+  # Safe Config Service
+  cfg-web:
+    image: safeglobal/safe-config-service:${CFG_VERSION}
+    tty: true
+    volumes:
+      - nginx-shared-cfg:/nginx
+    env_file:
+      - container_env_files/cfg.env
+    depends_on:
+      cfg-db:
+        condition: service_healthy
+      cgw-db:
+        condition: service_healthy
+
+  # Safe Client Gateway
+  cgw-redis:
+    image: redis:alpine
+    <<: *redishealthcheck
+
+  cgw-web:
+    image: safeglobal/safe-client-gateway-nest:${CGW_VERSION}
+    env_file:
+      - container_env_files/cgw.env
+    depends_on:
+      cgw-redis:
+        condition: service_healthy
+
+  ui:
+    image: ghcr.io/safe-global/safe-wallet-web:${UI_VERSION}
+    env_file:
+      - container_env_files/ui.env
+    expose:
+      - 8080
+
+  general-rabbitmq:
+    image: rabbitmq:alpine
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 15s
+      timeout: 30s
+      retries: 3
+      start_period: 15s
+
+  events-web:
+    image: ghcr.io/safe-global/safe-events-service:${EVENTS_VERSION}
+    env_file:
+      - container_env_files/events.env
+    depends_on:
+      events-db:
+        condition: service_healthy
+      general-rabbitmq:
+        condition: service_healthy

@@ -1,0 +1,37 @@
+.popup {
+  position: fixed;
+  z-index: 1300;
+  bottom: var(--space-2);
+  right: var(--space-2);
+  max-width: 400px;
+}
+
+.container {
+  padding: var(--space-2);
+}
+
+.container label,
+.container input {
+  user-select: none;
+}
+
+/* Full-width bottom sheet on mobile. Squaring the bottom corners against the screen edge
+   overrides `rounded-lg` from POPUP_SURFACE — this module is unlayered, so it wins. */
+@media (max-width: 599.95px) {
+  .popup {
+    right: 0;
+    bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+/* Link styling lives here rather than on the elements: this module is unlayered and so
+   always beats Tailwind's `utilities` layer, which would silently drop a hover utility. */
+.container a {
+  font-weight: 700;
+}
+
+.container a:hover {
+  color: var(--muted-foreground);
+}

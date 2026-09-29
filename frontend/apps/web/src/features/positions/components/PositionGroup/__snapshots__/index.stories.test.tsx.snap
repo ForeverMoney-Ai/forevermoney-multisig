@@ -1,0 +1,650 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`./index.stories Default 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="max-w-[900px] rounded-lg bg-card p-4"
+    >
+      <div
+        class="mb-4"
+      >
+        <div
+          class="w-full mb-4"
+        >
+          <div
+            class="w-full overflow-x-auto md:overflow-x-hidden rounded-t-lg bg-[var(--color-background-paper)] rounded-b-lg"
+            data-testid="table-container"
+          >
+            <div
+              class="relative w-full overflow-x-auto"
+              data-slot="table-container"
+            >
+              <table
+                aria-labelledby="tableTitle"
+                class="w-full caption-bottom text-sm compactTable"
+                data-slot="table"
+              >
+                <thead
+                  class="[&_tr]:border-b"
+                  data-slot="table-header"
+                >
+                  <tr
+                    class="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors"
+                    data-slot="table-row"
+                  >
+                    <th
+                      class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 text-sm first:pl-3"
+                      data-slot="table-head"
+                      style="width: 25%;"
+                    >
+                      <span
+                        class="text-sm"
+                      >
+                        <span
+                          class="m-0 text-sm leading-5 font-semibold text-[var(--color-text-primary)]"
+                          data-slot="typography"
+                          data-variant="paragraph-small-bold"
+                        >
+                          Supply
+                        </span>
+                      </span>
+                    </th>
+                    <th
+                      class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 text-sm first:pl-3"
+                      data-slot="table-head"
+                      style="width: 35%; text-align: right;"
+                    >
+                      <span
+                        class="text-sm"
+                      >
+                        Balance
+                      </span>
+                    </th>
+                    <th
+                      class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 text-sm first:pl-3"
+                      data-slot="table-head"
+                      style="width: 40%; text-align: right;"
+                    >
+                      <span
+                        class="text-sm"
+                      >
+                        Value
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  class="[&_tr:last-child]:border-0 tableBody"
+                  data-slot="table-body"
+                >
+                  <tr
+                    class="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors"
+                    data-slot="table-row"
+                    data-testid="table-row"
+                    tabindex="-1"
+                  >
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-name"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="flex items-center gap-2"
+                        >
+                          <div
+                            class="relative"
+                          >
+                            <iframe
+                              height="32"
+                              loading="lazy"
+                              referrerpolicy="strict-origin"
+                              sandbox="allow-scripts"
+                              srcdoc="
+    <body style="margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <img src="https://assets.coingecko.com/coins/images/2518/small/weth.png" alt="App logo" height="32" width="auto" style="border-radius: 100%;" />
+      <script>
+        document.querySelector('img').onerror = (e) => {
+          e.target.onerror = null
+          e.target.src = "/images/common/token-placeholder.svg"
+        }
+      </script>
+    </body>
+  "
+                              style="pointer-events: none; border: 0px; display: block;"
+                              tabindex="-1"
+                              title="WETH"
+                              width="32"
+                            />
+                          </div>
+                          <div>
+                            <span
+                              class="m-0 text-sm leading-5 font-semibold"
+                              data-slot="typography"
+                              data-variant="paragraph-small-bold"
+                            >
+                              Wrapped Ether
+                            </span>
+                            <span
+                              class="m-0 text-sm leading-5 font-normal block text-[var(--color-primary-light)]"
+                              data-slot="typography"
+                              data-variant="paragraph-small"
+                            >
+                              WETH
+                               •  
+                              Deposited
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-balance"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <p
+                          class="m-0 text-base leading-6 font-normal block w-full text-right"
+                          data-slot="typography"
+                          data-variant="paragraph"
+                        >
+                          1.5
+                           
+                          WETH
+                        </p>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-value"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="text-right"
+                        >
+                          <p
+                            class="m-0 text-base leading-6 font-normal"
+                            data-slot="typography"
+                            data-variant="paragraph"
+                          >
+                            <span
+                              class="whitespace-nowrap"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_1_"
+                            >
+                              <span
+                                aria-hidden="true"
+                              >
+                                $ 5,475
+                              </span>
+                              <span
+                                class="sr-only"
+                              >
+                                $ 5,475.00
+                              </span>
+                            </span>
+                          </p>
+                          <span
+                            class="m-0 text-xs leading-4 font-normal block"
+                            data-slot="typography"
+                            data-variant="paragraph-mini"
+                          >
+                            <span
+                              class="inline-flex w-fit items-center gap-1 whitespace-nowrap font-medium [&>svg]:size-3 [&>svg]:pointer-events-none text-foreground py-0.5 text-xs rounded-4xl bg-transparent px-0 pr-0 dark:bg-transparent"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_3_"
+                            >
+                              <mock-icon
+                                class="h-[6px] w-[9px] text-[var(--color-success-main)]"
+                              />
+                              <span
+                                class="text-[13px]"
+                              >
+                                2.50%
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors"
+                    data-slot="table-row"
+                    data-testid="table-row"
+                    tabindex="-1"
+                  >
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-name"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="flex items-center gap-2"
+                        >
+                          <div
+                            class="relative"
+                          >
+                            <iframe
+                              height="32"
+                              loading="lazy"
+                              referrerpolicy="strict-origin"
+                              sandbox="allow-scripts"
+                              srcdoc="
+    <body style="margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <img src="https://assets.coingecko.com/coins/images/6319/small/usdc.png" alt="App logo" height="32" width="auto" style="border-radius: 100%;" />
+      <script>
+        document.querySelector('img').onerror = (e) => {
+          e.target.onerror = null
+          e.target.src = "/images/common/token-placeholder.svg"
+        }
+      </script>
+    </body>
+  "
+                              style="pointer-events: none; border: 0px; display: block;"
+                              tabindex="-1"
+                              title="USDC"
+                              width="32"
+                            />
+                          </div>
+                          <div>
+                            <span
+                              class="m-0 text-sm leading-5 font-semibold"
+                              data-slot="typography"
+                              data-variant="paragraph-small-bold"
+                            >
+                              USD Coin
+                            </span>
+                            <span
+                              class="m-0 text-sm leading-5 font-normal block text-[var(--color-primary-light)]"
+                              data-slot="typography"
+                              data-variant="paragraph-small"
+                            >
+                              USDC
+                               •  
+                              Deposited
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-balance"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <p
+                          class="m-0 text-base leading-6 font-normal block w-full text-right"
+                          data-slot="typography"
+                          data-variant="paragraph"
+                        >
+                          10,000
+                           
+                          USDC
+                        </p>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-value"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="text-right"
+                        >
+                          <p
+                            class="m-0 text-base leading-6 font-normal"
+                            data-slot="typography"
+                            data-variant="paragraph"
+                          >
+                            <span
+                              class="whitespace-nowrap"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_5_"
+                            >
+                              <span
+                                aria-hidden="true"
+                              >
+                                $ 10,000
+                              </span>
+                              <span
+                                class="sr-only"
+                              >
+                                $ 10,000.00
+                              </span>
+                            </span>
+                          </p>
+                          <span
+                            class="m-0 text-xs leading-4 font-normal block"
+                            data-slot="typography"
+                            data-variant="paragraph-mini"
+                          >
+                            <span
+                              class="inline-flex w-fit items-center gap-1 whitespace-nowrap font-medium [&>svg]:size-3 [&>svg]:pointer-events-none text-foreground py-0.5 text-xs rounded-4xl bg-transparent px-0 pr-0 dark:bg-transparent"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_7_"
+                            >
+                              <mock-icon
+                                class="h-[6px] w-[9px] text-[var(--color-success-main)]"
+                              />
+                              <span
+                                class="text-[13px]"
+                              >
+                                0.01%
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors"
+                    data-slot="table-row"
+                    data-testid="table-row"
+                    tabindex="-1"
+                  >
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-name"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="flex items-center gap-2"
+                        >
+                          <div
+                            class="relative"
+                          >
+                            <iframe
+                              height="32"
+                              loading="lazy"
+                              referrerpolicy="strict-origin"
+                              sandbox="allow-scripts"
+                              srcdoc="
+    <body style="margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <img src="https://assets.coingecko.com/coins/images/9956/small/dai-multi-collateral-mcd.png" alt="App logo" height="32" width="auto" style="border-radius: 100%;" />
+      <script>
+        document.querySelector('img').onerror = (e) => {
+          e.target.onerror = null
+          e.target.src = "/images/common/token-placeholder.svg"
+        }
+      </script>
+    </body>
+  "
+                              style="pointer-events: none; border: 0px; display: block;"
+                              tabindex="-1"
+                              title="DAI"
+                              width="32"
+                            />
+                          </div>
+                          <div>
+                            <span
+                              class="m-0 text-sm leading-5 font-semibold"
+                              data-slot="typography"
+                              data-variant="paragraph-small-bold"
+                            >
+                              Dai Stablecoin
+                            </span>
+                            <span
+                              class="m-0 text-sm leading-5 font-normal block text-[var(--color-primary-light)]"
+                              data-slot="typography"
+                              data-variant="paragraph-small"
+                            >
+                              DAI
+                               •  
+                              Deposited
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-balance"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <p
+                          class="m-0 text-base leading-6 font-normal block w-full text-right"
+                          data-slot="typography"
+                          data-variant="paragraph"
+                        >
+                          5,000
+                           
+                          DAI
+                        </p>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-value"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="text-right"
+                        >
+                          <p
+                            class="m-0 text-base leading-6 font-normal"
+                            data-slot="typography"
+                            data-variant="paragraph"
+                          >
+                            <span
+                              class="whitespace-nowrap"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_9_"
+                            >
+                              <span
+                                aria-hidden="true"
+                              >
+                                $ 5,000
+                              </span>
+                              <span
+                                class="sr-only"
+                              >
+                                $ 5,000.00
+                              </span>
+                            </span>
+                          </p>
+                          <span
+                            class="m-0 text-xs leading-4 font-normal block"
+                            data-slot="typography"
+                            data-variant="paragraph-mini"
+                          >
+                            <span
+                              class="inline-flex w-fit items-center gap-1 whitespace-nowrap font-medium [&>svg]:size-3 [&>svg]:pointer-events-none text-destructive py-0.5 text-xs rounded-4xl bg-transparent px-0 pr-0 dark:bg-transparent"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_b_"
+                            >
+                              <mock-icon
+                                class="h-[6px] w-[9px] text-[var(--color-error-main)]"
+                              />
+                              <span
+                                class="text-[13px]"
+                              >
+                                0.02%
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors"
+                    data-slot="table-row"
+                    data-testid="table-row"
+                    tabindex="-1"
+                  >
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-name"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="flex items-center gap-2"
+                        >
+                          <div
+                            class="relative"
+                          >
+                            <iframe
+                              height="32"
+                              loading="lazy"
+                              referrerpolicy="strict-origin"
+                              sandbox="allow-scripts"
+                              srcdoc="
+    <body style="margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <img src="/images/common/token-placeholder.svg" alt="App logo" height="32" width="auto" style="border-radius: 100%;" />
+      <script>
+        document.querySelector('img').onerror = (e) => {
+          e.target.onerror = null
+          e.target.src = "/images/common/token-placeholder.svg"
+        }
+      </script>
+    </body>
+  "
+                              style="pointer-events: none; border: 0px; display: block;"
+                              tabindex="-1"
+                              title="UNK"
+                              width="32"
+                            />
+                          </div>
+                          <div>
+                            <span
+                              class="m-0 text-sm leading-5 font-semibold"
+                              data-slot="typography"
+                              data-variant="paragraph-small-bold"
+                            >
+                              Unknown Token
+                            </span>
+                            <span
+                              class="m-0 text-sm leading-5 font-normal block text-[var(--color-primary-light)]"
+                              data-slot="typography"
+                              data-variant="paragraph-small"
+                            >
+                              UNK
+                               •  
+                              Deposited
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-balance"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <p
+                          class="m-0 text-base leading-6 font-normal block w-full text-right"
+                          data-slot="typography"
+                          data-variant="paragraph"
+                        >
+                          1,000
+                           
+                          UNK
+                        </p>
+                      </div>
+                    </td>
+                    <td
+                      class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 first:pl-3"
+                      data-slot="table-cell"
+                      data-testid="table-cell-value"
+                    >
+                      <div
+                        class="overflow-hidden transition-all"
+                      >
+                        <div
+                          class="text-right"
+                        >
+                          <p
+                            class="m-0 text-base leading-6 font-normal"
+                            data-slot="typography"
+                            data-variant="paragraph"
+                          >
+                            <span
+                              class="whitespace-nowrap"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_d_"
+                            >
+                              <span
+                                aria-hidden="true"
+                              >
+                                $ 2,500
+                              </span>
+                              <span
+                                class="sr-only"
+                              >
+                                $ 2,500.00
+                              </span>
+                            </span>
+                          </p>
+                          <span
+                            class="m-0 text-xs leading-4 font-normal block"
+                            data-slot="typography"
+                            data-variant="paragraph-mini"
+                          >
+                            <span
+                              class="inline-flex w-fit items-center gap-1 whitespace-nowrap font-medium [&>svg]:size-3 [&>svg]:pointer-events-none text-foreground py-0.5 text-xs rounded-4xl bg-transparent px-0 pr-0 dark:bg-transparent"
+                              data-slot="tooltip-trigger"
+                              id="base-ui-_r_f_"
+                            >
+                              <mock-icon
+                                class="h-[6px] w-[9px] text-[var(--color-success-main)]"
+                              />
+                              <span
+                                class="text-[13px]"
+                              >
+                                1.23%
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

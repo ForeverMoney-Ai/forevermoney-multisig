@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ChangeThreshold should display the ChangeThreshold component with the new threshold range 1`] = `
+<div>
+  <div>
+    <span
+      class="m-0 text-sm leading-5 font-normal block text-muted-foreground mb-1"
+      data-slot="typography"
+      data-variant="paragraph-small"
+    >
+      Any transaction will require the confirmation of:
+    </span>
+    <p
+      aria-label="threshold"
+      class="m-0 text-base leading-6 font-normal"
+      data-slot="typography"
+      data-variant="paragraph"
+    >
+      <b>
+        3
+      </b>
+       out of
+       
+      <b>
+        1
+         signer
+      </b>
+    </p>
+  </div>
+  <div
+    class="my-2"
+  >
+    <div
+      aria-orientation="horizontal"
+      class="bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=vertical]:w-px data-[orientation=vertical]:self-stretch data-[orientation=horizontal]:-mx-6 data-[orientation=horizontal]:w-[calc(100%+(2*(var(--spacing)*6)))]"
+      data-orientation="horizontal"
+      data-slot="separator"
+      role="separator"
+    />
+  </div>
+</div>
+`;

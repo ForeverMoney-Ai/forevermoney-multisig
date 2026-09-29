@@ -1,0 +1,142 @@
+import memoize from 'lodash/memoize'
+
+const locale = typeof navigator !== 'undefined' ? navigator.language : undefined
+
+const _getNumberFormatter = (maximumFractionDigits?: number, compact?: boolean) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'decimal',
+    maximumFractionDigits,
+    notation: compact ? 'compact' : 'standard',
+  })
+}
+const getNumberFormatter = memoize(_getNumberFormatter, (...args: Parameters<typeof _getNumberFormatter>) =>
+  args.join(''),
+)
+
+const _getCurrencyFormatter = (
+  currency: string,
+  compact?: boolean,
+  maximumFractionDigits?: number,
+  minimumFractionDigits?: number,
+) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    currencyDisplay: 'narrowSymbol',
+    maximumFractionDigits,
+    minimumFractionDigits,
+    notation: compact ? 'compact' : 'standard',
+  })
+}
+const getCurrencyFormatter = memoize(_getCurrencyFormatter, (...args: Parameters<typeof _getCurrencyFormatter>) =>
+  args.join(''),
+)
+
+export const getLocalDecimalSeparator = (): string => {
+  const sampleNumber = 1.1
+  const numberWithSeparatorFormatted = new Intl.NumberFormat(locale).format(sampleNumber)
+  const separator = numberWithSeparatorFormatted.replace(/\p{Number}/gu, '')[0]
+
+  return separator
+}
+
+/**
+ * Intl.NumberFormat number formatter that adheres to our style guide
+ * @param number Number to format
+ */
+export const formatAmount = (number: string | number, precision = 5, maxLength = 6): string => {
+  const float = Number(number)
+  if (float === 0) return '0'
+  if (float === Math.round(float)) precision = 0
+  if (Math.abs(float) < 0.00001) return '< 0.00001'
+
+  const fullNum = getNumberFormatter(precision).format(float)
+
+  // +3 for the decimal point and the two decimal places
+  if (fullNum.length <= maxLength + 3) return fullNum
+
+  return getNumberFormatter(2, true).format(float)
+}
+
+/**
+ * Returns a formatted number with a defined precision not adhering to our style guide compact notation
+ * @param number Number to format
+ * @param precision Fraction digits to show
+ */
+// A string that `Intl.NumberFormat.format` can consume while preserving full precision.
+const isNumericString = (value: string): value is `${number}` => value.trim() !== '' && !Number.isNaN(Number(value))
+
+export const formatAmountPrecise = (number: string | number, precision?: number): string => {
+  const formatter = getNumberFormatter(precision)
+  // Pass the numeric string straight to Intl to keep full precision — converting to a JS
+  // number first (float64) loses digits beyond ~15 significant figures, e.g.
+  // 0.016000000000020475 would render as 0.016000000000020474.
+  if (typeof number === 'number' || isNumericString(number)) {
+    return formatter.format(number)
+  }
+
+  return NaN.toString()
+}
+
+/**
+ * Currency formatter that appends the currency code
+ * @param number Number to format
+ * @param currency ISO 4217 currency code
+ */
+export const formatCurrency = (number: string | number, currency: string, maxLength = 6): string => {
+  const float = Number(number)
+
+  let result = getCurrencyFormatter(currency, false, Math.abs(float) >= 1 || float === 0 ? 0 : 2).format(float)
+
+  // +1 for the currency symbol
+  if (result.length > maxLength + 1) {
+    result = getCurrencyFormatter(currency, true, 2).format(float)
+  }
+
+  return result.replace(/^(\D+)/, '$1 ')
+}
+
+// Crypto codes need more decimals than the 2-digit fiat default — a 0.0001 ETH
+// fee is meaningful and shouldn't collapse to "< 0.01".
+const CRYPTO_CURRENCIES = new Set(['BTC', 'ETH'])
+const getPrecision = (currency: string) => (CRYPTO_CURRENCIES.has(currency.toUpperCase()) ? 6 : 2)
+
+/**
+ * Currency formatter for small fees: forces fixed precision and shows
+ * "< {currency}{min}" when the value rounds to zero (e.g. "< $0.01", "< Ξ0.000001").
+ */
+export const formatCurrencyMinimal = (number: string | number, currency: string): string => {
+  const float = Number(number)
+  const precision = getPrecision(currency)
+  const min = Math.pow(10, -precision)
+  if (float > 0 && float < min / 2) {
+    return `< ${formatCurrencyPrecise(min, currency)}`
+  }
+  return formatCurrencyPrecise(number, currency)
+}
+
+export const formatCurrencyPrecise = (number: string | number, currency: string): string => {
+  const precision = getPrecision(currency)
+  const result = getCurrencyFormatter(currency, false, precision, precision).format(Number(number))
+  return result.replace(/^(\D+)/, '$1 ')
+}
+
+/**
+ * Safely compute the ratio `balance / total`.
+ *
+ * @param balance  The asset’s fiat balance
+ * @param total    The overall fiat total
+ * @returns A number between 0 and 1.  Returns 0 when the inputs are non-numeric, Infinity, or when total ≤ 0.
+ */
+export function percentageOfTotal(balance: number | string, total: number | string): number {
+  const totalNum = Number(total)
+  const balanceNum = Number(balance)
+
+  // invalid, zero or negative totals → return 0 to avoid division by 0/−n
+  if (!Number.isFinite(totalNum) || totalNum <= 0) return 0
+
+  // invalid balances → treat as 0 so the overall percentage still works
+  if (!Number.isFinite(balanceNum)) return 0
+
+  return balanceNum / totalNum
+}

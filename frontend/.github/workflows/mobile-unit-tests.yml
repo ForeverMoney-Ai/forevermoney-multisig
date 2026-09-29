@@ -1,0 +1,65 @@
+name: Mobile Tests and Coverage
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - apps/mobile/**
+      - packages/**
+      - yarn.lock
+      - package.json
+      - .yarnrc.yml
+      - .yarn/patches/**
+  pull_request:
+    paths:
+      - apps/mobile/**
+      - packages/**
+      - .github/workflows/mobile-unit-tests.yml
+      - yarn.lock
+      - package.json
+      - .yarnrc.yml
+      - .yarn/patches/**
+
+jobs:
+  test-and-coverage:
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ./.github/actions/yarn
+        with:
+          after-install: 'false'
+
+      # Run tests with coverage
+      - name: Run Jest tests with coverage
+        run: |
+          yarn workspace @safe-global/mobile test:coverage \
+            --coverageReporters=text \
+            --coverageReporters=json-summary \
+            --coverageReporters=lcov \
+            | tee ./coverage.txt && exit ${PIPESTATUS[0]}
+
+      - name: Jest Coverage Comment
+        uses: MishaKav/jest-coverage-comment@642ef024cc554a34b7082cea12c7bf63575ae151 # v1.0.36
+        with:
+          coverage-summary-path: ./coverage/coverage-summary.json
+          coverage-title: Coverage
+          coverage-path: ./coverage.txt
+
+      - name: Upload coverage to Datadog
+        if: success() && github.event_name == 'push'
+        uses: ./.github/actions/upload-coverage
+        with:
+          api-key: ${{ secrets.DATADOG_API_KEY }}
+          site: datadoghq.eu
+          coverage-path: apps/mobile/coverage
+          base-path: apps/mobile
+          flag: workspace:mobile

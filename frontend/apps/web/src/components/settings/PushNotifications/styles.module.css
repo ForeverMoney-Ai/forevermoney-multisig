@@ -1,0 +1,13 @@
+.item {
+  padding-left: var(--space-1);
+}
+
+.icon {
+  min-width: 38px;
+}
+
+.globalInfo {
+  border-radius: var(--radius-md);
+  background-color: var(--color-secondary-background);
+  padding: var(--space-2);
+}

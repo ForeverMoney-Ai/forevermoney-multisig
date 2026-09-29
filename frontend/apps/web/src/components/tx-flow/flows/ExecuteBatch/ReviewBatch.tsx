@@ -1,0 +1,269 @@
+import useWallet from '@/hooks/wallets/useWallet'
+import { Spinner } from '@/components/ui/spinner'
+import { Typography } from '@/components/ui/typography'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Alert } from '@/components/ui/alert'
+import useAsync from '@safe-global/utils/hooks/useAsync'
+import { useCurrentChain } from '@/hooks/useChains'
+import useSafeInfo from '@/hooks/useSafeInfo'
+import { encodeMultiSendData } from '@safe-global/protocol-kit'
+import { useState, useMemo, useContext, useCallback } from 'react'
+import type { SyntheticEvent } from 'react'
+import TxCheckError from '@/components/tx/TxCheckError'
+import TxSubmitError from '@/components/tx/TxSubmitError'
+import { ExecutionMethod, ExecutionMethodSelector } from '@/components/tx/ExecutionMethodSelector'
+import DecodedTxs from '@/components/tx-flow/flows/ExecuteBatch/DecodedTxs'
+import { useRelaysBySafe } from '@/hooks/useRemainingRelays'
+import useOnboard from '@/hooks/wallets/useOnboard'
+import { logError, Errors } from '@/services/exceptions'
+import { createMultiSendCallOnlyTx, dispatchBatchExecution, dispatchBatchExecutionRelay } from '@/services/tx/tx-sender'
+import { hasRemainingRelays } from '@/utils/relaying'
+import { getMultiSendTxs } from '@/utils/transactions'
+import TxCard, { TxCardActions } from '../../common/TxCard'
+import CheckWallet from '@/components/common/CheckWallet'
+import type { ExecuteBatchFlowProps } from '.'
+import { asError } from '@safe-global/utils/services/exceptions/utils'
+import SendToBlock from '@/components/tx/SendToBlock'
+import ConfirmationTitle, { ConfirmationTitleTypes } from '@/components/tx/shared/ConfirmationTitle'
+import { TxModalContext } from '@/components/tx-flow'
+import useGasPrice from '@/hooks/useGasPrice'
+import type { Overrides } from 'ethers'
+import { trackEvent, MixpanelEventParams } from '@/services/analytics'
+import { TX_EVENTS, TX_TYPES } from '@/services/analytics/events/transactions'
+import { isWalletRejection } from '@/utils/wallets'
+import WalletRejectionError from '@/components/tx/shared/errors/WalletRejectionError'
+import useUserNonce from '@/components/tx/AdvancedParams/useUserNonce'
+import { HexEncodedData } from '@/components/transactions/HexEncodedData'
+import { useTransactionsGetMultipleTransactionDetailsQuery } from '@safe-global/store/gateway/transactions'
+import NetworkWarning from '@/components/new-safe/create/NetworkWarning'
+import { FEATURES, getLatestSafeVersion, hasFeature } from '@safe-global/utils/utils/chains'
+import { useSafeShield, useSafeShieldForTxData } from '@/features/safe-shield/SafeShieldContext'
+import type { SafeTransaction } from '@safe-global/types-kit'
+import { fetchRecommendedParams } from '@/services/tx/tx-sender/recommendedNonce'
+import { useMultiSendContract } from './useMultiSendContract'
+
+/**
+ * Build gas overrides for batch execution based on chain EIP-1559 support
+ */
+const buildGasOverrides = (
+  isEIP1559: boolean,
+  maxFeePerGas: bigint | null | undefined,
+  maxPriorityFeePerGas: bigint | null | undefined,
+  userNonce: number,
+): Overrides & { nonce: number } => {
+  const gasOverrides: Overrides = isEIP1559
+    ? { maxFeePerGas: maxFeePerGas?.toString(), maxPriorityFeePerGas: maxPriorityFeePerGas?.toString() }
+    : { gasPrice: maxFeePerGas?.toString() }
+
+  return { ...gasOverrides, nonce: userNonce }
+}
+
+const BatchErrorMessages = ({
+  estimationError,
+  submitError,
+  isRejectedByUser,
+}: {
+  estimationError: unknown
+  submitError: Error | undefined
+  isRejectedByUser: Boolean
+}) => (
+  <>
+    {estimationError && <TxCheckError error={asError(estimationError)} context="estimation" />}
+    {submitError && <TxSubmitError error={submitError} context="execution" />}
+    {isRejectedByUser && <WalletRejectionError />}
+  </>
+)
+
+export const ReviewBatch = ({ params }: { params: ExecuteBatchFlowProps }) => {
+  const [isSubmittable, setIsSubmittable] = useState<boolean>(true)
+  const [submitError, setSubmitError] = useState<Error | undefined>()
+  const [isRejectedByUser, setIsRejectedByUser] = useState<Boolean>(false)
+  const [executionMethod, setExecutionMethod] = useState(ExecutionMethod.RELAY)
+  const chain = useCurrentChain()
+  const { safe } = useSafeInfo()
+  const [relays] = useRelaysBySafe()
+  const { setTxFlow } = useContext(TxModalContext)
+  const [gasPrice] = useGasPrice()
+  const userNonce = useUserNonce()
+  const latestSafeVersion = getLatestSafeVersion(chain)
+  const onboard = useOnboard()
+  const wallet = useWallet()
+
+  // Chain has relaying feature and available relays
+  const canRelay = hasRemainingRelays(relays)
+  const willRelay = canRelay && executionMethod === ExecutionMethod.RELAY
+
+  // EIP-1559 gas pricing support
+  const isEIP1559 = Boolean(chain && hasFeature(chain, FEATURES.EIP1559))
+
+  // Safe Shield - check if risk confirmation is needed (includes untrusted Safe)
+  const { needsRiskConfirmation, isRiskConfirmed } = useSafeShield()
+  const isUntrustedSafeBlocked = needsRiskConfirmation && !isRiskConfirmed
+
+  const {
+    data: txsWithDetails,
+    error,
+    isLoading: loading,
+  } = useTransactionsGetMultipleTransactionDetailsQuery(
+    {
+      chainId: chain?.chainId || '',
+      txIds: params.txs.map((tx) => tx.transaction.id),
+    },
+    {
+      skip: !chain?.chainId || !params.txs.length,
+    },
+  )
+
+  const { multiSendContract, multiSendContractAddress } = useMultiSendContract(safe)
+
+  const [multiSendTxs] = useAsync(async () => {
+    if (!txsWithDetails || !chain || !safe.version) return
+    return getMultiSendTxs(txsWithDetails, chain, safe.address.value, safe.version)
+  }, [chain, safe.address.value, safe.version, txsWithDetails])
+
+  const multiSendTxData = useMemo(() => {
+    if (!txsWithDetails || !multiSendTxs) return
+    return encodeMultiSendData(multiSendTxs) as `0x${string}`
+  }, [txsWithDetails, multiSendTxs])
+
+  const onExecute = useCallback(async () => {
+    if (!userNonce || !onboard || !wallet || !multiSendTxData || !multiSendContract || !txsWithDetails || !gasPrice)
+      return
+
+    const overrides = buildGasOverrides(isEIP1559, gasPrice.maxFeePerGas, gasPrice.maxPriorityFeePerGas, userNonce)
+
+    await dispatchBatchExecution(
+      txsWithDetails,
+      multiSendContract,
+      multiSendTxData,
+      wallet.provider,
+      safe.chainId,
+      wallet.address,
+      safe.address.value,
+      overrides,
+      safe.nonce,
+    )
+  }, [userNonce, onboard, wallet, multiSendTxData, multiSendContract, txsWithDetails, gasPrice, isEIP1559, safe])
+
+  const [safeTx] = useAsync<SafeTransaction | undefined>(async () => {
+    const safeTx = multiSendTxs ? await createMultiSendCallOnlyTx(multiSendTxs) : undefined
+
+    if (safeTx) {
+      // For simulation purposes, we need to estimate gas even if the Safe version doesn't require it
+      const { safeTxGas } = await fetchRecommendedParams(safe.chainId, safe.address.value, safeTx.data)
+      safeTx.data.safeTxGas = safeTxGas
+    }
+
+    return safeTx
+  }, [multiSendTxs, safe.chainId, safe.address.value])
+
+  useSafeShieldForTxData(safeTx)
+
+  const onRelay = async () => {
+    if (!multiSendTxData || !multiSendContract || !txsWithDetails) return
+
+    await dispatchBatchExecutionRelay(
+      txsWithDetails,
+      multiSendContract,
+      multiSendTxData,
+      safe.chainId,
+      safe.address.value,
+      safe.version ?? latestSafeVersion,
+    )
+  }
+
+  const handleSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault()
+    setIsSubmittable(false)
+    setSubmitError(undefined)
+    setIsRejectedByUser(false)
+
+    try {
+      await (willRelay ? onRelay() : onExecute())
+      setTxFlow(undefined)
+    } catch (_err) {
+      const err = asError(_err)
+      if (isWalletRejection(err)) {
+        setIsRejectedByUser(true)
+      } else {
+        logError(Errors._804, err)
+        setSubmitError(err)
+      }
+
+      setIsSubmittable(true)
+      return
+    }
+
+    trackEvent(
+      { ...TX_EVENTS.EXECUTE, label: TX_TYPES.bulk_execute },
+      {
+        [MixpanelEventParams.TRANSACTION_TYPE]: TX_TYPES.bulk_execute,
+        [MixpanelEventParams.THRESHOLD]: safe.threshold,
+      },
+    )
+  }
+
+  const submitDisabled = loading || !isSubmittable || !gasPrice || isUntrustedSafeBlocked
+
+  return (
+    <>
+      <TxCard>
+        <Typography variant="paragraph-small" className="block">
+          This transaction batches a total of {params.txs.length} transactions from your queue into a single Ethereum
+          transaction. Please check every included transaction carefully, especially if you have rejection transactions,
+          and make sure you want to execute all of them. Included transactions are highlighted when you hover over the
+          execute button.
+        </Typography>
+
+        {multiSendContract && <SendToBlock address={multiSendContractAddress} title="Interact with" />}
+
+        {multiSendTxData && <HexEncodedData title="Data" hexData={multiSendTxData} />}
+
+        <div>
+          <DecodedTxs txs={txsWithDetails} />
+        </div>
+
+        <Separator bleed="6" className="mt-4" />
+
+        <ConfirmationTitle variant={ConfirmationTitleTypes.execute} />
+
+        <NetworkWarning />
+
+        {canRelay ? (
+          <>
+            <ExecutionMethodSelector
+              executionMethod={executionMethod}
+              setExecutionMethod={setExecutionMethod}
+              relays={relays}
+              tooltip="You can only relay multisend transactions containing executions from the same Multi-sig account."
+            />
+          </>
+        ) : null}
+
+        <Alert variant="warning" outlined={false}>
+          Be aware that if any of the included transactions revert, none of them will be executed. This will result in
+          the loss of the allocated transaction fees.
+        </Alert>
+
+        <BatchErrorMessages estimationError={error} submitError={submitError} isRejectedByUser={isRejectedByUser} />
+
+        <div>
+          <div className="pt-4">
+            <Separator bleed="6" />
+          </div>
+
+          <TxCardActions>
+            <CheckWallet allowNonOwner={true} checkNetwork>
+              {(isOk) => (
+                <Button type="submit" size="submit" disabled={!isOk || submitDisabled} onClick={handleSubmit}>
+                  {!isSubmittable ? <Spinner className="size-5" /> : 'Submit'}
+                </Button>
+              )}
+            </CheckWallet>
+          </TxCardActions>
+        </div>
+      </TxCard>
+    </>
+  )
+}

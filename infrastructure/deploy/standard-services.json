@@ -1,0 +1,465 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "standard-worker-runtime",
+        "namespace": "bittensor-safe"
+      },
+      "data": {
+        "standard-worker.py": "\"\"\"RPC pacing for the unmodified upstream Celery tasks; no indexing logic here.\"\"\"\nfrom gevent import monkey\nmonkey.patch_all()\nimport os\nimport requests\nfrom gevent import sleep\nfrom gevent.lock import Semaphore\nfrom pacer import RpcPacer\n\npacer = RpcPacer(requests.Session.send, Semaphore(), sleep=sleep,\n                 interval=float(os.environ.get('RPC_INTERVAL_SECONDS', '5')))\nrequests.Session.send = lambda session, request, **kwargs: pacer(session, request, **kwargs)\n\nos.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.production')\nimport django\ndjango.setup()\nfrom django.core.management import call_command\ncall_command('check_chainid_matches')\nfrom safe_transaction_service.history.indexers import SafeEventsIndexerProvider, Erc20EventsIndexerProvider\n# Paid historical worker uses upstream adaptive windows: shrink on errors and\n# recover after fast successful reads. Live worker retains its existing setting.\nfor provider in (SafeEventsIndexerProvider, Erc20EventsIndexerProvider):\n    provider().block_auto_process_limit = os.environ.get('RPC_ADAPTIVE_WINDOWS', '0') == '1'\nfrom config.celery_app import app\napp.worker_main(['worker', '--pool=gevent', '--loglevel=info', '--concurrency='+os.environ.get('CELERYD_CONCURRENCY','3'),\n                 '--prefetch-multiplier=1', '--without-heartbeat', '--without-gossip',\n                 '--without-mingle', '-E', '-Q', os.environ['WORKER_QUEUES']])\n",
+        "pacer.py": "\"\"\"Bounded governance history backfill with request-level RPC throttling.\"\"\"\nimport json\nimport time\nfrom urllib.parse import urlsplit\n\n\nclass RpcPacer:\n    def __init__(self, send, lock, sleep=time.sleep, clock=time.monotonic, interval=15):\n        self.send, self.lock, self.sleep, self.clock = send, lock, sleep, clock\n        self.interval, self.next_request = interval, 0\n\n    def __call__(self, session, request, **kwargs):\n        # Pace either supported archive provider; never pace unrelated services.\n        host = urlsplit(request.url).hostname or ''\n        if not (host.endswith('.onfinality.io') or host == 'archive.chain.opentensor.ai'):\n            return self.send(session, request, **kwargs)\n        with self.lock:\n            try:\n                payload = json.loads(request.body or '{}')\n                weight = max(1, len(payload)) if isinstance(payload, list) else 1\n            except (ValueError, TypeError):\n                weight = 1\n            for attempt in range(5):\n                self.sleep(max(0, self.next_request - self.clock()))\n                self.next_request = self.clock() + self.interval * weight\n                response = self.send(session, request, **kwargs)\n                limited = response.status_code == 429\n                if response.status_code == 200:\n                    try:\n                        data = response.json()\n                        entries = data if isinstance(data, list) else [data]\n                        limited = any(isinstance(e, dict) and e.get('error', {}).get('code') in (-32029, -32004) for e in entries)\n                    except ValueError:\n                        pass\n                if not limited:\n                    return response\n                try:\n                    retry_after = float(response.headers.get('Retry-After', 0))\n                except (ValueError, TypeError):\n                    retry_after = 0\n                delay = max(120 * 2 ** attempt, retry_after)\n                response.close()\n                self.next_request = max(self.next_request, self.clock() + delay)\n                print('RPC_RATE_LIMIT wait_seconds=', delay, 'attempt=', attempt + 1, flush=True)\n            raise RuntimeError('Archive RPC remains rate limited; stopping without skipping history')\n\n"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "txs",
+        "namespace": "bittensor-safe",
+        "labels": {
+          "app.kubernetes.io/part-of": "bittensor-safe"
+        }
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "txs"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "txs"
+            }
+          },
+          "spec": {
+            "enableServiceLinks": false,
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "name": "txs",
+                "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "768Mi"
+                  }
+                },
+                "ports": [
+                  {
+                    "containerPort": 8888
+                  }
+                ],
+                "command": [
+                  "gunicorn",
+                  "--config",
+                  "gunicorn.conf.py",
+                  "--bind",
+                  "0.0.0.0:8888",
+                  "config.wsgi:application"
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "txs"
+                    }
+                  },
+                  {
+                    "secretRef": {
+                      "name": "txs"
+                    }
+                  }
+                ],
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": 8888
+                  },
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 10
+                },
+                "env": [
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT",
+                    "value": "1000"
+                  },
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX",
+                    "value": "1000"
+                  },
+                  {
+                    "name": "ETH_EVENTS_GET_LOGS_CONCURRENCY",
+                    "value": "1"
+                  },
+                  {
+                    "name": "RUN_MIGRATIONS",
+                    "value": "0"
+                  },
+                  {
+                    "name": "ETHEREUM_NODE_URL",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "archive-rpc",
+                        "key": "ETHEREUM_NODE_URL"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "worker",
+        "namespace": "bittensor-safe",
+        "labels": {
+          "app.kubernetes.io/part-of": "bittensor-safe"
+        }
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "worker"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "worker"
+            },
+            "annotations": {
+              "checksum/runtime": "ef5d84f896a05a707d5ad5132569887544cfb524c76f50a316a2c93f59214d40"
+            }
+          },
+          "spec": {
+            "enableServiceLinks": false,
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "name": "worker",
+                "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "512Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "1Gi"
+                  }
+                },
+                "command": [
+                  "python",
+                  "/runtime/standard-worker.py"
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "txs"
+                    }
+                  },
+                  {
+                    "secretRef": {
+                      "name": "txs"
+                    }
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "RUN_MIGRATIONS",
+                    "value": "0"
+                  },
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT",
+                    "value": "500"
+                  },
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX",
+                    "value": "500"
+                  },
+                  {
+                    "name": "ETH_EVENTS_GET_LOGS_CONCURRENCY",
+                    "value": "1"
+                  },
+                  {
+                    "name": "ETHEREUM_NODE_URL",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "archive-rpc",
+                        "key": "ETHEREUM_NODE_URL"
+                      }
+                    }
+                  },
+                  {
+                    "name": "WORKER_QUEUES",
+                    "value": "indexing"
+                  },
+                  {
+                    "name": "RPC_INTERVAL_SECONDS",
+                    "value": "0.1"
+                  },
+                  {
+                    "name": "RPC_ADAPTIVE_WINDOWS",
+                    "value": "1"
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "runtime",
+                    "mountPath": "/runtime",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "runtime",
+                "configMap": {
+                  "name": "standard-worker-runtime"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "worker-live",
+        "namespace": "bittensor-safe",
+        "labels": {
+          "app.kubernetes.io/part-of": "bittensor-safe"
+        }
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "worker-live"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "worker-live"
+            },
+            "annotations": {
+              "checksum/runtime": "ef5d84f896a05a707d5ad5132569887544cfb524c76f50a316a2c93f59214d40"
+            }
+          },
+          "spec": {
+            "enableServiceLinks": false,
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "name": "worker",
+                "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "512Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "1Gi"
+                  }
+                },
+                "command": [
+                  "python",
+                  "/runtime/standard-worker.py"
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "txs"
+                    }
+                  },
+                  {
+                    "secretRef": {
+                      "name": "txs"
+                    }
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "RUN_MIGRATIONS",
+                    "value": "0"
+                  },
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT",
+                    "value": "1000"
+                  },
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX",
+                    "value": "1000"
+                  },
+                  {
+                    "name": "ETH_EVENTS_GET_LOGS_CONCURRENCY",
+                    "value": "1"
+                  },
+                  {
+                    "name": "ETHEREUM_NODE_URL",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "archive-rpc",
+                        "key": "ETHEREUM_NODE_URL"
+                      }
+                    }
+                  },
+                  {
+                    "name": "WORKER_QUEUES",
+                    "value": "live-indexing,default,processing,contracts,tokens,notifications,webhooks"
+                  },
+                  {
+                    "name": "RPC_INTERVAL_SECONDS",
+                    "value": "1"
+                  },
+                  {
+                    "name": "RPC_ADAPTIVE_WINDOWS",
+                    "value": "0"
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "runtime",
+                    "mountPath": "/runtime",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "runtime",
+                "configMap": {
+                  "name": "standard-worker-runtime"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "scheduler",
+        "namespace": "bittensor-safe",
+        "labels": {
+          "app.kubernetes.io/part-of": "bittensor-safe"
+        }
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "scheduler"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "scheduler"
+            }
+          },
+          "spec": {
+            "enableServiceLinks": false,
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "name": "scheduler",
+                "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "384Mi"
+                  }
+                },
+                "command": [
+                  "docker/web/celery/scheduler/run.sh"
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "txs"
+                    }
+                  },
+                  {
+                    "secretRef": {
+                      "name": "txs"
+                    }
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT",
+                    "value": "1000"
+                  },
+                  {
+                    "name": "ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX",
+                    "value": "1000"
+                  },
+                  {
+                    "name": "ETH_EVENTS_GET_LOGS_CONCURRENCY",
+                    "value": "1"
+                  },
+                  {
+                    "name": "RUN_MIGRATIONS",
+                    "value": "0"
+                  },
+                  {
+                    "name": "ETHEREUM_NODE_URL",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "archive-rpc",
+                        "key": "ETHEREUM_NODE_URL"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

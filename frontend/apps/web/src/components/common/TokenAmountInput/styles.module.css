@@ -1,0 +1,12 @@
+/* The field itself is a standard NumberField (label + InputGroup + inline-end adornment).
+   The embedded token select uses the standard SelectTrigger styling (bordered core variant). */
+
+.select {
+  flex-shrink: 0;
+}
+
+.fiatDisplay {
+  padding-left: var(--space-1);
+  padding-top: var(--space-1);
+  min-height: var(--space-2);
+}

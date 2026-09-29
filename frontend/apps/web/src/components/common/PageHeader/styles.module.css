@@ -1,0 +1,92 @@
+.container {
+  padding: var(--space-4) var(--space-3) 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Opaque page background: the header is sticky, so scrolling content must not bleed through. */
+  background-color: var(--color-background-main);
+  z-index: 2;
+  width: 100%;
+  position: sticky !important;
+  top: var(--page-header-top);
+}
+
+/* Breathing room between the tabs and the content passing under them once the header is pinned.
+   Out of flow and no taller than `main`'s own top padding, so at rest it covers nothing but page
+   background and the tabs stay flush with the content. */
+.container::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--space-2);
+  background-color: inherit;
+  pointer-events: none;
+}
+
+/* In dark mode the page background is black (var(--background), set on .mainSpace),
+   so match it here — otherwise the header's opaque sticky background shows as a
+   lighter strip behind the tabs even when it isn't pinned. */
+[data-theme='dark'] .container {
+  background-color: var(--background);
+}
+
+.title {
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+
+.border {
+  border-bottom: 1px solid var(--border);
+}
+
+.pageHeader,
+.actionsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.pageHeader {
+  row-gap: var(--space-3);
+}
+
+.navWrapper {
+  min-width: 0;
+}
+
+.actionsWrapper {
+  gap: var(--space-2);
+}
+
+@media (max-width: 599.95px) {
+  .container {
+    padding: var(--space-3) var(--space-2) 0;
+  }
+
+  .border {
+    border: 0;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .navWrapper {
+    border-bottom: 1px solid var(--border);
+    margin-left: calc(var(--space-2) * -1);
+    padding-left: var(--space-2);
+    margin-right: calc(var(--space-2) * -1);
+    padding-right: var(--space-2);
+    align-self: stretch;
+  }
+
+  .actionsWrapper {
+    padding-bottom: var(--space-2);
+    display: contents;
+  }
+}

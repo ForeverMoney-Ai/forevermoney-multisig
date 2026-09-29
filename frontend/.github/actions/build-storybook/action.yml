@@ -1,0 +1,10 @@
+name: 'Build Storybook'
+
+description: 'Build the storybook'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build Storybook
+      shell: bash
+      run: yarn workspace @safe-global/web build-storybook -o ./out/storybook

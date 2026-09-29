@@ -1,0 +1,51 @@
+import { useContext, type ReactElement } from 'react'
+
+import EthHashInfo from '@/components/common/EthHashInfo'
+import TxCard, { TxCardActions } from '../../common/TxCard'
+import type { RecoveryFlowProps } from '.'
+
+import { TxFlowContext } from '../../TxFlowProvider'
+import { Typography } from '@/components/ui/typography'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+
+export function RemoveRecoveryFlowOverview({ delayModifier }: RecoveryFlowProps): ReactElement {
+  const { onNext } = useContext(TxFlowContext)
+  return (
+    <TxCard>
+      <Typography variant="paragraph-small" className="block">
+        This transaction will remove the recovery module from your Multi-sig account. You will no longer be able to recover
+        your Multi-sig account.
+      </Typography>
+
+      <Typography variant="paragraph-small" className="block">
+        This Recoverer will not be able to initiate the recovery process once this transaction is executed.
+      </Typography>
+
+      <div data-testid="remove-recoverer-section">
+        <Typography variant="paragraph-small" className="mb-2 block text-[var(--color-text-secondary)]">
+          Removing Recoverer
+        </Typography>
+
+        {delayModifier.recoverers.map((recoverer) => (
+          <EthHashInfo
+            avatarSize={32}
+            key={recoverer}
+            shortAddress={false}
+            address={recoverer}
+            hasExplorer
+            showCopyButton
+          />
+        ))}
+      </div>
+
+      <Separator bleed="6" />
+
+      <TxCardActions className="!mt-0">
+        <Button data-testid="next-btn" variant="default" onClick={onNext}>
+          Next
+        </Button>
+      </TxCardActions>
+    </TxCard>
+  )
+}

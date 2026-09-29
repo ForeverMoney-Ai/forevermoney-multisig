@@ -1,0 +1,90 @@
+import { selectUndeployedSafe } from '@/features/counterfactual/store'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import useSafeInfo from '@/hooks/useSafeInfo'
+import { initSafeSDK, setSafeSDK } from '@/hooks/coreSDK/safeCoreSDK'
+import { trackError } from '@/services/exceptions'
+import ErrorCodes from '@safe-global/utils/services/exceptions/ErrorCodes'
+import { useAppDispatch, useAppSelector } from '@/store'
+import { showNotification } from '@/store/notificationsSlice'
+import { useWeb3ReadOnly } from '@/hooks/wallets/web3ReadOnly'
+import { getRpcErrorContext } from '@/hooks/wallets/rpcEndpointInfo'
+import { parsePrefixedAddress, sameAddress } from '@safe-global/utils/utils/addresses'
+import { asError } from '@safe-global/utils/services/exceptions/utils'
+import { useChain } from '@/hooks/useChains'
+
+export const useInitSafeCoreSDK = () => {
+  const { safe, safeLoaded } = useSafeInfo()
+  const dispatch = useAppDispatch()
+  const web3ReadOnly = useWeb3ReadOnly()
+  const chain = useChain(safe.chainId)
+
+  const { query } = useRouter()
+  const prefixedAddress = Array.isArray(query.safe) ? query.safe[0] : query.safe
+  const { address } = parsePrefixedAddress(prefixedAddress || '')
+  const undeployedSafe = useAppSelector((state) => selectUndeployedSafe(state, safe.chainId, address))
+
+  useEffect(() => {
+    if (!safeLoaded || !web3ReadOnly || !sameAddress(address, safe.address.value)) {
+      // If we don't reset the SDK, a previous Safe could remain in the store
+      setSafeSDK(undefined)
+      return
+    }
+
+    // Runs can overlap and settle out of order, so a superseded one must not
+    // write to the store — see the mobile twin of this hook.
+    let cancelled = false
+
+    // A read-only instance of the SDK is sufficient because we connect the signer to it when needed
+    initSafeSDK({
+      provider: web3ReadOnly,
+      chainId: safe.chainId,
+      address: safe.address.value,
+      version: safe.version,
+      implementationVersionState: safe.implementationVersionState,
+      implementation: safe.implementation.value,
+      undeployedSafe,
+      isL2Chain: chain?.l2,
+      isZkChain: chain?.zk,
+    })
+      .then((safeSDK) => {
+        if (cancelled) return
+        setSafeSDK(safeSDK)
+      })
+      .catch((_e) => {
+        if (cancelled) return
+
+        // Leaving the previous SDK in the store would silently serve a stale
+        // instance (e.g. a counterfactual one after the Safe was deployed).
+        setSafeSDK(undefined)
+
+        const e = asError(_e)
+        dispatch(
+          showNotification({
+            message: 'Error connecting to the blockchain. Please try reloading the page.',
+            groupKey: 'core-sdk-init-error',
+            variant: 'error',
+            detailedMessage: e.message,
+          }),
+        )
+        trackError(ErrorCodes._105, e.message, getRpcErrorContext(web3ReadOnly))
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [
+    address,
+    chain?.l2,
+    chain?.zk,
+    dispatch,
+    safe.address.value,
+    safe.chainId,
+    safe.implementation.value,
+    safe.implementationVersionState,
+    safe.version,
+    safeLoaded,
+    web3ReadOnly,
+    undeployedSafe,
+  ])
+}

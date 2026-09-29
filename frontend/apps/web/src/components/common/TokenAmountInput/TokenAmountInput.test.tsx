@@ -1,0 +1,465 @@
+import React from 'react'
+import { render, screen, waitFor, within } from '@/tests/test-utils'
+import userEvent from '@testing-library/user-event'
+import { FormProvider, useForm, useFieldArray } from 'react-hook-form'
+import TokenAmountInput from './index'
+import { TokenAmountFields } from '@/components/tx-flow/flows/TokenTransfer/types'
+import { ZERO_ADDRESS } from '@safe-global/utils/utils/constants'
+import { TokenType } from '@safe-global/store/gateway/types'
+import type { Balances } from '@safe-global/store/gateway/AUTO_GENERATED/balances'
+
+const USDC_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+
+const mockBalances: Balances['items'] = [
+  {
+    balance: '1000000000000000000',
+    tokenInfo: {
+      address: ZERO_ADDRESS,
+      decimals: 18,
+      logoUri: '',
+      name: 'Ether',
+      symbol: 'ETH',
+      type: TokenType.NATIVE_TOKEN,
+    },
+    fiatBalance: '1000',
+    fiatConversion: '1000',
+  },
+  {
+    balance: '1000000000',
+    tokenInfo: {
+      address: USDC_ADDRESS,
+      decimals: 6,
+      logoUri: '',
+      name: 'USD Coin',
+      symbol: 'USDC',
+      type: TokenType.ERC20,
+    },
+    fiatBalance: '1000',
+    fiatConversion: '1',
+  },
+]
+
+// Wrapper component to provide form context
+const TestWrapper = ({
+  defaultTokenAddress,
+  balances = mockBalances,
+  children,
+}: {
+  defaultTokenAddress: string
+  balances?: Balances['items']
+  children?: React.ReactNode
+}) => {
+  const methods = useForm({
+    defaultValues: {
+      [TokenAmountFields.tokenAddress]: defaultTokenAddress,
+      [TokenAmountFields.amount]: '',
+    },
+  })
+
+  const selectedToken = balances.find((b) => b.tokenInfo.address === defaultTokenAddress)
+
+  return (
+    <FormProvider {...methods}>
+      <TokenAmountInput
+        balances={balances}
+        selectedToken={selectedToken}
+        maxAmount={BigInt(selectedToken?.balance || '0')}
+      />
+      {children}
+    </FormProvider>
+  )
+}
+
+// Wrapper for field array scenario
+const FieldArrayTestWrapper = ({
+  defaultTokenAddress,
+  balances = mockBalances,
+}: {
+  defaultTokenAddress: string
+  balances?: Balances['items']
+}) => {
+  const methods = useForm({
+    defaultValues: {
+      recipients: [
+        {
+          recipient: '',
+          [TokenAmountFields.tokenAddress]: defaultTokenAddress,
+          [TokenAmountFields.amount]: '',
+        },
+      ],
+    },
+  })
+
+  const selectedToken = balances.find((b) => b.tokenInfo.address === defaultTokenAddress)
+
+  return (
+    <FormProvider {...methods}>
+      <TokenAmountInput
+        balances={balances}
+        selectedToken={selectedToken}
+        maxAmount={BigInt(selectedToken?.balance || '0')}
+        fieldArray={{ name: 'recipients', index: 0 }}
+      />
+    </FormProvider>
+  )
+}
+
+// Wrapper that uses useFieldArray like CreateTokenTransfer does
+const UseFieldArrayTestWrapper = ({
+  defaultTokenAddress,
+  balances = mockBalances,
+}: {
+  defaultTokenAddress: string
+  balances?: Balances['items']
+}) => {
+  const methods = useForm({
+    defaultValues: {
+      recipients: [
+        {
+          recipient: '',
+          [TokenAmountFields.tokenAddress]: defaultTokenAddress,
+          [TokenAmountFields.amount]: '',
+        },
+      ],
+    },
+  })
+
+  // This is what CreateTokenTransfer does
+  const { fields } = useFieldArray({
+    control: methods.control,
+    name: 'recipients',
+  })
+
+  const selectedToken = balances.find((b) => b.tokenInfo.address === defaultTokenAddress)
+
+  return (
+    <FormProvider {...methods}>
+      {fields.map((field, index) => (
+        <TokenAmountInput
+          key={field.id}
+          balances={balances}
+          selectedToken={selectedToken}
+          maxAmount={BigInt(selectedToken?.balance || '0')}
+          fieldArray={{ name: 'recipients', index }}
+        />
+      ))}
+    </FormProvider>
+  )
+}
+
+// Wrapper that allows setting an initial amount for fiat display testing
+const FiatTestWrapper = ({
+  defaultTokenAddress,
+  defaultAmount = '',
+  balances = mockBalances,
+}: {
+  defaultTokenAddress: string
+  defaultAmount?: string
+  balances?: Balances['items']
+}) => {
+  const methods = useForm({
+    defaultValues: {
+      [TokenAmountFields.tokenAddress]: defaultTokenAddress,
+      [TokenAmountFields.amount]: defaultAmount,
+    },
+  })
+
+  const selectedToken = balances.find((b) => b.tokenInfo.address === defaultTokenAddress)
+
+  return (
+    <FormProvider {...methods}>
+      <TokenAmountInput
+        balances={balances}
+        selectedToken={selectedToken}
+        maxAmount={BigInt(selectedToken?.balance || '0')}
+      />
+    </FormProvider>
+  )
+}
+
+// The token select is controlled by `setValue` on a field the component never `register`s. RHF still
+// writes unregistered names into the form values, which is what keeps the chosen token in the
+// submitted payload — pin it so that assumption cannot silently break.
+const SubmitTestWrapper = ({
+  defaultTokenAddress,
+  onSubmit,
+}: {
+  defaultTokenAddress: string
+  onSubmit: (values: unknown) => void
+}) => {
+  const methods = useForm({
+    defaultValues: {
+      [TokenAmountFields.tokenAddress]: defaultTokenAddress,
+      [TokenAmountFields.amount]: '',
+    },
+  })
+
+  const selectedToken = mockBalances.find((b) => b.tokenInfo.address === defaultTokenAddress)
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={methods.handleSubmit(onSubmit)}>
+        <TokenAmountInput
+          balances={mockBalances}
+          selectedToken={selectedToken}
+          maxAmount={BigInt(selectedToken?.balance || '0')}
+          validate={() => undefined}
+        />
+        <button type="submit">Submit</button>
+      </form>
+    </FormProvider>
+  )
+}
+
+describe('TokenAmountInput', () => {
+  describe('Submitted values', () => {
+    it('keeps the picked token address in the submitted payload', async () => {
+      const onSubmit = jest.fn()
+      render(<SubmitTestWrapper defaultTokenAddress={ZERO_ADDRESS} onSubmit={onSubmit} />)
+
+      await userEvent.click(within(screen.getByTestId('token-selector')).getByRole('combobox'))
+      await userEvent.click(await screen.findByText('USD Coin'))
+
+      await userEvent.type(screen.getByTestId('token-amount-field'), '1')
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }))
+
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+      expect(onSubmit.mock.calls[0][0]).toMatchObject({ [TokenAmountFields.tokenAddress]: USDC_ADDRESS })
+    })
+  })
+
+  describe('Token preselection without fieldArray', () => {
+    it('should preselect ETH (ZERO_ADDRESS) by default', () => {
+      render(<TestWrapper defaultTokenAddress={ZERO_ADDRESS} />)
+
+      expect(screen.getByText('Ether')).toBeInTheDocument()
+    })
+
+    it('should preselect USDC when passed as default', () => {
+      render(<TestWrapper defaultTokenAddress={USDC_ADDRESS} />)
+
+      expect(screen.getByText('USD Coin')).toBeInTheDocument()
+    })
+  })
+
+  describe('Selected token missing from balances', () => {
+    it('leaves the trigger blank instead of showing the raw address', () => {
+      render(<TestWrapper defaultTokenAddress={ZERO_ADDRESS} balances={[]} />)
+
+      expect(screen.getByTestId('token-selector')).not.toHaveTextContent(ZERO_ADDRESS)
+    })
+  })
+
+  describe('Token preselection with fieldArray', () => {
+    it('should preselect ETH (ZERO_ADDRESS) in field array', () => {
+      render(<FieldArrayTestWrapper defaultTokenAddress={ZERO_ADDRESS} />)
+
+      expect(screen.getByText('Ether')).toBeInTheDocument()
+    })
+
+    it('should preselect USDC in field array when passed as default', () => {
+      render(<FieldArrayTestWrapper defaultTokenAddress={USDC_ADDRESS} />)
+
+      expect(screen.getByText('USD Coin')).toBeInTheDocument()
+    })
+  })
+
+  describe('Token preselection with useFieldArray (like CreateTokenTransfer)', () => {
+    it('should preselect ETH (ZERO_ADDRESS) with useFieldArray', () => {
+      render(<UseFieldArrayTestWrapper defaultTokenAddress={ZERO_ADDRESS} />)
+
+      const select = screen.getByTestId('token-selector')
+      const input = select.querySelector('input')
+
+      expect(screen.getByText('Ether')).toBeInTheDocument()
+      expect(input?.value).toBe(ZERO_ADDRESS)
+    })
+
+    it('should preselect USDC with useFieldArray', () => {
+      render(<UseFieldArrayTestWrapper defaultTokenAddress={USDC_ADDRESS} />)
+
+      const select = screen.getByTestId('token-selector')
+      const input = select.querySelector('input')
+
+      expect(screen.getByText('USD Coin')).toBeInTheDocument()
+      expect(input?.value).toBe(USDC_ADDRESS)
+    })
+  })
+
+  describe('Token preselection when balances load after initial render', () => {
+    // This simulates the real app where balances might be empty initially
+    const DelayedBalancesWrapper = ({ defaultTokenAddress }: { defaultTokenAddress: string }) => {
+      const [balances, setBalances] = React.useState<Balances['items']>([])
+
+      // Simulate balances loading after component mounts
+      React.useEffect(() => {
+        setBalances(mockBalances)
+      }, [])
+
+      const methods = useForm({
+        defaultValues: {
+          recipients: [
+            {
+              recipient: '',
+              [TokenAmountFields.tokenAddress]: defaultTokenAddress,
+              [TokenAmountFields.amount]: '',
+            },
+          ],
+        },
+      })
+
+      const { fields } = useFieldArray({
+        control: methods.control,
+        name: 'recipients',
+      })
+
+      const selectedToken = balances.find((b) => b.tokenInfo.address === defaultTokenAddress)
+
+      return (
+        <FormProvider {...methods}>
+          {fields.map((field, index) => (
+            <TokenAmountInput
+              key={field.id}
+              balances={balances}
+              selectedToken={selectedToken}
+              maxAmount={BigInt(selectedToken?.balance || '0')}
+              fieldArray={{ name: 'recipients', index }}
+            />
+          ))}
+        </FormProvider>
+      )
+    }
+
+    it('should preselect USDC even when balances load after initial render', async () => {
+      render(<DelayedBalancesWrapper defaultTokenAddress={USDC_ADDRESS} />)
+
+      // Wait for balances to load
+      await screen.findByText('USD Coin')
+
+      const select = screen.getByTestId('token-selector')
+      const input = select.querySelector('input')
+
+      expect(input?.value).toBe(USDC_ADDRESS)
+    })
+
+    it('should NOT preselect ZERO_ADDRESS when USDC is passed', async () => {
+      render(<DelayedBalancesWrapper defaultTokenAddress={USDC_ADDRESS} />)
+
+      // Wait for balances to load
+      await screen.findByText('USD Coin')
+
+      const select = screen.getByTestId('token-selector')
+      const input = select.querySelector('input')
+
+      // This should fail if ZERO_ADDRESS is being selected instead of USDC
+      expect(input?.value).not.toBe(ZERO_ADDRESS)
+      expect(input?.value).toBe(USDC_ADDRESS)
+    })
+  })
+
+  describe('Fiat value display', () => {
+    it('should show fiat value when an amount is entered and token has fiatConversion', () => {
+      render(<FiatTestWrapper defaultTokenAddress={USDC_ADDRESS} defaultAmount="50" />)
+
+      // 50 USDC * $1 fiatConversion = $50
+      const fiatDisplay = screen.getByTestId('fiat-display')
+      expect(fiatDisplay).toBeVisible()
+      expect(fiatDisplay.textContent).toContain('50')
+    })
+
+    it('should show fiat value for ETH', () => {
+      render(<FiatTestWrapper defaultTokenAddress={ZERO_ADDRESS} defaultAmount="0.5" />)
+
+      // 0.5 ETH * $1000 fiatConversion = $500
+      const fiatDisplay = screen.getByTestId('fiat-display')
+      expect(fiatDisplay).toBeVisible()
+      expect(fiatDisplay.textContent).toContain('500')
+    })
+
+    it('should not render fiat value when amount is empty', () => {
+      render(<FiatTestWrapper defaultTokenAddress={USDC_ADDRESS} defaultAmount="" />)
+
+      expect(screen.queryByTestId('fiat-display')).not.toBeInTheDocument()
+    })
+
+    it('should not render fiat value when amount is "0"', () => {
+      render(<FiatTestWrapper defaultTokenAddress={USDC_ADDRESS} defaultAmount="0" />)
+
+      expect(screen.queryByTestId('fiat-display')).not.toBeInTheDocument()
+    })
+
+    it('should not render fiat value when token has no fiatConversion', () => {
+      const balancesNoFiat: Balances['items'] = [
+        {
+          ...mockBalances[1],
+          fiatConversion: '',
+        },
+      ]
+
+      render(<FiatTestWrapper defaultTokenAddress={USDC_ADDRESS} defaultAmount="50" balances={balancesNoFiat} />)
+
+      expect(screen.queryByTestId('fiat-display')).not.toBeInTheDocument()
+    })
+
+    it('should not render fiat value when fiatConversion is "0"', () => {
+      const balancesZeroFiat: Balances['items'] = [
+        {
+          ...mockBalances[1],
+          fiatConversion: '0',
+        },
+      ]
+
+      render(<FiatTestWrapper defaultTokenAddress={USDC_ADDRESS} defaultAmount="50" balances={balancesZeroFiat} />)
+
+      expect(screen.queryByTestId('fiat-display')).not.toBeInTheDocument()
+    })
+
+    it('should not render fiat value when selectedToken is undefined', () => {
+      render(<FiatTestWrapper defaultTokenAddress="0x0000000000000000000000000000000000000001" defaultAmount="50" />)
+
+      expect(screen.queryByTestId('fiat-display')).not.toBeInTheDocument()
+    })
+
+    it('should not render fiat value for negative amounts', () => {
+      render(<FiatTestWrapper defaultTokenAddress={USDC_ADDRESS} defaultAmount="-5" />)
+
+      expect(screen.queryByTestId('fiat-display')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Error state styling', () => {
+    // The amount FIELD (label + border) must turn destructive on error, but the typed
+    // VALUE text must stay neutral — the invalid `Field` ancestor would otherwise cascade its red
+    // colour onto the value via CSS inheritance (see ui/input.tsx's `text-foreground`).
+    const ErroredWrapper = ({ defaultAmount }: { defaultAmount: string }) => {
+      const methods = useForm({
+        defaultValues: { [TokenAmountFields.tokenAddress]: USDC_ADDRESS, [TokenAmountFields.amount]: defaultAmount },
+      })
+
+      React.useEffect(() => {
+        methods.setError(TokenAmountFields.amount, { type: 'validate', message: 'Insufficient funds' })
+      }, [methods])
+
+      const selectedToken = mockBalances.find((b) => b.tokenInfo.address === USDC_ADDRESS)
+
+      return (
+        <FormProvider {...methods}>
+          <TokenAmountInput balances={mockBalances} selectedToken={selectedToken} maxAmount={0n} />
+        </FormProvider>
+      )
+    }
+
+    it('keeps the typed value neutral while the label goes destructive on an insufficient-funds error', () => {
+      render(<ErroredWrapper defaultAmount="0.0159" />)
+
+      const amountField = screen.getByTestId('token-amount-field')
+
+      // The label swaps in the error message and turns destructive...
+      expect(screen.getByText('Insufficient funds')).toHaveClass('text-destructive')
+      // ...but the typed value stays the normal foreground colour, not red.
+      expect(amountField).toHaveDisplayValue('0.0159')
+      expect(amountField).toHaveClass('text-foreground')
+      expect(amountField.className).not.toContain('text-destructive')
+    })
+  })
+})

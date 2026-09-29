@@ -1,0 +1,91 @@
+import { useEffect, type ReactElement } from 'react'
+import classnames from 'classnames'
+import { useForm } from 'react-hook-form'
+import * as metadata from '@/markdown/terms/version'
+
+import { useAppDispatch, useAppSelector } from '@/store'
+import {
+  selectCookies,
+  CookieAndTermType,
+  saveCookieAndTermConsent,
+  hasAcceptedTerms,
+} from '@/store/cookiesAndTermsSlice'
+import { selectCookieBanner, openCookieBanner, closeCookieBanner } from '@/store/popupSlice'
+
+import css from './styles.module.css'
+import { COOKIE_AND_TERM_WARNING } from './constants'
+import WarningMessage from './WarningMessage'
+import IntroText from './IntroText'
+import CookieOptionsList from './CookieOptionsList'
+import CookieBannerActions from './CookieBannerActions'
+
+/** Overlay chrome for the first-visit popup, matching the other overlays in the design system. */
+export const POPUP_SURFACE = 'bg-popover text-popover-foreground rounded-lg shadow-lg ring-foreground/10 ring-1'
+
+export const CookieAndTermBanner = ({ warningKey }: { warningKey?: CookieAndTermType }): ReactElement => {
+  const warning = warningKey ? COOKIE_AND_TERM_WARNING[warningKey] : undefined
+  const dispatch = useAppDispatch()
+  const cookies = useAppSelector(selectCookies)
+
+  const { control, getValues, setValue } = useForm({
+    defaultValues: {
+      [CookieAndTermType.TERMS]: true,
+      [CookieAndTermType.NECESSARY]: true,
+      [CookieAndTermType.UPDATES]: cookies[CookieAndTermType.UPDATES] ?? false,
+      [CookieAndTermType.ANALYTICS]: cookies[CookieAndTermType.ANALYTICS] ?? false,
+      ...(warningKey ? { [warningKey]: true } : {}),
+    },
+  })
+
+  const handleAccept = () => {
+    const values = getValues()
+    dispatch(
+      saveCookieAndTermConsent({
+        ...values,
+        termsVersion: metadata.version,
+      }),
+    )
+    dispatch(closeCookieBanner())
+  }
+
+  const handleAcceptAll = () => {
+    setValue(CookieAndTermType.UPDATES, true)
+    setValue(CookieAndTermType.ANALYTICS, true)
+    setTimeout(handleAccept, 300)
+  }
+
+  return (
+    <div data-testid="cookies-popup" className={css.container}>
+      {warning && <WarningMessage message={warning} />}
+      <form>
+        <IntroText lastUpdated={metadata.lastUpdated} />
+
+        <CookieOptionsList control={control} />
+
+        <CookieBannerActions onAccept={handleAccept} onAcceptAll={handleAcceptAll} />
+      </form>
+    </div>
+  )
+}
+
+const CookieBannerPopup = (): ReactElement | null => {
+  const cookiePopup = useAppSelector(selectCookieBanner)
+  const dispatch = useAppDispatch()
+  const hasAccepted = useAppSelector(hasAcceptedTerms)
+  const shouldOpen = !hasAccepted
+
+  useEffect(() => {
+    if (shouldOpen) {
+      dispatch(openCookieBanner({}))
+    } else {
+      dispatch(closeCookieBanner())
+    }
+  }, [dispatch, shouldOpen])
+
+  return cookiePopup.open ? (
+    <div className={classnames(css.popup, POPUP_SURFACE)}>
+      <CookieAndTermBanner warningKey={cookiePopup.warningKey} />
+    </div>
+  ) : null
+}
+export default CookieBannerPopup

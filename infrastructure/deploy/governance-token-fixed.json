@@ -1,0 +1,79 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "governance-token-fixed",
+    "namespace": "bittensor-safe"
+  },
+  "spec": {
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 43200,
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "governance-token-fixed"
+        }
+      },
+      "spec": {
+        "enableServiceLinks": false,
+        "automountServiceAccountToken": false,
+        "containers": [
+          {
+            "name": "backfill",
+            "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6",
+            "imagePullPolicy": "IfNotPresent",
+            "resources": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "512Mi"
+              },
+              "limits": {
+                "cpu": "500m",
+                "memory": "1Gi"
+              }
+            },
+            "command": [
+              "python",
+              "manage.py",
+              "shell",
+              "-c",
+              "\"\"\"Bounded governance history backfill with request-level RPC throttling.\"\"\"\nimport json\nimport time\nfrom urllib.parse import urlsplit\n\n\nclass RpcPacer:\n    def __init__(self, send, lock, sleep=time.sleep, clock=time.monotonic, interval=15):\n        self.send, self.lock, self.sleep, self.clock = send, lock, sleep, clock\n        self.interval, self.next_request = interval, 0\n\n    def __call__(self, session, request, **kwargs):\n        # Serialize all OnFinality HTTP requests in this backfill process.\n        if not urlsplit(request.url).hostname.endswith('.onfinality.io'):\n            return self.send(session, request, **kwargs)\n        with self.lock:\n            try:\n                payload = json.loads(request.body or '{}')\n                weight = max(1, len(payload)) if isinstance(payload, list) else 1\n            except (ValueError, TypeError):\n                weight = 1\n            for attempt in range(5):\n                self.sleep(max(0, self.next_request - self.clock()))\n                self.next_request = self.clock() + self.interval * weight\n                response = self.send(session, request, **kwargs)\n                limited = response.status_code == 429\n                if response.status_code == 200:\n                    try:\n                        data = response.json()\n                        entries = data if isinstance(data, list) else [data]\n                        limited = any(isinstance(e, dict) and e.get('error', {}).get('code') in (-32029, -32004) for e in entries)\n                    except ValueError:\n                        pass\n                if not limited:\n                    return response\n                try:\n                    retry_after = float(response.headers.get('Retry-After', 0))\n                except (ValueError, TypeError):\n                    retry_after = 0\n                delay = max(120 * 2 ** attempt, retry_after)\n                response.close()\n                self.next_request = max(self.next_request, self.clock() + delay)\n                print('RPC_RATE_LIMIT wait_seconds=', delay, 'attempt=', attempt + 1, flush=True)\n            raise RuntimeError('Archive RPC remains rate limited; stopping without skipping history')\n\n\ndef run():\n    import requests\n    from gevent import sleep\n    from gevent.lock import Semaphore\n    from safe_transaction_service.history.services import IndexServiceProvider\n    pacer = RpcPacer(requests.Session.send, Semaphore(), sleep=sleep)\n    def send(session, request, **kwargs):\n        return pacer(session, request, **kwargs)\n    requests.Session.send = send\n    # Importing the service initializes Django providers used by the indexer.\n    IndexServiceProvider()\n    addresses = {'0xADF60fcC63217961c931d57f1dCE2C5d70Af3546'}\n    stop = 9122933\n    from safe_transaction_service.history.indexers import Erc20EventsIndexerProvider\n\n    def token_chunk(lo, hi):\n        \"\"\"Process exactly one fixed window without the service's 1-block fallback.\"\"\"\n        indexer = Erc20EventsIndexerProvider.get_new_instance()\n        indexer.block_auto_process_limit = False\n        elements = indexer.find_relevant_elements(addresses, lo, hi)\n        return len(indexer.process_elements(elements))\n\n    for phase, start, method in [('TOKEN', 8899146, token_chunk)]:\n        print('PHASE_START', phase, start, stop, flush=True)\n        for lo in range(start, stop + 1, 1000):\n            hi = min(lo + 999, stop)\n            for attempt in range(5):\n                try:\n                    n = method(lo, hi)\n                    break\n                except Exception as exc:\n                    if attempt == 4:\n                        raise\n                    delay = 120 * 2**attempt\n                    print('WINDOW_BACKOFF', phase, lo, type(exc).__name__, delay, flush=True)\n                    time.sleep(delay)\n            print('CHECKPOINT', phase, hi, 'events', n, flush=True)\n        if phase == 'SAFE':\n            s.reprocess_addresses(addresses)\n        print('PHASE_COMPLETE', phase, flush=True)\n    print('BACKFILL_COMPLETE through=', stop, flush=True)\n\nif __name__ == '__main__':\n    run()\n\nrun()\n"
+            ],
+            "envFrom": [
+              {
+                "configMapRef": {
+                  "name": "txs"
+                }
+              },
+              {
+                "secretRef": {
+                  "name": "txs"
+                }
+              },
+              {
+                "secretRef": {
+                  "name": "archive-rpc"
+                }
+              }
+            ],
+            "env": [
+              {
+                "name": "RUN_MIGRATIONS",
+                "value": "0"
+              },
+              {
+                "name": "WORKER_QUEUES",
+                "value": "default,indexing,processing,contracts,tokens,notifications,webhooks"
+              },
+              {
+                "name": "ETH_EVENTS_GET_LOGS_CONCURRENCY",
+                "value": "1"
+              }
+            ]
+          }
+        ],
+        "restartPolicy": "Never"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+.progressBar {
+  width: 100%;
+  gap: 0;
+}
+
+@media (max-width: 599.95px) {
+  .progressBar :global([data-slot='progress-track']) {
+    border-radius: 0;
+  }
+}

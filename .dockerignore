@@ -1,0 +1,9 @@
+.git
+**/node_modules
+**/.next
+**/out
+**/.env
+**/.env.local
+**/.env.production
+**/artifacts
+ci/output

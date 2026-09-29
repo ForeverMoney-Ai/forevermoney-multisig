@@ -1,0 +1,188 @@
+import classnames from 'classnames'
+import { evmToSs58 } from '@/components/common/SpaceSafeBar/BittensorAddress'
+import type { ReactElement, ReactNode, SyntheticEvent } from 'react'
+import { isAddress } from 'ethers'
+import { Cloud } from 'lucide-react'
+import AddressBookIcon from '@/public/images/sidebar/address-book.svg'
+import { useIsBelowSm } from '@/hooks/useMediaQuery'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import Identicon from '../../Identicon'
+import CopyAddressButton from '../../CopyAddressButton'
+import ExplorerButton, { type ExplorerButtonProps } from '../../ExplorerButton'
+import { shortenAddress } from '@safe-global/utils/utils/formatters'
+import ImageFallback from '../../ImageFallback'
+import css from './styles.module.css'
+import { ContactSource } from '@/hooks/useAllAddressBooks'
+
+export type EthHashInfoProps = {
+  address: string
+  chainId?: string
+  name?: string | null
+  showAvatar?: boolean
+  onlyName?: boolean
+  showCopyButton?: boolean
+  prefix?: string
+  showPrefix?: boolean
+  shortAddress?: boolean
+  copyAddress?: boolean
+  customAvatar?: string | null
+  hasExplorer?: boolean
+  avatarSize?: number
+  children?: ReactNode
+  trusted?: boolean
+  ExplorerButtonProps?: ExplorerButtonProps
+  addressBookNameSource?: ContactSource
+  highlight4bytes?: boolean
+  badgeTooltip?: ReactNode
+}
+
+const stopPropagation = (e: SyntheticEvent) => e.stopPropagation()
+
+const SrcEthHashInfo = ({
+  address,
+  chainId,
+  customAvatar,
+  prefix = '',
+  showPrefix = true,
+  shortAddress = true,
+  copyAddress = true,
+  showAvatar = true,
+  onlyName = false,
+  avatarSize,
+  name,
+  showCopyButton,
+  hasExplorer,
+  ExplorerButtonProps,
+  children,
+  trusted = true,
+  addressBookNameSource,
+  highlight4bytes = false,
+  badgeTooltip,
+}: EthHashInfoProps): ReactElement => {
+  const shouldPrefix = isAddress(address)
+  const isFinney = chainId === '964' || prefix === 'tao' || prefix === 'finney'
+  const ss58 = isFinney ? evmToSs58(address) : undefined
+  const displayPrefix = isFinney ? 'finney' : prefix
+  const isMobile = useIsBelowSm()
+  const identicon = <Identicon address={address} size={avatarSize} />
+
+  const accountStylesWithBadge = badgeTooltip
+    ? {
+        backgroundColor: 'var(--color-background-main)',
+        fontWeight: 'bold',
+        borderRadius: '16px',
+        padding: name ? '2px 8px 2px 6px' : undefined,
+      }
+    : undefined
+
+  const highlightedAddress = highlight4bytes ? (
+    <>
+      {address.slice(0, 2)}
+      <b>{address.slice(2, 6)}</b>
+      {address.slice(6, -4)}
+      <b>{address.slice(-4)}</b>
+    </>
+  ) : (
+    address
+  )
+
+  const addressElement = (
+    <>
+      {showPrefix && shouldPrefix && displayPrefix && <b>{displayPrefix}:</b>}
+      <span>{shortAddress || isMobile ? shortenAddress(address) : highlightedAddress}</span>
+    </>
+  )
+
+  return (
+    <div className={css.container} style={ss58 && !shortAddress ? { alignItems: 'flex-start' } : undefined}>
+      {showAvatar && (
+        <div
+          className={css.avatarContainer}
+          style={avatarSize !== undefined ? { width: `${avatarSize}px`, height: `${avatarSize}px` } : undefined}
+        >
+          {customAvatar ? (
+            <ImageFallback src={customAvatar} fallbackComponent={identicon} width={avatarSize} height={avatarSize} />
+          ) : (
+            identicon
+          )}
+        </div>
+      )}
+
+      <div className={classnames('min-w-0 flex-1 gap-1 overflow-hidden', { [css.inline]: onlyName })}>
+        {!!name ? (
+          <div title={name} className="ethHashInfo-name flex items-center gap-1" style={accountStylesWithBadge}>
+            <div className="overflow-hidden text-ellipsis">{name}</div>
+
+            {badgeTooltip
+              ? badgeTooltip
+              : !!addressBookNameSource && (
+                  <Tooltip>
+                    <TooltipTrigger render={<span style={{ lineHeight: 0 }} />}>
+                      {addressBookNameSource === ContactSource.local ? (
+                        <AddressBookIcon className="size-5 text-[var(--color-border-main)]" />
+                      ) : (
+                        <Cloud className="size-5 text-[var(--color-border-main)]" />
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      From your {addressBookNameSource === ContactSource.space ? 'workspace' : 'local'} address book
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+          </div>
+        ) : (
+          badgeTooltip && <div className="flex items-center gap-1">{badgeTooltip}</div>
+        )}
+
+        {ss58 ? (
+          <div className="flex min-w-0 flex-col gap-1" data-testid="finney-address-pair">
+            <div className={classnames('flex min-w-0 gap-1', shortAddress ? 'items-center' : 'items-start')} title={ss58}>
+              <span className={classnames('min-w-0 font-medium', shortAddress ? 'truncate [&>span]:inline' : 'break-all [&>span]:inline')} data-testid="finney-primary-address">
+                {copyAddress ? <CopyAddressButton address={ss58} trusted={trusted}>{showPrefix && <b>finney:</b>}{shortAddress ? `${ss58.slice(0, 6)}…${ss58.slice(-6)}` : ss58}</CopyAddressButton> : <>{showPrefix && <b>finney:</b>}{shortAddress ? `${ss58.slice(0, 6)}…${ss58.slice(-6)}` : ss58}</>}
+              </span>
+              <span className="flex shrink-0 items-center gap-1" data-testid="finney-primary-actions">
+                {showCopyButton && <CopyAddressButton address={ss58} trusted={trusted} />}
+                {hasExplorer && <ExplorerButton href={`https://taostats.io/account/${ss58}`} title="View SS58 on Taostats" onClick={stopPropagation} />}
+                {children}
+              </span>
+            </div>
+            <div className={classnames('flex min-w-0 gap-1 text-muted-foreground text-xs', shortAddress ? 'items-center' : 'items-start')} title={address} data-testid="finney-evm-address">
+              <span className="shrink-0">EVM</span>
+              <span className={classnames('min-w-0', shortAddress ? 'truncate [&>span]:inline' : 'break-all [&>span]:inline')}>{copyAddress ? <CopyAddressButton address={address} trusted={trusted}>{shortAddress ? shortenAddress(address) : highlightedAddress}</CopyAddressButton> : <>{shortAddress ? shortenAddress(address) : highlightedAddress}</>}</span>
+              <span className="flex shrink-0 items-center gap-1" data-testid="finney-evm-actions">
+                {showCopyButton && <CopyAddressButton address={address} trusted={trusted} />}
+                {hasExplorer && ExplorerButtonProps && <ExplorerButton {...ExplorerButtonProps} onClick={stopPropagation} />}
+              </span>
+            </div>
+          </div>
+        ) : (
+        <div className={classnames(css.addressContainer, { [css.inline]: onlyName })}>
+          {(!onlyName || !name) && (
+            <div className="overflow-hidden text-ellipsis font-[weight:inherit] text-[length:inherit]">
+              {copyAddress ? (
+                <CopyAddressButton address={address} trusted={trusted}>
+                  {addressElement}
+                </CopyAddressButton>
+              ) : (
+                addressElement
+              )}
+            </div>
+          )}
+
+          {showCopyButton && <CopyAddressButton address={address} trusted={trusted} />}
+
+          {hasExplorer && ExplorerButtonProps && (
+            <div className="text-[var(--color-border-main)]">
+              <ExplorerButton {...ExplorerButtonProps} onClick={stopPropagation} />
+            </div>
+          )}
+
+          {children}
+        </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default SrcEthHashInfo

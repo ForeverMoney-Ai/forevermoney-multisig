@@ -1,0 +1,144 @@
+import type { ReactElement } from 'react'
+import type {
+  ContractAnalysisResults,
+  DeadlockAnalysisResults,
+  ThreatAnalysisResults,
+  RecipientAnalysisResults,
+  Severity,
+  SafeAnalysisResult,
+} from '@safe-global/utils/features/safe-shield/types'
+import { SafeShieldAnalysisLoading } from './SafeShieldAnalysisLoading'
+import { SafeShieldAnalysisEmpty } from './SafeShieldAnalysisEmpty'
+import { AnalysisGroupCard } from '../AnalysisGroupCard'
+import { TenderlySimulation } from '../TenderlySimulation'
+import UntrustedSafeWarning from '../UntrustedSafeWarning'
+import type { AsyncResult } from '@safe-global/utils/hooks/useAsync'
+import isEmpty from 'lodash/isEmpty'
+import type { SafeTransaction } from '@safe-global/types-kit'
+import { analysisVisibilityDelay, calculateAnalysisDelays, useDelayedLoading } from '../../hooks/useDelayedLoading'
+import { SAFE_SHIELD_EVENTS } from '@/services/analytics'
+import { HypernativeFeature, type HypernativeAuthStatus } from '@/features/hypernative'
+import { SafenetChecksFeature } from '@/features/safenet-checks'
+import { useLoadFeature } from '@/features/__core__'
+import { ThreatAnalysis } from '../ThreatAnalysis'
+
+export const SafeShieldContent = ({
+  recipient,
+  contract,
+  threat,
+  deadlock,
+  safeTx,
+  overallStatus,
+  hypernativeAuth,
+  showHypernativeInfo = true,
+  showHypernativeActiveStatus = true,
+  safeAnalysis,
+  onAddToTrustedList,
+}: {
+  recipient: AsyncResult<RecipientAnalysisResults>
+  contract: AsyncResult<ContractAnalysisResults>
+  threat: AsyncResult<ThreatAnalysisResults>
+  deadlock: AsyncResult<DeadlockAnalysisResults>
+  safeTx?: SafeTransaction
+  overallStatus?: { severity: Severity; title: string }
+  hypernativeAuth?: HypernativeAuthStatus
+  showHypernativeInfo?: boolean
+  showHypernativeActiveStatus?: boolean
+  safeAnalysis?: SafeAnalysisResult | null
+  onAddToTrustedList?: () => void
+}): ReactElement => {
+  const hn = useLoadFeature(HypernativeFeature)
+  const safenet = useLoadFeature(SafenetChecksFeature)
+  const [recipientResults = {}, _recipientError, recipientLoading = false] = recipient
+  const [contractResults = {}, _contractError, contractLoading = false] = contract
+  const [threatResults = {}, _threatError, threatLoading = false] = threat
+  const [deadlockResults = {}, _deadlockError, deadlockLoading = false] = deadlock
+
+  const highlightedSeverity = overallStatus?.severity
+  const loading = recipientLoading || contractLoading || threatLoading || deadlockLoading
+  const isLoadingVisible = useDelayedLoading(loading, analysisVisibilityDelay)
+  const shouldShowContent = !isLoadingVisible
+
+  const recipientEmpty = isEmpty(recipientResults)
+  const contractEmpty = isEmpty(contractResults)
+  const threatEmpty = isEmpty(threatResults) || isEmpty(threatResults?.THREAT)
+  const deadlockEmpty = isEmpty(deadlockResults)
+  const analysesEmpty = recipientEmpty && contractEmpty && threatEmpty && deadlockEmpty
+  const allEmpty = recipientEmpty && contractEmpty && threatEmpty && deadlockEmpty && !safeTx
+
+  const { recipientDelay, contractAnalysisDelay, deadlockAnalysisDelay, threatAnalysisDelay, simulationAnalysisDelay } =
+    calculateAnalysisDelays(recipientEmpty, contractEmpty, deadlockEmpty)
+
+  return (
+    <div className="px-1 pb-1">
+      {/* overflow-hidden clips the last analysis row's square background to the rounded corners;
+          rounded-b-md (12px) = the parent's rounded-lg (16px) minus the 4px px-1/pb-1 inset, which
+          keeps this curve concentric with the outer one. */}
+      <div className="relative overflow-hidden rounded-b-md border border-t-0 border-[var(--color-background-main)]">
+        {showHypernativeInfo && (
+          <hn.HnInfoCard hypernativeAuth={hypernativeAuth} showActiveStatus={showHypernativeActiveStatus} />
+        )}
+
+        {isLoadingVisible && <SafeShieldAnalysisLoading analysesEmpty={analysesEmpty} loading={isLoadingVisible} />}
+
+        {shouldShowContent && !loading && allEmpty && !hypernativeAuth && <SafeShieldAnalysisEmpty />}
+
+        <div className="[&>div]:border-t [&>div]:border-[var(--color-background-main)]">
+          {/* Untrusted Safe warning - shown at top when Safe is not pinned */}
+          {safeAnalysis && onAddToTrustedList && (
+            <UntrustedSafeWarning safeAnalysis={safeAnalysis} onAddToTrustedList={onAddToTrustedList} />
+          )}
+
+          <AnalysisGroupCard
+            data-testid="recipient-analysis-group-card"
+            delay={recipientDelay}
+            data={recipientResults}
+            highlightedSeverity={highlightedSeverity}
+            analyticsEvent={SAFE_SHIELD_EVENTS.RECIPIENT_DECODED}
+          />
+
+          <AnalysisGroupCard
+            data-testid="contract-analysis-group-card"
+            data={contractResults}
+            delay={contractAnalysisDelay}
+            highlightedSeverity={highlightedSeverity}
+            analyticsEvent={SAFE_SHIELD_EVENTS.CONTRACT_DECODED}
+            showImage
+          />
+
+          <AnalysisGroupCard
+            data-testid="deadlock-analysis-group-card"
+            data={deadlockResults}
+            delay={deadlockAnalysisDelay}
+            highlightedSeverity={highlightedSeverity}
+            analyticsEvent={SAFE_SHIELD_EVENTS.DEADLOCK_ANALYZED}
+          />
+
+          <ThreatAnalysis
+            threat={threat}
+            delay={threatAnalysisDelay}
+            highlightedSeverity={highlightedSeverity}
+            hypernativeAuth={hypernativeAuth}
+          />
+
+          <hn.HnCustomChecksCard
+            threat={threat}
+            delay={threatAnalysisDelay}
+            highlightedSeverity={highlightedSeverity}
+            hypernativeAuth={hypernativeAuth}
+          />
+
+          {shouldShowContent && <safenet.SafenetChecksSection />}
+
+          {!contractLoading && !threatLoading && (
+            <TenderlySimulation
+              safeTx={safeTx}
+              delay={simulationAnalysisDelay}
+              highlightedSeverity={highlightedSeverity}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

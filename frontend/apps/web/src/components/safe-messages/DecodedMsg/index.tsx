@@ -1,0 +1,97 @@
+import type { MessageItem } from '@safe-global/store/gateway/AUTO_GENERATED/messages'
+import { generateDataRowValue, TxDataRow } from '@/components/transactions/TxDetails/Summary/TxDataRow'
+import { Value } from '@/components/transactions/TxDetails/TxData/DecodedData/ValueArray'
+import { isByte } from '@/utils/transaction-guards'
+import { normalizeTypedData } from '@safe-global/utils/utils/web3'
+import { type TypedData } from '@safe-global/store/gateway/AUTO_GENERATED/messages'
+import { Typography } from '@/components/ui/typography'
+import ObservabilityErrorBoundary from '@/components/common/ObservabilityErrorBoundary'
+import classNames from 'classnames'
+import { isAddress } from 'ethers'
+import { useMemo, type ReactElement } from 'react'
+import Msg from '../Msg'
+import css from './styles.module.css'
+import { Errors } from '@/services/exceptions'
+import useLogError from '@/hooks/useLogError'
+
+const EIP712_DOMAIN_TYPE = 'EIP712Domain'
+
+const DecodedTypedObject = ({ displayedType, eip712Msg }: { displayedType: string; eip712Msg: TypedData }) => {
+  const { types, message: msg, domain } = eip712Msg
+  const findType = (paramName: string) => types[displayedType].find((paramType) => paramType.name === paramName)?.type
+  return (
+    <div>
+      <Typography variant="paragraph-mini-bold" className="uppercase text-[var(--color-border-main)]">
+        {displayedType}
+      </Typography>
+
+      {Object.entries(displayedType === EIP712_DOMAIN_TYPE ? domain : msg).map((param, index) => {
+        const [paramName, paramValue] = param
+        const type = findType(paramName) || 'string'
+
+        const isArrayValueParam = Array.isArray(paramValue)
+        const isNested = Object.keys(types).some((typeName) => typeName === type || `${typeName}[]` === type)
+        const inlineType = isAddress(paramValue as string) ? 'address' : isByte(type) ? 'bytes' : undefined
+        const paramValueAsString = typeof paramValue === 'string' ? paramValue : JSON.stringify(paramValue, null, 2)
+        return (
+          <TxDataRow key={`${displayedType}_param-${index}`} title={`${param[0]}(${type})`}>
+            {isNested ? (
+              <div className={classNames(css.nestedMsg, 'rounded')}>{paramValueAsString}</div>
+            ) : isArrayValueParam ? (
+              <Value method={displayedType} type={type} value={paramValueAsString} />
+            ) : (
+              generateDataRowValue(paramValueAsString, inlineType, true)
+            )}
+          </TxDataRow>
+        )
+      })}
+    </div>
+  )
+}
+
+export const DecodedMsg = ({
+  message,
+  isInModal = false,
+}: {
+  message: MessageItem['message'] | undefined
+  isInModal?: boolean
+}): ReactElement | null => {
+  const isTextMessage = typeof message === 'string'
+
+  // Normalize the message so we know its primaryType. Hoisted above the early
+  // returns — and memoised — so a message we cannot normalize is reported once
+  // per message instead of once per render of the details panel.
+  const { normalizedMsg, normalizeFailure } = useMemo<{
+    normalizedMsg?: TypedData
+    normalizeFailure?: unknown
+  }>(() => {
+    if (!message || typeof message === 'string') return {}
+
+    try {
+      return { normalizedMsg: normalizeTypedData(message) }
+    } catch (error) {
+      return { normalizedMsg: message, normalizeFailure: error }
+    }
+  }, [message])
+
+  useLogError(Errors._809, normalizeFailure)
+
+  if (!message) {
+    return null
+  }
+  if (isTextMessage) {
+    return <Msg message={message} />
+  }
+  if (!normalizedMsg) {
+    return null
+  }
+
+  return (
+    <div className={classNames(css.container, 'rounded', { [css.scrollable]: isInModal })}>
+      <ObservabilityErrorBoundary fallback={<div>Error decoding message</div>}>
+        <DecodedTypedObject eip712Msg={normalizedMsg} displayedType={EIP712_DOMAIN_TYPE} />
+        <DecodedTypedObject eip712Msg={normalizedMsg} displayedType={normalizedMsg.primaryType} />
+      </ObservabilityErrorBoundary>
+    </div>
+  )
+}

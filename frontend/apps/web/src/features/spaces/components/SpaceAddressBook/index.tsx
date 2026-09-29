@@ -1,0 +1,249 @@
+import { useMemo, useState } from 'react'
+import { Typography } from '@/components/ui/typography'
+import TableCard from '@/components/common/TableCard'
+import {
+  useIsInvited,
+  useIsAdmin,
+  useAddressBookSearch,
+  useGetSpaceAddressBook,
+  useGetAddressBookRequests,
+} from '@/features/spaces'
+import { useUsersGetWithWalletsV1Query } from '@safe-global/store/gateway/AUTO_GENERATED/users'
+import { useAppSelector } from '@/store'
+import { isAuthenticated } from '@/store/authSlice'
+import useAllAddressBooks from '@/hooks/useAllAddressBooks'
+import { useHasFeature } from '@/hooks/useChains'
+import { FEATURES } from '@safe-global/utils/utils/chains'
+import type { AddressBookEntry } from './SpaceAddressBookTable'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { Badge } from '@/components/ui/badge'
+import { Check } from 'lucide-react'
+import AddressBookSearchInput from '@/components/common/AddressBookSearchInput'
+import PreviewInvite from '../InviteBanner/PreviewInvite'
+import Track from '@/components/common/Track'
+import { SPACE_EVENTS } from '@/services/analytics/events/spaces'
+import AddContact from './AddContact'
+import AddLocalContact from './AddLocalContact'
+import SpaceAddressBookTable from './SpaceAddressBookTable'
+import PendingRequestsTable from './PendingRequestsTable'
+import ImportAddressBook from './Import'
+import RequestToAddButton from './RequestToAddButton'
+import AddToWorkspaceButton from './AddToWorkspaceButton'
+
+const SpaceAddressBook = () => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState('workspace')
+  const isAdmin = useIsAdmin()
+  const isInvited = useIsInvited()
+  const isPrivateAddressBookEnabled = useHasFeature(FEATURES.PRIVATE_ADDRESS_BOOK) ?? false
+  const isUserSignedIn = useAppSelector(isAuthenticated)
+  const { currentData: user } = useUsersGetWithWalletsV1Query(undefined, { skip: !isUserSignedIn })
+  const addressBookItems = useGetSpaceAddressBook()
+  const pendingRequests = useGetAddressBookRequests()
+  const allLocalAddressBooks = useAllAddressBooks()
+
+  const localContacts: AddressBookEntry[] = useMemo(() => {
+    const walletAddress = user?.wallets[0]?.address ?? ''
+    const byAddress = new Map<string, { address: string; name: string; chainIds: Set<string> }>()
+    for (const [chainId, book] of Object.entries(allLocalAddressBooks)) {
+      for (const [address, name] of Object.entries(book)) {
+        const key = address.toLowerCase()
+        const existing = byAddress.get(key)
+        if (existing) {
+          existing.chainIds.add(chainId)
+        } else {
+          byAddress.set(key, { address, name, chainIds: new Set([chainId]) })
+        }
+      }
+    }
+    return Array.from(byAddress.values()).map(({ address, name, chainIds }) => ({
+      name,
+      address,
+      chainIds: Array.from(chainIds),
+      createdBy: walletAddress,
+      createdByUserId: 0,
+      lastUpdatedBy: '',
+      lastUpdatedByUserId: 0,
+      createdAt: '',
+      updatedAt: '',
+      isLocal: true,
+    }))
+  }, [allLocalAddressBooks, user?.wallets])
+
+  // Local contacts = the local address book (no space contacts)
+  // Contacts that duplicate a space address are marked and sorted to the bottom
+  const sortedLocalContacts: AddressBookEntry[] = useMemo(() => {
+    const spaceAddresses = new Set(addressBookItems.map((item) => item.address.toLowerCase()))
+
+    const marked = localContacts.map((entry) => ({
+      ...entry,
+      isDuplicate: spaceAddresses.has(entry.address.toLowerCase()),
+    }))
+    return marked.sort((a, b) => Number(a.isDuplicate) - Number(b.isDuplicate))
+  }, [localContacts, addressBookItems])
+
+  const filteredAllRaw = useAddressBookSearch(addressBookItems, searchQuery)
+  const filteredAll: AddressBookEntry[] = useMemo(
+    () => filteredAllRaw.map((item) => ({ ...item, isLocal: false })),
+    [filteredAllRaw],
+  )
+  const filteredMine = useAddressBookSearch(sortedLocalContacts, searchQuery) as AddressBookEntry[]
+
+  const pendingAddresses = useMemo(
+    () => new Set(pendingRequests.map((r) => r.address.toLowerCase())),
+    [pendingRequests],
+  )
+
+  return (
+    <>
+      {isInvited && <PreviewInvite />}
+
+      <div>
+        <div className="mb-6 flex flex-col gap-6">
+          <Typography variant="h2" className="font-bold leading-[1] tracking-tight">
+            Address book
+          </Typography>
+        </div>
+
+        <Tabs
+          defaultValue="workspace"
+          onValueChange={(val) => {
+            setSearchQuery('')
+            setActiveTab(val)
+          }}
+        >
+          <TabsList variant="underline" className="flex-wrap mb-4">
+            <TabsTrigger value="workspace" className="cursor-pointer">
+              <Tooltip>
+                <TooltipTrigger render={<span />}>Workspace contacts ({addressBookItems.length})</TooltipTrigger>
+                <TooltipContent>Shared contacts visible to everyone in this workspace</TooltipContent>
+              </Tooltip>
+            </TabsTrigger>
+            {isPrivateAddressBookEnabled && (
+              <>
+                <TabsTrigger value="mine" className="cursor-pointer">
+                  <Tooltip>
+                    <TooltipTrigger render={<span />}>Local contacts ({sortedLocalContacts.length})</TooltipTrigger>
+                    <TooltipContent>These contacts are in your local browser storage</TooltipContent>
+                  </Tooltip>
+                </TabsTrigger>
+                <TabsTrigger value="pending" className="cursor-pointer">
+                  <Tooltip>
+                    <TooltipTrigger render={<span />}>Pending ({pendingRequests.length})</TooltipTrigger>
+                    <TooltipContent>Contacts you proposed to add to the workspace</TooltipContent>
+                  </Tooltip>
+                </TabsTrigger>
+              </>
+            )}
+          </TabsList>
+
+          {(activeTab === 'workspace' || activeTab === 'mine') && (
+            // mb-4 on top of the Tabs root's own gap-2: 8px alone left the search almost touching
+            <div className="mt-6 mb-4 flex flex-wrap items-center gap-2">
+              {/* Only rendered when it holds an action. An always-present wrapper is still a flex
+                  item when empty, so the row's gap-2 pushed the search 8px right of the table card
+                  it sits above — three different left edges for viewers without admin rights. */}
+              {(isAdmin && activeTab === 'workspace') || (isPrivateAddressBookEnabled && activeTab === 'mine') ? (
+                <div className="flex shrink-0 gap-2">
+                  {isAdmin && activeTab === 'workspace' && (
+                    <>
+                      <Track {...SPACE_EVENTS.ADD_ADDRESS}>
+                        <AddContact label="Add shared contact" />
+                      </Track>
+                      <ImportAddressBook />
+                    </>
+                  )}
+                  {isPrivateAddressBookEnabled && activeTab === 'mine' && <AddLocalContact />}
+                </div>
+              ) : null}
+              {(activeTab === 'workspace' ? addressBookItems.length > 0 : sortedLocalContacts.length > 0) && (
+                // `default` (h-9), not `lg`: the Add contact / Import buttons on this row are
+                // `size="action"`, which is h-9.
+                <AddressBookSearchInput value={searchQuery} onChange={setSearchQuery} inputSize="default" />
+              )}
+            </div>
+          )}
+
+          <TableCard>
+            <TabsContent value="workspace">
+              {searchQuery && filteredAll.length === 0 ? (
+                <p className="text-muted-foreground mb-2 p-4 text-sm">Found 0 results</p>
+              ) : addressBookItems.length === 0 ? (
+                <p className="text-muted-foreground p-4 text-sm">No contacts in this workspace yet.</p>
+              ) : (
+                <SpaceAddressBookTable entries={filteredAll} />
+              )}
+            </TabsContent>
+
+            {isPrivateAddressBookEnabled && (
+              <>
+                <TabsContent value="mine">
+                  {searchQuery && filteredMine.length === 0 ? (
+                    <p className="text-muted-foreground mb-2 p-4 text-sm">Found 0 results</p>
+                  ) : filteredMine.length === 0 ? (
+                    <p className="text-muted-foreground p-4 text-sm">You haven&apos;t added any contacts yet.</p>
+                  ) : (
+                    <SpaceAddressBookTable
+                      entries={filteredMine}
+                      showAddedBy={false}
+                      renderExtraAction={(entry, { isCompact }) => {
+                        if (entry.isDuplicate) {
+                          return (
+                            <Tooltip>
+                              <TooltipTrigger
+                                render={
+                                  <span className="inline-flex" aria-label={isCompact ? 'Already shared' : undefined} />
+                                }
+                              >
+                                {isCompact ? (
+                                  <Check className="text-muted-foreground size-4" />
+                                ) : (
+                                  <Badge variant="secondary">Already shared</Badge>
+                                )}
+                              </TooltipTrigger>
+                              <TooltipContent>Already saved in your workspace address book</TooltipContent>
+                            </Tooltip>
+                          )
+                        }
+                        if (isAdmin) {
+                          return (
+                            <AddToWorkspaceButton
+                              address={entry.address}
+                              name={entry.name}
+                              chainIds={entry.chainIds}
+                              isCompact={isCompact}
+                            />
+                          )
+                        }
+                        // Invitees can preview the space but cannot propose contacts
+                        if (isInvited) {
+                          return null
+                        }
+                        return (
+                          <RequestToAddButton
+                            address={entry.address}
+                            name={entry.name}
+                            chainIds={entry.chainIds}
+                            alreadyRequested={pendingAddresses.has(entry.address.toLowerCase())}
+                            isCompact={isCompact}
+                          />
+                        )
+                      }}
+                    />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="pending" className="mt-4 sm:mt-0">
+                  <PendingRequestsTable requests={pendingRequests} />
+                </TabsContent>
+              </>
+            )}
+          </TableCard>
+        </Tabs>
+      </div>
+    </>
+  )
+}
+
+export default SpaceAddressBook

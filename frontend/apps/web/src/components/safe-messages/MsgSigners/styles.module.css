@@ -1,0 +1,59 @@
+.icon {
+  height: 16px;
+  width: 16px;
+}
+
+.icon path:last-of-type {
+  fill: var(--color-background-paper);
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+}
+
+.signers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: relative;
+}
+
+.signers::before {
+  content: '';
+  position: absolute;
+  border-left: 2px solid var(--color-border-light);
+  left: 15px;
+  top: 20px;
+  height: calc(100% - 40px);
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-1);
+}
+
+.listItem:first-of-type {
+  padding-top: 0;
+}
+
+/* Positioned so the icons paint over `.signers::before`, which is absolute and would otherwise strike
+   through them. Not `z-index: -1` on the line: `.signers` makes no stacking context, so the line would
+   drop behind the enclosing InfoBox fill and vanish between the icons too. */
+.listItemIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-main);
+  min-width: 32px;
+  padding: var(--space-1) 0;
+}
+
+.listItemText {
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-1);
+  min-width: 0;
+}

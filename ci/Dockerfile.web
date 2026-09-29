@@ -1,0 +1,20 @@
+FROM node:24-bookworm-slim AS build
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ git libusb-1.0-0-dev libudev-dev && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+ENV HUSKY=0 CYPRESS_INSTALL_BINARY=0 NEXT_TELEMETRY_DISABLED=1
+COPY frontend/ ./
+RUN corepack enable && yarn install --immutable && yarn workspace @safe-global/web after-install
+COPY infrastructure/deploy/ /deployment/
+RUN ln -s /app/apps/web/src/services/tx /overrides
+ENV NEXT_PUBLIC_IS_PRODUCTION=true NEXT_PUBLIC_IS_OFFICIAL_HOST=false NEXT_PUBLIC_BRAND_NAME="ForeverMoney Safe" NEXT_PUBLIC_GATEWAY_URL_PRODUCTION=/cgw NEXT_PUBLIC_DEFAULT_MAINNET_CHAIN_ID=964 NEXT_PUBLIC_SAFE_VERSION=1.4.1 NODE_OPTIONS=--max-old-space-size=4096
+ARG COMMIT_SHA
+ARG FINNEY_RPC_URL
+ENV NEXT_PUBLIC_FINNEY_RPC_URL=$FINNEY_RPC_URL
+ENV NEXT_PUBLIC_COMMIT_HASH=$COMMIT_SHA GITHUB_SHA=$COMMIT_SHA
+WORKDIR /app/apps/web
+RUN yarn tsc --noEmit --incremental false --pretty false
+RUN node /deployment/check-alpha-planner.cjs && node /deployment/check-finney-shield.cjs
+RUN yarn build
+RUN python3 /deployment/brand-mobile.py out && python3 /deployment/branding/postprocess.py out multisig && mkdir -p out/assets/metadata && cp -R /deployment/assets/metadata/. out/assets/metadata/
+FROM scratch AS export
+COPY --from=build /app/apps/web/out/ /

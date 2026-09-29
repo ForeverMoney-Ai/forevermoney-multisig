@@ -1,0 +1,176 @@
+import { decodeAlphaTransfer, decodeAlphaBatch } from '@/services/tx/finney-alpha'
+import FinneyAlphaTransfer from '@/components/common/FinneyAlphaTransfer'
+import { decodeSs58Transfer } from '@/services/tx/finney-tao'
+import FinneyTaoTransfer from '@/components/common/FinneyTaoTransfer'
+import type { TransactionDetails } from '@safe-global/store/gateway/AUTO_GENERATED/transactions'
+import { TransactionStatus } from '@safe-global/store/gateway/types'
+import SettingsChangeTxInfo from '@/components/transactions/TxDetails/TxData/SettingsChange'
+import {
+  isStakingTxExitInfo,
+  isBridgeOrderTxInfo,
+  isExecTxData,
+  isLifiSwapTxInfo,
+  isOnChainConfirmationTxData,
+  isSafeUpdateTxData,
+  isStakingTxWithdrawInfo,
+  isVaultDepositTxInfo,
+  isVaultRedeemTxInfo,
+  isCancellationTxInfo,
+  isCustomTxInfo,
+  isMigrateToL2TxData,
+  isMultisigDetailedExecutionInfo,
+  isMultiSendTxInfo,
+  isOrderTxInfo,
+  isSettingsChangeTxInfo,
+  isSpendingLimitMethod,
+  isStakingTxDepositInfo,
+  isSupportedSpendingLimitAddress,
+  isTransferTxInfo,
+  type SpendingLimitMethods,
+} from '@/utils/transaction-guards'
+import { SpendingLimits } from '@/components/transactions/TxDetails/TxData/SpendingLimits'
+import type { PropsWithChildren, ReactElement } from 'react'
+import RejectionTxInfo from '@/components/transactions/TxDetails/TxData/Rejection'
+import TransferTxInfo from '@/components/transactions/TxDetails/TxData/Transfer'
+import useChainId from '@/hooks/useChainId'
+import { MigrationToL2TxData } from './MigrationToL2TxData'
+import { StakingTxDepositDetails, StakingTxExitDetails, StakingTxWithdrawDetails } from './Staking'
+import { SwapFeature } from '@/features/swap'
+import { useLoadFeature } from '@/features/__core__'
+import { OnChainConfirmation } from './NestedTransaction/OnChainConfirmation'
+import { ExecTransaction } from './NestedTransaction/ExecTransaction'
+import SafeUpdate from './SafeUpdate'
+import { VaultDepositTxDetails, VaultRedeemTxDetails } from '@/features/earn'
+import DecodedData from './DecodedData'
+import ObservabilityErrorBoundary from '@/components/common/ObservabilityErrorBoundary'
+import Multisend from './DecodedData/Multisend'
+import BridgeTransaction from '@/components/tx/confirmation-views/BridgeTransaction'
+import { LifiSwapTransaction } from '@/components/tx/confirmation-views/LifiSwapTransaction'
+
+const TxData = ({
+  txInfo,
+  txData,
+  txDetails,
+  trusted,
+  imitation,
+  executingSafeAddress,
+  children,
+}: PropsWithChildren<{
+  txInfo: TransactionDetails['txInfo']
+  txData: TransactionDetails['txData']
+  txDetails?: TransactionDetails
+  trusted: boolean
+  imitation: boolean
+  // Safe whose context the txData executes in. Only needed when it can't be derived from
+  // `txDetails.safeAddress` (e.g. ExecTransaction, which renders a preview without txDetails).
+  executingSafeAddress?: string
+}>): ReactElement => {
+  const chainId = useChainId()
+  const { SwapOrder } = useLoadFeature(SwapFeature)
+
+  const batch = txData && decodeAlphaBatch(chainId, txData.to.value, txData.hexData || '', txData.value || '0', txData.operation)
+  if (batch) return <FinneyAlphaTransfer {...batch} />
+
+  const alpha = txData && decodeAlphaTransfer(chainId, txData.to.value, txData.hexData || '', txData.value || '0', txData.operation)
+  if (alpha) return <FinneyAlphaTransfer {...alpha} />
+
+  const ss58Transfer = txData && decodeSs58Transfer(chainId, txData.to.value, txData.hexData || '', txData.value || '0', txData.operation)
+  if (ss58Transfer) return <FinneyTaoTransfer {...ss58Transfer} />
+
+  if (isOrderTxInfo(txInfo)) {
+    return <SwapOrder txData={txData} txInfo={txInfo} />
+  }
+
+  if (isStakingTxDepositInfo(txInfo)) {
+    return <StakingTxDepositDetails txData={txData} info={txInfo} />
+  }
+
+  if (isStakingTxExitInfo(txInfo)) {
+    return <StakingTxExitDetails info={txInfo} />
+  }
+
+  if (isStakingTxWithdrawInfo(txInfo)) {
+    return <StakingTxWithdrawDetails info={txInfo} />
+  }
+
+  // @ts-ignore: TODO: Fix this type
+  if (isVaultDepositTxInfo(txInfo)) {
+    return <VaultDepositTxDetails info={txInfo} />
+  }
+
+  // @ts-ignore: TODO: Fix this type
+  if (isVaultRedeemTxInfo(txInfo)) {
+    return <VaultRedeemTxDetails info={txInfo} />
+  }
+
+  if (isBridgeOrderTxInfo(txInfo)) {
+    return <BridgeTransaction txInfo={txInfo} />
+  }
+
+  if (isLifiSwapTxInfo(txInfo)) {
+    return <LifiSwapTransaction txInfo={txInfo} isPreview={false} />
+  }
+
+  if (isTransferTxInfo(txInfo)) {
+    return (
+      <TransferTxInfo
+        txInfo={txInfo}
+        txStatus={txDetails?.txStatus ?? TransactionStatus.AWAITING_CONFIRMATIONS}
+        trusted={trusted}
+        imitation={imitation}
+      />
+    )
+  }
+
+  if (isSettingsChangeTxInfo(txInfo)) {
+    return <SettingsChangeTxInfo settingsInfo={txInfo.settingsInfo} isTxExecuted={!!txDetails?.executedAt} />
+  }
+
+  if (txDetails && isCancellationTxInfo(txInfo) && isMultisigDetailedExecutionInfo(txDetails.detailedExecutionInfo)) {
+    return <RejectionTxInfo nonce={txDetails.detailedExecutionInfo?.nonce} isTxExecuted={!!txDetails.executedAt} />
+  }
+
+  if (
+    isCustomTxInfo(txInfo) &&
+    isSupportedSpendingLimitAddress(txInfo, chainId) &&
+    isSpendingLimitMethod(txData?.dataDecoded?.method)
+  ) {
+    return <SpendingLimits txData={txData} txInfo={txInfo} type={txData?.dataDecoded?.method as SpendingLimitMethods} />
+  }
+
+  if (txDetails && isMigrateToL2TxData(txData, chainId)) {
+    return <MigrationToL2TxData txDetails={txDetails} />
+  }
+
+  if (isOnChainConfirmationTxData(txData)) {
+    return <OnChainConfirmation data={txData} />
+  }
+
+  if (isExecTxData(txData)) {
+    return <ExecTransaction data={txData} />
+  }
+
+  if (isSafeUpdateTxData(txData)) {
+    return <SafeUpdate txData={txData} />
+  }
+
+  return !!children ? (
+    <>{children}</>
+  ) : (
+    <>
+      <DecodedData txData={txData} toInfo={isCustomTxInfo(txInfo) ? txInfo.to : txData?.to} />
+
+      {(isMultiSendTxInfo(txInfo) || isOrderTxInfo(txInfo)) && (
+        <ObservabilityErrorBoundary fallback={<div>Error parsing data</div>}>
+          <Multisend
+            txData={txData}
+            isExecuted={!!txDetails?.executedAt}
+            executingSafeAddress={executingSafeAddress ?? txDetails?.safeAddress}
+          />
+        </ObservabilityErrorBoundary>
+      )}
+    </>
+  )
+}
+
+export default TxData

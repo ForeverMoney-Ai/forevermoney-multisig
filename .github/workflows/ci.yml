@@ -1,0 +1,123 @@
+name: Build and validate
+on:
+  push:
+    branches: [main, 'codex/full-stack-ci']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [web, builder]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ci/Dockerfile.${{ matrix.component }}
+          build-args: |
+            COMMIT_SHA=${{ github.sha }}
+            FINNEY_RPC_URL=${{ secrets.FINNEY_BROWSER_RPC_URL }}
+          outputs: type=local,dest=ci/output/${{ matrix.component }}
+          cache-from: type=gha,scope=${{ matrix.component }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.component }},ignore-error=true,timeout=5m
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.component }}-${{ github.sha }}
+          path: ci/output/${{ matrix.component }}/
+          if-no-files-found: error
+          retention-days: 14
+  deployment-checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 ci/test_deploy.py
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [build, deployment-checks, browser-smoke, cluster-preflight]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-${{ github.sha }}
+          path: ci/output/web
+      - uses: actions/download-artifact@v4
+        with:
+          name: builder-${{ github.sha }}
+          path: ci/output/builder
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: v1.34.1
+      - name: Configure scoped deployment access
+        env:
+          DEPLOY_KUBECONFIG: ${{ secrets.DEPLOY_KUBECONFIG }}
+        run: |
+          test -n "$DEPLOY_KUBECONFIG"
+          umask 077
+          printf '%s' "$DEPLOY_KUBECONFIG" > "$RUNNER_TEMP/deploy-kubeconfig"
+          echo "KUBECONFIG=$RUNNER_TEMP/deploy-kubeconfig" >> "$GITHUB_ENV"
+      - name: Deploy and verify application stack
+        run: python3 ci/deploy.py
+      - name: Remove deployment credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/deploy-kubeconfig"
+  browser-smoke:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-${{ github.sha }}
+          path: ci/output/web
+      - uses: actions/download-artifact@v4
+        with:
+          name: builder-${{ github.sha }}
+          path: ci/output/web/tx-builder
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ci/browser/package-lock.json
+      - run: npm ci && npx playwright install --with-deps chromium && npm test
+        working-directory: ci/browser
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure-${{ github.sha }}
+          path: ci/browser/test-results/
+          retention-days: 7
+  cluster-preflight:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: v1.34.1
+      - name: Validate manifests against production without applying
+        env:
+          DEPLOY_KUBECONFIG: ${{ secrets.DEPLOY_KUBECONFIG }}
+        run: |
+          test -n "$DEPLOY_KUBECONFIG"
+          umask 077
+          export KUBECONFIG="$RUNNER_TEMP/deploy-kubeconfig"
+          trap 'rm -f "$KUBECONFIG"' EXIT
+          printf '%s' "$DEPLOY_KUBECONFIG" > "$KUBECONFIG"
+          python3 ci/deploy.py --check

@@ -1,0 +1,169 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "github-deploy",
+        "namespace": "bittensor-safe"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "Role",
+      "metadata": {
+        "name": "github-deploy",
+        "namespace": "bittensor-safe"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            "apps"
+          ],
+          "resources": [
+            "deployments"
+          ],
+          "resourceNames": [
+            "ui",
+            "cgw",
+            "cfg",
+            "txs",
+            "worker",
+            "worker-live",
+            "scheduler",
+            "address-resolver",
+            "governance-sync",
+            "price-proxy"
+          ],
+          "verbs": [
+            "get",
+            "list",
+            "watch",
+            "patch",
+            "update"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "configmaps"
+          ],
+          "resourceNames": [
+            "ui-nginx",
+            "address-resolver-runtime",
+            "standard-worker-runtime",
+            "governance-sync-code",
+            "sync-alert-code",
+            "cfg",
+            "cgw",
+            "txs",
+            "price-proxy-code"
+          ],
+          "verbs": [
+            "get",
+            "patch",
+            "update"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "services"
+          ],
+          "resourceNames": [
+            "ui",
+            "cgw",
+            "cfg",
+            "txs",
+            "address-resolver",
+            "price-proxy"
+          ],
+          "verbs": [
+            "get",
+            "patch",
+            "update"
+          ]
+        },
+        {
+          "apiGroups": [
+            "networking.k8s.io"
+          ],
+          "resources": [
+            "ingresses"
+          ],
+          "verbs": [
+            "get",
+            "patch",
+            "update"
+          ]
+        },
+        {
+          "apiGroups": [
+            "batch"
+          ],
+          "resources": [
+            "cronjobs"
+          ],
+          "resourceNames": [
+            "sync-alert"
+          ],
+          "verbs": [
+            "get",
+            "patch",
+            "update"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods"
+          ],
+          "verbs": [
+            "get",
+            "list"
+          ]
+        },
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods/exec"
+          ],
+          "verbs": [
+            "create"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "RoleBinding",
+      "metadata": {
+        "name": "github-deploy",
+        "namespace": "bittensor-safe"
+      },
+      "subjects": [
+        {
+          "kind": "ServiceAccount",
+          "name": "github-deploy",
+          "namespace": "bittensor-safe"
+        }
+      ],
+      "roleRef": {
+        "kind": "Role",
+        "name": "github-deploy",
+        "apiGroup": "rbac.authorization.k8s.io"
+      }
+    }
+  ]
+}

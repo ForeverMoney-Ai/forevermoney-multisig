@@ -1,0 +1,364 @@
+import { act, render, screen, waitFor, within } from '@/tests/test-utils'
+import { userEvent } from '@testing-library/user-event'
+import TxNonce from '../index'
+import { SafeTxContext, type SafeTxContextParams } from '@/components/tx-flow/SafeTxProvider'
+import { TxFlowContext, initialContext as initialTxFlowContext } from '@/components/tx-flow/TxFlowProvider'
+import { extendedSafeInfoBuilder } from '@/tests/builders/safe'
+
+jest.mock('@/hooks/useSafeInfo')
+jest.mock('@/hooks/usePreviousNonces')
+jest.mock('@/hooks/useTxQueue')
+jest.mock('@/hooks/useAddressBook', () => ({
+  __esModule: true,
+  default: () => ({}),
+}))
+
+const mockUseSafeInfo = jest.requireMock('@/hooks/useSafeInfo').default as jest.Mock
+const mockUsePreviousNonces = jest.requireMock('@/hooks/usePreviousNonces').default as jest.Mock
+const mockUseQueuedTxByNonce = jest.requireMock('@/hooks/useTxQueue').useQueuedTxByNonce as jest.Mock
+
+const defaultSafeTxContext: SafeTxContextParams = {
+  safeTx: undefined,
+  setSafeTx: jest.fn(),
+  safeMessage: undefined,
+  setSafeMessage: jest.fn(),
+  safeMessageHash: undefined,
+  setSafeMessageHash: jest.fn(),
+  safeTxError: undefined,
+  setSafeTxError: jest.fn(),
+  nonce: 5,
+  setNonce: jest.fn(),
+  nonceNeeded: true,
+  setNonceNeeded: jest.fn(),
+  safeTxGas: undefined,
+  setSafeTxGas: jest.fn(),
+  recommendedNonce: 5,
+  txOrigin: undefined,
+  setTxOrigin: jest.fn(),
+  isReadOnly: false,
+  gtfPaymentMode: 'safe',
+  setGtfPaymentMode: jest.fn(),
+  gtfSelectedGasToken: undefined,
+  setGtfSelectedGasToken: jest.fn(),
+}
+
+const renderTxNonce = (
+  contextOverrides: Partial<SafeTxContextParams> = {},
+  canEdit?: boolean,
+  txFlowOverrides: Partial<typeof initialTxFlowContext> = {},
+) => {
+  const contextValue = { ...defaultSafeTxContext, ...contextOverrides }
+  const txFlowValue = { ...initialTxFlowContext, ...txFlowOverrides }
+  return render(
+    <TxFlowContext.Provider value={txFlowValue}>
+      <SafeTxContext.Provider value={contextValue}>
+        <TxNonce {...(canEdit !== undefined ? { canEdit } : {})} />
+      </SafeTxContext.Provider>
+    </TxFlowContext.Provider>,
+  )
+}
+
+describe('TxNonce', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    const safe = extendedSafeInfoBuilder().with({ nonce: 5 }).build()
+    mockUseSafeInfo.mockReturnValue({
+      safe,
+      safeAddress: safe.address.value,
+      safeLoaded: true,
+      safeLoading: false,
+    })
+    mockUsePreviousNonces.mockReturnValue([])
+    mockUseQueuedTxByNonce.mockReturnValue([])
+  })
+
+  describe('loading state', () => {
+    it('shows a skeleton when nonce is undefined', () => {
+      const { container } = renderTxNonce({ nonce: undefined })
+      // shadcn Skeleton renders when nonce is undefined
+      expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument()
+    })
+
+    it('shows a skeleton when recommendedNonce is undefined', () => {
+      const { container } = renderTxNonce({ recommendedNonce: undefined })
+      expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument()
+    })
+
+    it('shows a skeleton when both nonce and recommendedNonce are undefined', () => {
+      const { container } = renderTxNonce({ nonce: undefined, recommendedNonce: undefined })
+      expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument()
+    })
+  })
+
+  describe('read-only display', () => {
+    it('shows nonce as plain text when isReadOnly is true', () => {
+      renderTxNonce({ nonce: 7, recommendedNonce: 7, isReadOnly: true })
+      expect(screen.getByText('7')).toBeInTheDocument()
+      // No input field
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    })
+
+    it('shows nonce as plain text when canEdit is false', () => {
+      renderTxNonce({ nonce: 3, recommendedNonce: 3 }, false)
+      expect(screen.getByText('3')).toBeInTheDocument()
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    })
+
+    it('shows nonce as plain text when safeTx has signatures (isReadOnly from context)', () => {
+      // TxNonce renders read-only when context isReadOnly=true (set by SafeTxProvider when tx is signed)
+      const mockSignature = { signer: '0xSigner', data: '0xData', isContractSignature: false }
+      const safeTx = {
+        data: { nonce: 5, to: '0x', value: '0', data: '0x', operation: 0 },
+        signatures: new Map([['0xSigner', mockSignature]]),
+      } as any
+      renderTxNonce({ nonce: 5, recommendedNonce: 5, safeTx, isReadOnly: true })
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+      expect(screen.getByText('5')).toBeInTheDocument()
+    })
+  })
+
+  describe('editable state', () => {
+    it('renders the nonce label', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+      expect(screen.getByText('Nonce')).toBeInTheDocument()
+    })
+
+    it('renders the nonce field container', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+      expect(screen.getByTestId('nonce-fld')).toBeInTheDocument()
+    })
+
+    it('renders an autocomplete input when editable', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+      expect(screen.getByRole('combobox')).toBeInTheDocument()
+    })
+
+    it('shows the current nonce value in the input', () => {
+      renderTxNonce({ nonce: 42, recommendedNonce: 42 })
+      const input = screen.getByRole('combobox') as HTMLInputElement
+      expect(input.value).toBe('42')
+    })
+
+    // jsdom drops both clamp() values and custom properties, so assert the class wiring only.
+    it('sizes the inner input to the value-width variable, leaving room for the addons', () => {
+      renderTxNonce({ nonce: 42, recommendedNonce: 42 })
+      const input = screen.getByRole('combobox') as HTMLInputElement
+      const group = input.closest('[data-slot="input-group"]') as HTMLElement
+      expect(group).toHaveClass('[&_input]:w-(--nonce-width)', '[&_input]:min-w-0')
+    })
+
+    it('shows reset button when nonce differs from recommended', () => {
+      renderTxNonce({ nonce: 10, recommendedNonce: 5 })
+      // Reset to recommended nonce button appears as an IconButton
+      expect(screen.getByRole('button', { name: /reset to recommended nonce/i })).toBeInTheDocument()
+    })
+
+    it('does not show reset button when nonce equals recommended', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+      expect(screen.queryByRole('button', { name: /reset to recommended nonce/i })).not.toBeInTheDocument()
+    })
+  })
+
+  describe('rejection flow', () => {
+    it('shows nonce as read-only when isRejection is true in TxFlowContext', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 }, undefined, { isRejection: true })
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+      expect(screen.getByText('5')).toBeInTheDocument()
+    })
+
+    it('allows nonce editing for transactions with empty data when not a rejection flow', () => {
+      const safeTx = {
+        data: { nonce: 5, to: '0x123', value: '0', data: '0x', operation: 0 },
+        signatures: new Map(),
+      } as any
+      renderTxNonce({ nonce: 5, recommendedNonce: 5, safeTx }, undefined, { isRejection: false })
+      expect(screen.getByRole('combobox')).toBeInTheDocument()
+    })
+
+    it('locks nonce when confirming an existing rejection tx (isRejection from ConfirmTxFlow)', () => {
+      const safeTx = {
+        data: { nonce: 5, to: '0x123', value: '0', data: '0x', operation: 0 },
+        signatures: new Map(),
+      } as any
+      renderTxNonce({ nonce: 5, recommendedNonce: 5, safeTx }, undefined, { isRejection: true })
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+      expect(screen.getByText('5')).toBeInTheDocument()
+    })
+  })
+
+  describe('canEdit prop', () => {
+    it('defaults to editable when canEdit is not provided', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+      expect(screen.getByRole('combobox')).toBeInTheDocument()
+    })
+
+    it('shows editable input when canEdit is true', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 }, true)
+      expect(screen.getByRole('combobox')).toBeInTheDocument()
+    })
+
+    it('shows read-only text when canEdit is false even if not isReadOnly', () => {
+      renderTxNonce({ nonce: 5, recommendedNonce: 5, isReadOnly: false }, false)
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+      expect(screen.getByText('5')).toBeInTheDocument()
+    })
+  })
+
+  describe('nonce dropdown', () => {
+    // Regression: the group labels ("Recommended nonce" / "Replace existing") are rendered
+    // directly inside the popup list. Base UI's GroupLabel requires a Combobox.Group ancestor
+    // for its context, so mounting the popup throws and the dropdown never opens.
+    it('opens the nonce dropdown when the input is clicked', async () => {
+      const user = userEvent.setup()
+      mockUsePreviousNonces.mockReturnValue([4, 3])
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+
+      await user.click(screen.getByRole('combobox'))
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument()
+      })
+      expect(screen.getByText('Recommended nonce')).toBeInTheDocument()
+      expect(screen.getByText('Replace existing')).toBeInTheDocument()
+    })
+
+    it('opens the nonce dropdown on arrow down', async () => {
+      const user = userEvent.setup()
+      mockUsePreviousNonces.mockReturnValue([4, 3])
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+
+      const input = screen.getByRole('combobox')
+      await act(async () => input.focus())
+      await user.keyboard('{ArrowDown}')
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument()
+      })
+    })
+
+    it('sizes the popup to fit its content instead of the tiny input', async () => {
+      const user = userEvent.setup()
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+
+      await user.click(screen.getByRole('combobox'))
+
+      const content = await waitFor(() => {
+        const el = document.querySelector('[data-slot="combobox-content"]')
+        expect(el).toBeInTheDocument()
+        return el as HTMLElement
+      })
+      expect(content).toHaveClass('w-max', 'min-w-40', 'max-w-[300px]')
+    })
+  })
+
+  describe('replace existing nonce label', () => {
+    const buildQueuedTx = (overrides: { note?: string | null; humanDescription?: string | null } = {}) => ({
+      type: 'TRANSACTION' as const,
+      conflictType: 'None' as const,
+      transaction: {
+        id: 'tx-1',
+        timestamp: Date.now(),
+        txStatus: 'AWAITING_CONFIRMATIONS' as const,
+        note: overrides.note ?? null,
+        txInfo: {
+          type: 'Custom' as const,
+          humanDescription: overrides.humanDescription ?? null,
+          to: { value: '0x0000000000000000000000000000000000000000' },
+          dataSize: '0',
+          value: '0',
+          isCancellation: false,
+          methodName: null,
+          actionCount: null,
+        },
+      },
+    })
+
+    const openNonceDropdown = async () => {
+      const user = userEvent.setup()
+      await user.click(screen.getByRole('combobox'))
+      return screen.findByRole('listbox')
+    }
+
+    const mockQueueByNonce = (nonce: number, tx: ReturnType<typeof buildQueuedTx> | null) => {
+      mockUseQueuedTxByNonce.mockImplementation((n: number) => (n === nonce && tx ? [tx] : []))
+    }
+
+    const getPreviousNonceOption = (listbox: HTMLElement) => within(listbox).getByRole('option', { selected: false })
+
+    it('shows the transaction note when present', async () => {
+      mockUsePreviousNonces.mockReturnValue([4])
+      mockQueueByNonce(4, buildQueuedTx({ note: 'Treasury payout', humanDescription: 'fallback' }))
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+
+      const option = getPreviousNonceOption(await openNonceDropdown())
+      expect(option).toHaveTextContent(/Treasury payout/)
+      expect(option).not.toHaveTextContent(/fallback/)
+    })
+
+    it('falls back to humanDescription when note is missing', async () => {
+      mockUsePreviousNonces.mockReturnValue([4])
+      mockQueueByNonce(4, buildQueuedTx({ note: null, humanDescription: 'Send to alice.eth' }))
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+
+      const option = getPreviousNonceOption(await openNonceDropdown())
+      expect(option).toHaveTextContent(/Send to alice\.eth/)
+    })
+
+    it('treats a whitespace-only note as missing and falls back', async () => {
+      mockUsePreviousNonces.mockReturnValue([4])
+      mockQueueByNonce(4, buildQueuedTx({ note: '   ', humanDescription: 'Send to alice.eth' }))
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+
+      const option = getPreviousNonceOption(await openNonceDropdown())
+      expect(option).toHaveTextContent(/Send to alice\.eth/)
+    })
+
+    it('shows "New transaction" when no queued txs exist for that nonce', async () => {
+      mockUsePreviousNonces.mockReturnValue([4])
+      mockQueueByNonce(4, null)
+      renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+
+      const option = getPreviousNonceOption(await openNonceDropdown())
+      expect(option).toHaveTextContent(/New transaction/)
+    })
+  })
+
+  describe('warning states', () => {
+    it('shows warning when nonce is higher than recommended', () => {
+      const { container } = renderTxNonce({ nonce: 10, recommendedNonce: 5 })
+      // MUI Tooltip sets aria-label on the wrapped element (NumberField/TextField)
+      const warningEl = container.querySelector('[aria-label="Nonce is higher than the recommended nonce"]')
+      expect(warningEl).toBeInTheDocument()
+    })
+
+    it('shows "nonce is much higher" warning when nonce exceeds safe nonce by 100+', () => {
+      const safe = extendedSafeInfoBuilder().with({ nonce: 5 }).build()
+      mockUseSafeInfo.mockReturnValue({
+        safe,
+        safeAddress: safe.address.value,
+        safeLoaded: true,
+        safeLoading: false,
+      })
+      const { container } = renderTxNonce({ nonce: 106, recommendedNonce: 5 })
+      const warningEl = container.querySelector('[aria-label="Nonce is much higher than the current nonce"]')
+      expect(warningEl).toBeInTheDocument()
+    })
+
+    it('shows no warning when nonce equals recommended', () => {
+      const { container } = renderTxNonce({ nonce: 5, recommendedNonce: 5 })
+      expect(
+        container.querySelector('[aria-label="Nonce is higher than the recommended nonce"]'),
+      ).not.toBeInTheDocument()
+      expect(
+        container.querySelector('[aria-label="Nonce is much higher than the current nonce"]'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('anchors the warning tooltip to a laid-out element, not a display:contents box', () => {
+      const { container } = renderTxNonce({ nonce: 10, recommendedNonce: 5 })
+      const trigger = container.querySelector('[data-slot="tooltip-trigger"]')
+      expect(trigger).toBeInTheDocument()
+      expect(trigger).not.toHaveClass('contents')
+    })
+  })
+})

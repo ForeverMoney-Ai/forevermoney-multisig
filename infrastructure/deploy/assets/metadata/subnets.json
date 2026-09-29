@@ -1,0 +1,902 @@
+{
+  "source": "ForeverMoney",
+  "fetchedAt": "2026-09-09T12:50:17.937Z",
+  "subnets": [
+    {
+      "netuid": 1,
+      "symbol": "SN1",
+      "name": "Apex",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn1.webp"
+    },
+    {
+      "netuid": 2,
+      "symbol": "SN2",
+      "name": "DSperse",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn2.webp"
+    },
+    {
+      "netuid": 3,
+      "symbol": "SN3",
+      "name": "Teutonic",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn3.webp"
+    },
+    {
+      "netuid": 4,
+      "symbol": "SN4",
+      "name": "Targon",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn4.webp"
+    },
+    {
+      "netuid": 5,
+      "symbol": "SN5",
+      "name": "Hone",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 6,
+      "symbol": "SN6",
+      "name": "Numinous",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn6.webp"
+    },
+    {
+      "netuid": 7,
+      "symbol": "SN7",
+      "name": "Allways",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn7.webp"
+    },
+    {
+      "netuid": 8,
+      "symbol": "SN8",
+      "name": "Vanta",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn8.webp"
+    },
+    {
+      "netuid": 9,
+      "symbol": "SN9",
+      "name": "iota",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn9.webp"
+    },
+    {
+      "netuid": 10,
+      "symbol": "SN10",
+      "name": "Pareton",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn10.webp"
+    },
+    {
+      "netuid": 11,
+      "symbol": "SN11",
+      "name": "TrajectoryRL",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn11.webp"
+    },
+    {
+      "netuid": 12,
+      "symbol": "SN12",
+      "name": "Compute Horde",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn12.webp"
+    },
+    {
+      "netuid": 13,
+      "symbol": "SN13",
+      "name": "Data Universe",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn13.webp"
+    },
+    {
+      "netuid": 14,
+      "symbol": "SN14",
+      "name": "Cacheon",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn14.webp"
+    },
+    {
+      "netuid": 15,
+      "symbol": "SN15",
+      "name": "ORO",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn15.webp"
+    },
+    {
+      "netuid": 16,
+      "symbol": "SN16",
+      "name": "trav",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 17,
+      "symbol": "SN17",
+      "name": "404\u2014GEN",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn17.webp"
+    },
+    {
+      "netuid": 18,
+      "symbol": "SN18",
+      "name": "Zeus",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn18.webp"
+    },
+    {
+      "netuid": 19,
+      "symbol": "SN19",
+      "name": "blockmachine",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn19.webp"
+    },
+    {
+      "netuid": 20,
+      "symbol": "SN20",
+      "name": "ChronoSeek",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn20.webp"
+    },
+    {
+      "netuid": 21,
+      "symbol": "SN21",
+      "name": "AdTAO",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn21.webp"
+    },
+    {
+      "netuid": 22,
+      "symbol": "SN22",
+      "name": "Desearch",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn22.webp"
+    },
+    {
+      "netuid": 23,
+      "symbol": "SN23",
+      "name": "Trishool",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn23.webp"
+    },
+    {
+      "netuid": 24,
+      "symbol": "SN24",
+      "name": "Quasar",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 25,
+      "symbol": "SN25",
+      "name": "UR",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn25.webp"
+    },
+    {
+      "netuid": 26,
+      "symbol": "SN26",
+      "name": "Perturb",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn26.webp"
+    },
+    {
+      "netuid": 27,
+      "symbol": "SN27",
+      "name": "Orion",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 28,
+      "symbol": "SN28",
+      "name": "SayGM",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn28.webp"
+    },
+    {
+      "netuid": 29,
+      "symbol": "SN29",
+      "name": "ho\u03c4floa\u03c4",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 30,
+      "symbol": "SN30",
+      "name": "Endure Network",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn30.webp"
+    },
+    {
+      "netuid": 31,
+      "symbol": "SN31",
+      "name": "rec4ll",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 32,
+      "symbol": "SN32",
+      "name": "ItsAI",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn32.webp"
+    },
+    {
+      "netuid": 33,
+      "symbol": "SN33",
+      "name": "ReadyAI",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn33.webp"
+    },
+    {
+      "netuid": 34,
+      "symbol": "SN34",
+      "name": "BitMind",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn34.webp"
+    },
+    {
+      "netuid": 35,
+      "symbol": "SN35",
+      "name": "OxMarkets",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn35.webp"
+    },
+    {
+      "netuid": 36,
+      "symbol": "SN36",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 37,
+      "symbol": "SN37",
+      "name": "Aurelius",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn37.webp"
+    },
+    {
+      "netuid": 38,
+      "symbol": "SN38",
+      "name": "ChronoLLM",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn38.webp"
+    },
+    {
+      "netuid": 39,
+      "symbol": "SN39",
+      "name": "deprecated",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 40,
+      "symbol": "SN40",
+      "name": "Ralph",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn40.webp"
+    },
+    {
+      "netuid": 41,
+      "symbol": "SN41",
+      "name": "Almanac",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn41.webp"
+    },
+    {
+      "netuid": 42,
+      "symbol": "SN42",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 43,
+      "symbol": "SN43",
+      "name": "Graphite",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn43.webp"
+    },
+    {
+      "netuid": 44,
+      "symbol": "SN44",
+      "name": "Score",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn44.webp"
+    },
+    {
+      "netuid": 45,
+      "symbol": "SN45",
+      "name": "AlphaRidge.ai",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn45.webp"
+    },
+    {
+      "netuid": 46,
+      "symbol": "SN46",
+      "name": "Instant",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn46.webp"
+    },
+    {
+      "netuid": 47,
+      "symbol": "SN47",
+      "name": "Feval",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn47.webp"
+    },
+    {
+      "netuid": 48,
+      "symbol": "SN48",
+      "name": "Quantum Compute",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn48.webp"
+    },
+    {
+      "netuid": 49,
+      "symbol": "SN49",
+      "name": "Nepher Robotics",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn49.webp"
+    },
+    {
+      "netuid": 50,
+      "symbol": "SN50",
+      "name": "Synth",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn50.webp"
+    },
+    {
+      "netuid": 51,
+      "symbol": "SN51",
+      "name": "lium.io",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn51.webp"
+    },
+    {
+      "netuid": 52,
+      "symbol": "SN52",
+      "name": "Dojo",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 53,
+      "symbol": "SN53",
+      "name": "engy",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn53.webp"
+    },
+    {
+      "netuid": 54,
+      "symbol": "SN54",
+      "name": "Yanez",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn54.webp"
+    },
+    {
+      "netuid": 55,
+      "symbol": "SN55",
+      "name": "NIOME",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn55.webp"
+    },
+    {
+      "netuid": 56,
+      "symbol": "SN56",
+      "name": "Gradients",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn56.webp"
+    },
+    {
+      "netuid": 57,
+      "symbol": "SN57",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 58,
+      "symbol": "SN58",
+      "name": "greevils",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn58.webp"
+    },
+    {
+      "netuid": 59,
+      "symbol": "SN59",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 60,
+      "symbol": "SN60",
+      "name": "Bitsec.ai",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn60.webp"
+    },
+    {
+      "netuid": 61,
+      "symbol": "SN61",
+      "name": "RedTeam",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn61.webp"
+    },
+    {
+      "netuid": 62,
+      "symbol": "SN62",
+      "name": "Ridges",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn62.webp"
+    },
+    {
+      "netuid": 63,
+      "symbol": "SN63",
+      "name": "Enigma",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn63.webp"
+    },
+    {
+      "netuid": 64,
+      "symbol": "SN64",
+      "name": "Chutes",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn64.webp"
+    },
+    {
+      "netuid": 65,
+      "symbol": "SN65",
+      "name": "True Performance Network",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn65.webp"
+    },
+    {
+      "netuid": 66,
+      "symbol": "SN66",
+      "name": "conjectures",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn66.webp"
+    },
+    {
+      "netuid": 67,
+      "symbol": "SN67",
+      "name": "Harnyx",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn67.webp"
+    },
+    {
+      "netuid": 68,
+      "symbol": "SN68",
+      "name": "NOVA",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn68.webp"
+    },
+    {
+      "netuid": 69,
+      "symbol": "SN69",
+      "name": "Herald",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn69.webp"
+    },
+    {
+      "netuid": 70,
+      "symbol": "SN70",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 71,
+      "symbol": "SN71",
+      "name": "Leadpoet",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn71.webp"
+    },
+    {
+      "netuid": 72,
+      "symbol": "SN72",
+      "name": "StreetVision by NATIX",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn72.webp"
+    },
+    {
+      "netuid": 73,
+      "symbol": "SN73",
+      "name": "Parked",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 74,
+      "symbol": "SN74",
+      "name": "Gittensor",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn74.webp"
+    },
+    {
+      "netuid": 75,
+      "symbol": "SN75",
+      "name": "Hippius",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn75.webp"
+    },
+    {
+      "netuid": 76,
+      "symbol": "SN76",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 77,
+      "symbol": "SN77",
+      "name": "Liquidity",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn77.webp"
+    },
+    {
+      "netuid": 78,
+      "symbol": "SN78",
+      "name": "Umi",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn78.webp"
+    },
+    {
+      "netuid": 79,
+      "symbol": "SN79",
+      "name": "MVTRX",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn79.webp"
+    },
+    {
+      "netuid": 80,
+      "symbol": "SN80",
+      "name": "OpenRoboto",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn80.webp"
+    },
+    {
+      "netuid": 81,
+      "symbol": "SN81",
+      "name": "Reliquary",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn81.webp"
+    },
+    {
+      "netuid": 82,
+      "symbol": "SN82",
+      "name": "Compelle",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn82.webp"
+    },
+    {
+      "netuid": 83,
+      "symbol": "SN83",
+      "name": "CliqueAI",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn83.webp"
+    },
+    {
+      "netuid": 84,
+      "symbol": "SN84",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 85,
+      "symbol": "SN85",
+      "name": "Vidaio",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn85.webp"
+    },
+    {
+      "netuid": 86,
+      "symbol": "SN86",
+      "name": "Unknown",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 87,
+      "symbol": "SN87",
+      "name": "Provenonce",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn87.webp"
+    },
+    {
+      "netuid": 88,
+      "symbol": "SN88",
+      "name": "Investing",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn88.webp"
+    },
+    {
+      "netuid": 89,
+      "symbol": "SN89",
+      "name": "InfiniteQuant",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn89.webp"
+    },
+    {
+      "netuid": 90,
+      "symbol": "SN90",
+      "name": "KubeTEE",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn90.webp"
+    },
+    {
+      "netuid": 91,
+      "symbol": "SN91",
+      "name": "cascade",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn91.webp"
+    },
+    {
+      "netuid": 92,
+      "symbol": "SN92",
+      "name": "MicroTensor",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn92.webp"
+    },
+    {
+      "netuid": 93,
+      "symbol": "SN93",
+      "name": "Bitcast",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn93.webp"
+    },
+    {
+      "netuid": 94,
+      "symbol": "SN94",
+      "name": "pending...",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 95,
+      "symbol": "SN95",
+      "name": "Actual",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn95.webp"
+    },
+    {
+      "netuid": 96,
+      "symbol": "SN96",
+      "name": "Verathos",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn96.webp"
+    },
+    {
+      "netuid": 97,
+      "symbol": "SN97",
+      "name": "Albedo",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn97.webp"
+    },
+    {
+      "netuid": 98,
+      "symbol": "SN98",
+      "name": "NeverPlayAlone",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn98.webp"
+    },
+    {
+      "netuid": 99,
+      "symbol": "SN99",
+      "name": "Thirty Spokes",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn99.webp"
+    },
+    {
+      "netuid": 100,
+      "symbol": "SN100",
+      "name": "Cortex",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn100.webp"
+    },
+    {
+      "netuid": 101,
+      "symbol": "SN101",
+      "name": "Tag101",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn101.webp"
+    },
+    {
+      "netuid": 102,
+      "symbol": "SN102",
+      "name": "ConnitoAI",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn102.webp"
+    },
+    {
+      "netuid": 103,
+      "symbol": "SN103",
+      "name": "Capcomp",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn103.webp"
+    },
+    {
+      "netuid": 104,
+      "symbol": "SN104",
+      "name": "TAOstatus",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn104.webp"
+    },
+    {
+      "netuid": 105,
+      "symbol": "SN105",
+      "name": "Beam",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn105.webp"
+    },
+    {
+      "netuid": 106,
+      "symbol": "SN106",
+      "name": "Nodexo",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn106.webp"
+    },
+    {
+      "netuid": 107,
+      "symbol": "SN107",
+      "name": "Minos",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn107.webp"
+    },
+    {
+      "netuid": 108,
+      "symbol": "SN108",
+      "name": "Prometheon",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn108.webp"
+    },
+    {
+      "netuid": 109,
+      "symbol": "SN109",
+      "name": "Finsight",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn109.webp"
+    },
+    {
+      "netuid": 110,
+      "symbol": "SN110",
+      "name": "Green Compute",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn110.webp"
+    },
+    {
+      "netuid": 111,
+      "symbol": "SN111",
+      "name": "Claims",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn111.webp"
+    },
+    {
+      "netuid": 112,
+      "symbol": "SN112",
+      "name": "parked",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 113,
+      "symbol": "SN113",
+      "name": "TensorUSD",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn113.webp"
+    },
+    {
+      "netuid": 114,
+      "symbol": "SN114",
+      "name": "SOMA",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn114.webp"
+    },
+    {
+      "netuid": 115,
+      "symbol": "SN115",
+      "name": "MoirAI",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn115.webp"
+    },
+    {
+      "netuid": 116,
+      "symbol": "SN116",
+      "name": "Memo",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 117,
+      "symbol": "SN117",
+      "name": "glyph",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn117.webp"
+    },
+    {
+      "netuid": 118,
+      "symbol": "SN118",
+      "name": "Ditto",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn118.webp"
+    },
+    {
+      "netuid": 119,
+      "symbol": "SN119",
+      "name": "Satori",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 120,
+      "symbol": "SN120",
+      "name": "Affine",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn120.webp"
+    },
+    {
+      "netuid": 121,
+      "symbol": "SN121",
+      "name": "sundae_bar",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn121.webp"
+    },
+    {
+      "netuid": 122,
+      "symbol": "SN122",
+      "name": "CookingTAO",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn122.webp"
+    },
+    {
+      "netuid": 123,
+      "symbol": "SN123",
+      "name": "MANTIS",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/tao.png"
+    },
+    {
+      "netuid": 124,
+      "symbol": "SN124",
+      "name": "Swarm",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn124.webp"
+    },
+    {
+      "netuid": 125,
+      "symbol": "SN125",
+      "name": "Refinery",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn125.webp"
+    },
+    {
+      "netuid": 126,
+      "symbol": "SN126",
+      "name": "Poker44",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn126.webp"
+    },
+    {
+      "netuid": 127,
+      "symbol": "SN127",
+      "name": "Astrid",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn127.webp"
+    },
+    {
+      "netuid": 128,
+      "symbol": "SN128",
+      "name": "ByteLeap",
+      "address": null,
+      "logoUri": "https://safe.forevermoney.ai/assets/metadata/subnets/sn128.webp"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "name": "governanceSafe",
+    "address": "0xADF60fcC63217961c931d57f1dCE2C5d70Af3546",
+    "deploymentBlock": 8786146
+  },
+  {
+    "name": "safeL2",
+    "address": "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762",
+    "deploymentBlock": 5125434
+  }
+]

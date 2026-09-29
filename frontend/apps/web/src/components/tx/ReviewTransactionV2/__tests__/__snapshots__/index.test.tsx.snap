@@ -1,0 +1,350 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ReviewTransaction should display a confirmation screen 1`] = `
+<div>
+  <div
+    class="bg-card text-card-foreground overflow-hidden text-sm has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col gap-0 py-0 rounded-xl txCardRoot my-4"
+    data-radius="xl"
+    data-size="none"
+    data-slot="card"
+    data-surface="default"
+    data-variant="default"
+  >
+    <div
+      class="px-6 group-data-[size=sm]/card:px-4 group-data-[size=lg]/card:px-8 group-data-[size=none]/card:px-0 cardContent"
+      data-slot="card-content"
+      data-testid="card-content"
+    >
+      <div>
+        <div
+          class="flex flex-col gap-4"
+        >
+          <div
+            class="flex flex-wrap gap-2 xl:flex-nowrap"
+          >
+            <div
+              class="break-words min-w-[100px] basis-auto lg:basis-[170px] xl:basis-1/4 xl:flex-nowrap"
+              data-testid="tx-row-title"
+            >
+              <span
+                class="m-0 text-sm leading-5 font-normal text-[var(--color-primary-light)]"
+                data-slot="typography"
+                data-variant="paragraph-small"
+              >
+                Interacted with
+              </span>
+            </div>
+            <div
+              class="max-w-full flex-1 xl:min-w-0"
+              data-testid="tx-data-row"
+            >
+              <div
+                class="text-sm leading-5"
+              >
+                <div
+                  class="container"
+                >
+                  <div
+                    class="avatarContainer"
+                    style="width: 20px; height: 20px;"
+                  >
+                    <div
+                      class="icon"
+                      style="background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4IDgiIHNoYXBlLXJlbmRlcmluZz0ib3B0aW1pemVTcGVlZCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij48cGF0aCBmaWxsPSJoc2woOTIgOTYlIDQzJSkiIGQ9Ik0wLDBIOFY4SDB6Ii8+PHBhdGggZmlsbD0iaHNsKDMxMCA4NCUgMzglKSIgZD0iTTEsMGgxdjFoLTF6TTYsMGgxdjFoLTF6TTIsMGgxdjFoLTF6TTUsMGgxdjFoLTF6TTMsMGgxdjFoLTF6TTQsMGgxdjFoLTF6TTAsMWgxdjFoLTF6TTcsMWgxdjFoLTF6TTEsMWgxdjFoLTF6TTYsMWgxdjFoLTF6TTIsMWgxdjFoLTF6TTUsMWgxdjFoLTF6TTMsMWgxdjFoLTF6TTQsMWgxdjFoLTF6TTAsMmgxdjFoLTF6TTcsMmgxdjFoLTF6TTIsMmgxdjFoLTF6TTUsMmgxdjFoLTF6TTMsMmgxdjFoLTF6TTQsMmgxdjFoLTF6TTMsM2gxdjFoLTF6TTQsM2gxdjFoLTF6TTAsNGgxdjFoLTF6TTcsNGgxdjFoLTF6TTEsNGgxdjFoLTF6TTYsNGgxdjFoLTF6TTIsNGgxdjFoLTF6TTUsNGgxdjFoLTF6TTEsNWgxdjFoLTF6TTYsNWgxdjFoLTF6TTIsNWgxdjFoLTF6TTUsNWgxdjFoLTF6TTMsNWgxdjFoLTF6TTQsNWgxdjFoLTF6TTIsNmgxdjFoLTF6TTUsNmgxdjFoLTF6TTMsNmgxdjFoLTF6TTQsNmgxdjFoLTF6TTMsN2gxdjFoLTF6TTQsN2gxdjFoLTF6Ii8+PHBhdGggZmlsbD0iaHNsKDM1MSA2MSUgNjUlKSIgZD0iTTMsNGgxdjFoLTF6TTQsNGgxdjFoLTF6TTAsNWgxdjFoLTF6TTcsNWgxdjFoLTF6TTAsN2gxdjFoLTF6TTcsN2gxdjFoLTF6Ii8+PC9zdmc+); width: 20px; height: 20px;"
+                    />
+                  </div>
+                  <div
+                    class="gap-1 overflow-hidden"
+                  >
+                    <div
+                      class="addressContainer"
+                    >
+                      <div
+                        class="overflow-hidden text-ellipsis font-[weight:inherit] text-[length:inherit]"
+                      >
+                        <span
+                          aria-label="Copy to clipboard"
+                          class="inline-flex cursor-pointer"
+                          data-slot="tooltip-trigger"
+                          id="base-ui-_r_3_"
+                        >
+                          <span>
+                            0xE20CcFf2c38Ef3b64109361D7b7691ff2c7D5f67
+                          </span>
+                        </span>
+                      </div>
+                      <span
+                        aria-label="Copy to clipboard"
+                        class="inline-flex cursor-pointer"
+                        data-slot="tooltip-trigger"
+                        id="base-ui-_r_5_"
+                      >
+                        <button
+                          aria-label="Copy to clipboard"
+                          class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground size-6 in-data-[slot=button-group]:rounded-sm [&_svg:not([class*='size-'])]:size-3"
+                          data-slot="button"
+                          tabindex="0"
+                          type="button"
+                        >
+                          <mock-icon
+                            class="size-4 text-[var(--color-border-main)]"
+                            data-testid="copy-btn-icon"
+                          />
+                        </button>
+                      </span>
+                      <div
+                        class="text-[var(--color-border-main)]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="mt-4"
+      >
+        <div
+          class="bg-card text-card-foreground overflow-hidden text-sm has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col gap-6 py-6 rounded-lg item"
+          data-radius="lg"
+          data-size="default"
+          data-slot="card"
+          data-surface="default"
+          data-variant="default"
+          style="--accordion-border-active: var(--color-info-dark); --accordion-fill-active: var(--color-info-background);"
+        >
+          <div
+            class="flex w-full flex-col"
+            data-orientation="vertical"
+            data-slot="accordion"
+            dir="ltr"
+            role="region"
+          >
+            <div
+              class="not-last:border-b border-0"
+              data-closed=""
+              data-index="0"
+              data-orientation="vertical"
+              data-slot="accordion-item"
+            >
+              <h3
+                class="flex"
+                data-closed=""
+                data-index="0"
+                data-orientation="vertical"
+              >
+                <button
+                  aria-disabled="false"
+                  aria-expanded="false"
+                  class="focus-visible:ring-ring/50 focus-visible:border-ring focus-visible:after:border-ring **:data-[slot=accordion-trigger-icon]:text-muted-foreground cursor-pointer rounded-md py-4 text-left text-sm font-medium focus-visible:ring-[3px] **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 group/accordion-trigger relative flex flex-1 justify-between border border-transparent transition-all outline-none disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50 trigger items-center px-4"
+                  data-orientation="vertical"
+                  data-slot="accordion-trigger"
+                  data-testid="decoded-tx-summary"
+                  data-value=""
+                  id="base-ui-_r_8_"
+                  tabindex="0"
+                  type="button"
+                >
+                  <div
+                    class="flex w-full flex-row items-center justify-between"
+                  >
+                    <span
+                      class="m-0 text-sm leading-5 font-semibold"
+                      data-slot="typography"
+                      data-testid="tx-advanced-details"
+                      data-variant="paragraph-small-bold"
+                    >
+                      Transaction details
+                      <span
+                        data-slot="tooltip-trigger"
+                        id="base-ui-_r_a_"
+                      >
+                        <mock-icon
+                          class="ml-1 inline size-4 align-middle text-[var(--color-border-main)]"
+                        />
+                      </span>
+                    </span>
+                  </div>
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-chevron-down pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
+                    data-slot="accordion-trigger-icon"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="m6 9 6 6 6-6"
+                    />
+                  </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-chevron-up pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
+                    data-slot="accordion-trigger-icon"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="m18 15-6-6-6 6"
+                    />
+                  </svg>
+                </button>
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        aria-orientation="horizontal"
+        class="bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=vertical]:w-px data-[orientation=vertical]:self-stretch data-[orientation=horizontal]:-mx-6 data-[orientation=horizontal]:w-[calc(100%+(2*(var(--spacing)*6)))] mt-4"
+        data-orientation="horizontal"
+        data-slot="separator"
+        role="separator"
+      />
+      <div
+        class="txCardActions flex items-center justify-end !mt-0"
+      >
+        <div
+          class="flex flex-row items-center gap-4"
+        >
+          <span
+            aria-label="Please connect your wallet"
+            data-slot="tooltip-trigger"
+            data-testid="check-wallet-tooltip-trigger"
+            id="base-ui-_r_c_"
+          >
+            <button
+              class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none bg-primary text-primary-foreground hover:bg-primary/80 disabled:bg-muted disabled:text-muted-foreground aria-disabled:bg-muted aria-disabled:text-muted-foreground disabled:[&_svg]:text-muted-foreground aria-disabled:[&_svg]:text-muted-foreground dark:[&_svg]:text-black dark:disabled:bg-muted dark:disabled:text-muted-foreground dark:aria-disabled:bg-muted dark:aria-disabled:text-muted-foreground dark:disabled:[&_svg]:text-muted-foreground dark:aria-disabled:[&_svg]:text-muted-foreground h-9 gap-2 px-6 min-w-[7rem] [&_svg:not([class*='size-'])]:size-5 order-1"
+              data-disabled=""
+              data-slot="button"
+              data-testid="continue-sign-btn"
+              disabled=""
+              tabindex="0"
+              type="submit"
+            >
+              Continue
+            </button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ReviewTransaction should display a loading component 1`] = `
+<div>
+  <div
+    class="bg-card text-card-foreground overflow-hidden text-sm has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col gap-0 py-0 rounded-xl txCardRoot my-4"
+    data-radius="xl"
+    data-size="none"
+    data-slot="card"
+    data-surface="default"
+    data-variant="default"
+  >
+    <div
+      class="px-6 group-data-[size=sm]/card:px-4 group-data-[size=lg]/card:px-8 group-data-[size=none]/card:px-0 cardContent"
+      data-slot="card-content"
+      data-testid="card-content"
+    >
+      <div
+        class="mb-10 flex min-h-[38svh] items-center justify-center"
+      >
+        <div
+          class="box"
+        >
+          <div
+            class="rect rectTl"
+          />
+          <div
+            class="rect rectTr"
+          />
+          <div
+            class="rect rectBl"
+          />
+          <div
+            class="rect rectBr"
+          />
+          <div
+            class="rect rectCenter"
+          />
+          <svg
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <filter
+                id="gooey"
+              >
+                <fegaussianblur
+                  in="SourceGraphic"
+                  result="blur"
+                  stdDeviation="3"
+                />
+                <fecolormatrix
+                  in="blur"
+                  mode="matrix"
+                  result="goo"
+                  values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+                />
+                <fecomposite
+                  in="SourceGraphic"
+                  in2="goo"
+                  operator="atop"
+                />
+              </filter>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ReviewTransaction should display an error screen 1`] = `
+<div>
+  <div
+    class="bg-card text-card-foreground overflow-hidden text-sm has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col gap-0 py-0 rounded-xl txCardRoot my-4"
+    data-radius="xl"
+    data-size="none"
+    data-slot="card"
+    data-surface="default"
+    data-variant="default"
+  >
+    <div
+      class="px-6 group-data-[size=sm]/card:px-4 group-data-[size=lg]/card:px-8 group-data-[size=none]/card:px-0 cardContent"
+      data-slot="card-content"
+      data-testid="card-content"
+    >
+      <div
+        class="mb-10 flex min-h-[38svh] items-center justify-center"
+        data-testid="error-transaction-preview"
+      >
+        <p
+          class="m-0 text-base leading-6 font-semibold"
+          data-slot="typography"
+          data-variant="paragraph-bold"
+        >
+          Error loading preview. Please try again.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;

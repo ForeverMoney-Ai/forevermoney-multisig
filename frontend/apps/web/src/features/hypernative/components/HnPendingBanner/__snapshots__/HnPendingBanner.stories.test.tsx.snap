@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`./HnPendingBanner.stories Default 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="max-w-[600px] p-4"
+    >
+      <div
+        class="banner"
+      >
+        <div
+          class="flex flex-row items-start gap-2 content"
+        >
+          <div
+            class="iconContainer"
+          >
+            <mock-icon
+              class="icon"
+            />
+          </div>
+          <div
+            class="textContainer"
+          >
+            <p
+              class="m-0 text-base leading-6 font-semibold title"
+              data-slot="typography"
+              data-variant="paragraph-bold"
+            >
+              Guardian setup in progress
+            </p>
+            <span
+              class="m-0 text-sm leading-5 font-normal description"
+              data-slot="typography"
+              data-variant="paragraph-small"
+            >
+              We've received your request and will follow up with next steps.
+            </span>
+          </div>
+        </div>
+        <button
+          aria-label="close"
+          class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-4 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 closeButton"
+          data-slot="button"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-x"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 6 6 18"
+            />
+            <path
+              d="m6 6 12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./HnPendingBanner.stories NonDismissable 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="max-w-[600px] p-4"
+    >
+      <div
+        class="banner"
+      >
+        <div
+          class="flex flex-row items-start gap-2 content"
+        >
+          <div
+            class="iconContainer"
+          >
+            <mock-icon
+              class="icon"
+            />
+          </div>
+          <div
+            class="textContainer"
+          >
+            <p
+              class="m-0 text-base leading-6 font-semibold title"
+              data-slot="typography"
+              data-variant="paragraph-bold"
+            >
+              Guardian setup in progress
+            </p>
+            <span
+              class="m-0 text-sm leading-5 font-normal description"
+              data-slot="typography"
+              data-variant="paragraph-small"
+            >
+              We've received your request and will follow up with next steps.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

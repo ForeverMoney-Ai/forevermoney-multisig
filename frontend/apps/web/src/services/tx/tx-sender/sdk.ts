@@ -1,0 +1,276 @@
+import { getSafeSDK } from '@/hooks/coreSDK/safeCoreSDK'
+import type Safe from '@safe-global/protocol-kit'
+import { SafeProvider } from '@safe-global/protocol-kit'
+import {
+  SigningMethod,
+  OperationType,
+  type SafeTransaction,
+  type SafeMultisigTransactionResponse,
+} from '@safe-global/types-kit'
+import { generatePreValidatedSignature } from '@safe-global/protocol-kit'
+import { sameAddress } from '@safe-global/utils/utils/addresses'
+import type { Eip1193Provider, JsonRpcSigner } from 'ethers'
+import { isHardwareWallet, isWalletConnect } from '@/utils/wallets'
+import { getChainConfig } from '@/utils/chains'
+import { createWeb3 } from '@/hooks/wallets/web3'
+import { getWeb3ReadOnly } from '@/hooks/wallets/web3ReadOnly'
+import { toQuantity } from 'ethers'
+import { connectWallet, getConnectedWallet } from '@/hooks/wallets/useOnboard'
+import { type OnboardAPI } from '@web3-onboard/core'
+import type { ConnectedWallet } from '@/hooks/wallets/useOnboard'
+import { UncheckedJsonRpcSigner } from '@/utils/providers/UncheckedJsonRpcSigner'
+import get from 'lodash/get'
+import { maybePlural } from '@safe-global/utils/utils/formatters'
+import { hasActiveScope } from '@/components/tx-flow/safe-scope/activeScope'
+import type { TxSenderScope } from '@/components/tx-flow/safe-scope/types'
+import { logError } from '@/services/exceptions'
+import ErrorCodes from '@safe-global/utils/services/exceptions/ErrorCodes'
+
+/**
+ * The SDK for the Safe being transacted on.
+ *
+ * With a `scope` (Space-level flow) it is that Safe's own instance — never the app-wide one, even if the
+ * scoped one is not ready yet. Without one it is the app-wide SDK that `useInitSafeCoreSDK` binds to the URL Safe —
+ * unless a `SafeScopeProvider` is mounted and the caller simply forgot to pass its scope, in which
+ * case falling back to that URL-Safe SDK would silently sign for the wrong Safe, so this throws instead.
+ */
+export const getAndValidateSafeSDK = (scope?: TxSenderScope): Safe => {
+  if (scope) {
+    if (!scope.sdk) {
+      throw new Error('The multi-sig SDK for the selected multi-sig account is not initialized yet.')
+    }
+    return scope.sdk
+  }
+
+  if (hasActiveScope()) {
+    // A Space-level flow is open but this caller did not pass its scope: it is about to use the URL
+    // Safe's SDK. Safe-level routes never hit this (no provider mounted).
+    logError(ErrorCodes._822, 'getAndValidateSafeSDK called without a scope while a SafeScopeProvider is mounted')
+    throw new Error('A multi-sig account must be selected before transacting in this flow.')
+  }
+
+  const safeSDK = getSafeSDK()
+  if (!safeSDK) {
+    throw new Error(
+      'The multi-sig SDK could not be initialized. Please be aware that we only support v1.0.0 multi-sig accounts and up.',
+    )
+  }
+  return safeSDK
+}
+
+export const getSafeProvider = (scope?: TxSenderScope) => {
+  if (scope) {
+    if (!scope.web3ReadOnly) {
+      throw new Error('The provider for the selected multi-sig account is not initialized yet.')
+    }
+    return new SafeProvider({ provider: scope.web3ReadOnly._getConnection().url })
+  }
+
+  const provider = getWeb3ReadOnly()
+  if (!provider) {
+    throw new Error('Provider not found.')
+  }
+
+  return new SafeProvider({ provider: provider._getConnection().url })
+}
+
+async function switchOrAddChain(walletProvider: ConnectedWallet['provider'], chainId: string): Promise<void> {
+  const UNKNOWN_CHAIN_ERROR_CODE = 4902
+  const hexChainId = toQuantity(parseInt(chainId))
+
+  try {
+    return await walletProvider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: hexChainId }],
+    })
+  } catch (error) {
+    const errorCode = get(error, 'code') as number | undefined
+
+    // Rabby emits the same error code as MM, but it is nested
+    const nestedErrorCode = get(error, 'data.originalError.code') as number | undefined
+
+    if (errorCode === UNKNOWN_CHAIN_ERROR_CODE || nestedErrorCode === UNKNOWN_CHAIN_ERROR_CODE) {
+      const chain = await getChainConfig(chainId)
+
+      await walletProvider.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: hexChainId,
+            chainName: chain.chainName,
+            nativeCurrency: chain.nativeCurrency,
+            rpcUrls: [chain.publicRpcUri.value],
+            blockExplorerUrls: [new URL(chain.blockExplorerUriTemplate.address).origin],
+          },
+        ],
+      })
+      // Adding a network does not guarantee the wallet selects it.
+      const selected = await walletProvider.request({ method: 'eth_chainId' })
+      if (BigInt(selected as string) !== BigInt(chainId)) {
+        await walletProvider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: hexChainId }] })
+      }
+      return
+    }
+
+    throw error
+  }
+}
+
+export const switchWalletChain = async (onboard: OnboardAPI, chainId: string): Promise<ConnectedWallet | null> => {
+  const currentWallet = getConnectedWallet(onboard.state.get().wallets)
+  if (!currentWallet) return null
+
+  // Onboard incorrectly returns WalletConnect's chainId, so it needs to be switched unconditionally
+  if (currentWallet.chainId === chainId && !isWalletConnect(currentWallet)) {
+    return currentWallet
+  }
+
+  // Hardware wallets cannot switch chains
+  if (isHardwareWallet(currentWallet)) {
+    await onboard.disconnectWallet({ label: currentWallet.label })
+    const wallets = await connectWallet(onboard, { autoSelect: currentWallet.label })
+    return wallets ? getConnectedWallet(wallets) : null
+  }
+
+  // Onboard doesn't update immediately and otherwise returns a stale wallet if we directly get its state
+  return new Promise((resolve, reject) => {
+    let subscription: { unsubscribe: () => void } | undefined
+    let settled = false
+    const finish = (wallet: ConnectedWallet | null, error?: Error) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      subscription?.unsubscribe()
+      if (error) reject(error)
+      else resolve(wallet)
+    }
+    const timer = setTimeout(() => finish(null, new Error('The wallet did not confirm the network switch. Check its pending requests, or disconnect and reconnect it on Finney (chain ID 964).')), 45000)
+    subscription = onboard.state.select('wallets').subscribe((newWallets) => {
+      const wallet = getConnectedWallet(newWallets)
+      if (wallet?.chainId === chainId) finish(wallet)
+    })
+    if (settled) subscription.unsubscribe()
+    switchOrAddChain(currentWallet.provider, chainId).catch((error) => {
+      finish(null, error instanceof Error ? error : new Error('The wallet could not switch networks. Open the wallet to check its pending requests.'))
+    })
+  })
+}
+
+export const assertWalletChain = async (onboard: OnboardAPI, chainId: string): Promise<ConnectedWallet> => {
+  const wallet = getConnectedWallet(onboard.state.get().wallets)
+
+  if (!wallet) {
+    throw new Error('No wallet connected.')
+  }
+
+  const newWallet = await switchWalletChain(onboard, chainId)
+
+  if (!newWallet) {
+    throw new Error('No wallet connected.')
+  }
+
+  if (newWallet.chainId !== chainId) {
+    throw new Error('Wallet connected to wrong chain.')
+  }
+
+  return newWallet
+}
+
+export const getAssertedChainSigner = async (provider: Eip1193Provider): Promise<JsonRpcSigner> => {
+  const browserProvider = createWeb3(provider)
+  return browserProvider.getSigner()
+}
+
+export const getUncheckedSigner = async (provider: Eip1193Provider) => {
+  const browserProvider = createWeb3(provider)
+  return new UncheckedJsonRpcSigner(browserProvider, (await browserProvider.getSigner()).address)
+}
+
+export const getSafeSDKWithSigner = async (provider: Eip1193Provider, scope?: TxSenderScope): Promise<Safe> => {
+  const sdk = getAndValidateSafeSDK(scope)
+
+  return sdk.connect({ provider })
+}
+
+export const tryOffChainTxSigning = async (safeTx: SafeTransaction, sdk: Safe): Promise<SafeTransaction> => {
+  return sdk.signTransaction(safeTx, SigningMethod.ETH_SIGN_TYPED_DATA)
+}
+
+export const isDelegateCall = (safeTx: SafeTransaction): boolean => {
+  return safeTx.data.operation === OperationType.DelegateCall
+}
+
+// TODO: This is a workaround and a duplication of sdk.executeTransaction but it returns the encoded tx instead of executing it.
+export const prepareTxExecution = async (
+  safeTransaction: SafeTransaction,
+  provider: Eip1193Provider,
+  scope?: TxSenderScope,
+) => {
+  const sdk = await getSafeSDKWithSigner(provider, scope)
+
+  if (!sdk.getContractManager().safeContract) {
+    throw new Error('Multi-sig is not deployed')
+  }
+
+  const transaction =
+    'isExecuted' in safeTransaction
+      ? await sdk.toSafeTransactionType(safeTransaction as unknown as SafeMultisigTransactionResponse)
+      : safeTransaction
+
+  const signedSafeTransaction = await sdk.copyTransaction(transaction)
+
+  const txHash = await sdk.getTransactionHash(signedSafeTransaction)
+  const ownersWhoApprovedTx = await sdk.getOwnersWhoApprovedTx(txHash)
+  for (const owner of ownersWhoApprovedTx) {
+    signedSafeTransaction.addSignature(generatePreValidatedSignature(owner))
+  }
+  const owners = await sdk.getOwners()
+  const threshold = await sdk.getThreshold()
+  const signerAddress = await sdk.getSafeProvider().getSignerAddress()
+  if (threshold > signedSafeTransaction.signatures.size && signerAddress && owners.includes(signerAddress)) {
+    signedSafeTransaction.addSignature(generatePreValidatedSignature(signerAddress))
+  }
+
+  if (threshold > signedSafeTransaction.signatures.size) {
+    const signaturesMissing = threshold - signedSafeTransaction.signatures.size
+    throw new Error(
+      `There ${signaturesMissing > 1 ? 'are' : 'is'} ${signaturesMissing} signature${maybePlural(
+        signaturesMissing,
+      )} missing`,
+    )
+  }
+
+  const value = BigInt(signedSafeTransaction.data.value)
+  if (value !== 0n) {
+    const balance = await sdk.getBalance()
+    if (value > balance) {
+      throw new Error('Not enough Ether funds')
+    }
+  }
+
+  return sdk.getEncodedTransaction(signedSafeTransaction)
+}
+
+// TODO: This is a duplication of sdk.approveTransactionHash but it returns the encoded tx instead of executing it.
+export const prepareApproveTxHash = async (hash: string, provider: Eip1193Provider, scope?: TxSenderScope) => {
+  const sdk = await getSafeSDKWithSigner(provider, scope)
+
+  const safeContract = sdk.getContractManager().safeContract
+
+  if (!safeContract) {
+    throw new Error('Multi-sig is not deployed')
+  }
+
+  const owners = await sdk.getOwners()
+  const signerAddress = await sdk.getSafeProvider().getSignerAddress()
+  if (!signerAddress) {
+    throw new Error('SafeProvider must be initialized with a signer to use this method')
+  }
+  const addressIsOwner = owners.some((owner: string) => signerAddress && sameAddress(owner, signerAddress))
+  if (!addressIsOwner) {
+    throw new Error('Transaction hashes can only be approved by multi-sig owners')
+  }
+
+  // @ts-ignore
+  return safeContract.encode('approveHash', [hash])
+}

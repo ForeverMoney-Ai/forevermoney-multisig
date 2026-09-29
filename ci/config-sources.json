@@ -1,0 +1,22 @@
+{
+  "ui-nginx": {
+    "nginx.conf": "ci/runtime/ui-nginx-nginx.conf"
+  },
+  "address-resolver-runtime": {
+    "address-resolver.py": "infrastructure/deploy/address-resolver.py"
+  },
+  "standard-worker-runtime": {
+    "pacer.py": "ci/runtime/standard-worker-runtime-pacer.py",
+    "standard-worker.py": "infrastructure/deploy/standard-worker.py"
+  },
+  "governance-sync-code": {
+    "continuous_sync.py": "ci/runtime/governance-sync-code-continuous_sync.py",
+    "pacer.py": "ci/runtime/governance-sync-code-pacer.py"
+  },
+  "sync-alert-code": {
+    "monitor.py": "infrastructure/deploy/telegram-monitor/monitor.py"
+  },
+  "price-proxy-code": {
+    "price_proxy.py": "infrastructure/deploy/price-proxy/price_proxy.py"
+  }
+}

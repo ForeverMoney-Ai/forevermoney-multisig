@@ -1,0 +1,30 @@
+[
+  {
+    "name": "safeL2",
+    "address": "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762",
+    "codeBytes": 24421,
+    "deploymentBlock": null,
+    "note": "Runtime code exists at latest. Historical state is pruned/unverified; binary-search boundaries were not deployment blocks."
+  },
+  {
+    "name": "factory",
+    "address": "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67",
+    "codeBytes": 3054,
+    "deploymentBlock": null,
+    "note": "Runtime code exists at latest. Historical state is pruned/unverified; binary-search boundaries were not deployment blocks."
+  },
+  {
+    "name": "fallback",
+    "address": "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99",
+    "codeBytes": 5637,
+    "deploymentBlock": null,
+    "note": "Runtime code exists at latest. Historical state is pruned/unverified; binary-search boundaries were not deployment blocks."
+  },
+  {
+    "name": "multisend",
+    "address": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+    "codeBytes": 629,
+    "deploymentBlock": null,
+    "note": "Runtime code exists at latest. Historical state is pruned/unverified; binary-search boundaries were not deployment blocks."
+  }
+]

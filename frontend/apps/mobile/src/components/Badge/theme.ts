@@ -1,0 +1,108 @@
+import { tokens } from '@/src/theme/tokens'
+
+/** The design system's background/backdropOverlay: backdrop.main at 75%, identical in light and dark */
+export const backdropOverlayBackground = `${tokens.color.backdropMainLight.val}BF`
+
+export const badgeTheme = {
+  light_badge_success: {
+    background: tokens.color.successLightDark,
+    color: tokens.color.backgroundMainDark,
+    success: tokens.color.successMainLight,
+  },
+  dark_badge_success: {
+    color: tokens.color.backgroundMainDark,
+    background: tokens.color.backgroundLightDark,
+  },
+  light_badge_success_variant1: {
+    background: tokens.color.successBackgroundLight,
+    color: tokens.color.successMainLight,
+  },
+  dark_badge_success_variant1: {
+    background: tokens.color.successBackgroundDark,
+    color: tokens.color.successMainLight,
+  },
+  light_badge_success_variant2: {
+    background: tokens.color.secondaryLightLight,
+    color: tokens.color.primaryMainLight,
+  },
+  dark_badge_success_variant2: {
+    background: tokens.color.secondaryMainLight,
+    color: tokens.color.primaryMainLight,
+  },
+  light_badge_warning: {
+    color: tokens.color.warning1ContrastTextLight,
+    background: tokens.color.warningBackgroundLight,
+  },
+  dark_badge_warning: {
+    color: tokens.color.warning1ContrastTextDark,
+    background: tokens.color.warningBackgroundDark,
+  },
+  light_badge_warning_variant2: {
+    color: tokens.color.warning1TextLight,
+    background: tokens.color.warning1ContrastTextLight,
+  },
+  dark_badge_warning_variant2: {
+    color: tokens.color.warning1MainDark,
+    background: tokens.color.warning1ContrastTextDark,
+  },
+  // warning.dark on its opposite-mode counterpart, so the pill stands out on the warning card
+  light_badge_warning_variant3: {
+    color: tokens.color.warningDarkDark,
+    background: tokens.color.warningDarkLight,
+  },
+  dark_badge_warning_variant3: {
+    color: tokens.color.warningDarkLight,
+    background: tokens.color.warningDarkDark,
+  },
+  light_badge_overlay: {
+    color: tokens.color.staticPrimaryLight,
+    background: backdropOverlayBackground,
+  },
+  dark_badge_overlay: {
+    color: tokens.color.staticPrimaryDark,
+    background: backdropOverlayBackground,
+  },
+  dark_badge_background: {
+    color: tokens.color.textPrimaryDark,
+    background: tokens.color.borderLightDark,
+  },
+  light_badge_background: {
+    color: tokens.color.textPrimaryLight,
+    background: tokens.color.backgroundMainLight,
+    borderColor: tokens.color.logoBackgroundLight,
+  },
+  light_badge_error: {
+    color: tokens.color.errorMainLight,
+    background: tokens.color.errorBackgroundLight,
+    borderColor: tokens.color.borderBackgroundLight,
+  },
+  dark_badge_error: {
+    color: tokens.color.errorMainDark,
+    background: tokens.color.errorBackgroundDark,
+    borderColor: tokens.color.borderBackgroundDark,
+  },
+  light_badge_background_inverted: {
+    color: tokens.color.logoBackgroundLight,
+    background: tokens.color.textPrimaryLight,
+  },
+  dark_badge_background_inverted: {
+    color: tokens.color.logoBackgroundDark,
+    background: tokens.color.textPrimaryDark,
+  },
+  light_badge_outline: {
+    background: 'transparent',
+    borderColor: tokens.color.borderLightLight,
+  },
+  dark_badge_outline: {
+    background: 'transparent',
+    borderColor: tokens.color.borderLightDark,
+  },
+  light_badge_skeleton: {
+    background: tokens.color.backgroundSkeletonLight,
+    color: tokens.color.textPrimaryLight,
+  },
+  dark_badge_skeleton: {
+    background: tokens.color.backgroundSkeletonDark,
+    color: tokens.color.textPrimaryDark,
+  },
+}

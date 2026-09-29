@@ -1,0 +1,808 @@
+import { createElement } from 'react'
+import type { Chain } from '@safe-global/store/gateway/AUTO_GENERATED/chains'
+
+import {
+  GlobalPushNotifications,
+  _mergeNotifiableSafes,
+  _transformCurrentSubscribedSafes,
+  _getTotalNotifiableSafes,
+  _areAllSafesSelected,
+  _getTotalSignaturesRequired,
+  _shouldRegisterSelectedSafes,
+  _shouldUnregsiterSelectedSafes,
+  _getSafesToRegister,
+  _getSafesToUnregister,
+  _shouldUnregisterDevice,
+  _filterSafesForRenewal,
+  _sanitizeNotifiableSafes,
+  _filterUndeployedSafes,
+  _transformAddedSafes,
+} from '../GlobalPushNotifications'
+import type { AddedSafesState } from '@/store/addedSafesSlice'
+import type { UndeployedSafe } from '@safe-global/utils/features/counterfactual/store/types'
+import type { OwnersGetAllSafesByOwnerV2ApiResponse as AllOwnedSafes } from '@safe-global/store/gateway/AUTO_GENERATED/owners'
+import { fireEvent, render, screen, waitFor } from '@/tests/test-utils'
+import type { PushNotificationPreferences } from '@/services/push-notifications/preferences'
+import useChains from '@/hooks/useChains'
+import useWallet from '@/hooks/wallets/useWallet'
+import { useAllOwnedSafes } from '@/hooks/safes'
+import { useNotificationPreferences } from '../hooks/useNotificationPreferences'
+import { useNotificationRegistrations } from '../hooks/useNotificationRegistrations'
+import { useNotificationsRenewal } from '../hooks/useNotificationsRenewal'
+
+jest.mock('@/hooks/useChains')
+
+jest.mock('@/hooks/wallets/useWallet')
+
+jest.mock('@/hooks/safes')
+
+jest.mock('../hooks/useNotificationPreferences')
+
+jest.mock('../hooks/useNotificationRegistrations')
+
+jest.mock('../hooks/useNotificationsRenewal')
+
+jest.mock('@/components/common/CheckWalletWithPermission', () => ({
+  __esModule: true,
+  default: ({ children }: { children: (isOk: boolean) => unknown }) => children(true),
+}))
+
+jest.mock('@/components/common/EthHashInfo', () => ({
+  __esModule: true,
+  default: ({ address }: { address: string }) => address,
+}))
+
+describe('GlobalPushNotifications', () => {
+  const ownerAddress = '0x1111111111111111111111111111111111111111'
+  const safeAddress = '0x2222222222222222222222222222222222222222'
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(useChains as jest.MockedFunction<typeof useChains>).mockReturnValue({
+      configs: [{ chainId: '1', chainName: 'Ethereum', shortName: 'eth' }] as Chain[],
+    })
+    ;(useWallet as jest.MockedFunction<typeof useWallet>).mockReturnValue({
+      address: ownerAddress,
+    } as ReturnType<typeof useWallet>)
+    ;(useAllOwnedSafes as jest.MockedFunction<typeof useAllOwnedSafes>).mockReturnValue([
+      { '1': [safeAddress] },
+      undefined,
+      false,
+    ] as ReturnType<typeof useAllOwnedSafes>)
+    ;(useNotificationPreferences as jest.MockedFunction<typeof useNotificationPreferences>).mockReturnValue({
+      uuid: 'uuid',
+      getAllPreferences: jest.fn(() => undefined),
+      getPreferences: jest.fn(() => undefined),
+      updatePreferences: jest.fn(),
+      createPreferences: jest.fn(),
+      deletePreferences: jest.fn(),
+      deleteAllChainPreferences: jest.fn(),
+      _getAllPreferenceEntries: jest.fn(() => Promise.resolve([])),
+      _deleteManyPreferenceKeys: jest.fn(),
+      getChainPreferences: jest.fn(() => []),
+    })
+    ;(useNotificationRegistrations as jest.MockedFunction<typeof useNotificationRegistrations>).mockReturnValue({
+      registerNotifications: jest.fn(),
+      unregisterSafeNotifications: jest.fn(),
+      unregisterDeviceNotifications: jest.fn(),
+    } as ReturnType<typeof useNotificationRegistrations>)
+    ;(useNotificationsRenewal as jest.MockedFunction<typeof useNotificationsRenewal>).mockReturnValue({
+      safesForRenewal: undefined,
+    } as ReturnType<typeof useNotificationsRenewal>)
+  })
+
+  it('renders the selectable Multi-sig accounts inside shadcn list primitives', () => {
+    render(createElement(GlobalPushNotifications))
+
+    expect(screen.getByText('Select all').closest('[data-slot="list"]')).toBeInTheDocument()
+    expect(screen.getByText('Ethereum Multi-sig accounts').closest('[data-slot="list-item"]')).toBeInTheDocument()
+    expect(screen.getByText(safeAddress).closest('[data-slot="list-item"]')).toBeInTheDocument()
+  })
+
+  describe('onSave', () => {
+    const otherSafeAddress = '0x3333333333333333333333333333333333333333'
+
+    const subscribedPreferences: PushNotificationPreferences = {
+      [`1:${safeAddress}`]: {
+        chainId: '1',
+        safeAddress,
+        preferences: {} as PushNotificationPreferences[keyof PushNotificationPreferences]['preferences'],
+      },
+    }
+
+    let registerNotificationsMock: jest.Mock
+    let unregisterSafeNotificationsMock: jest.Mock
+    let unregisterDeviceNotificationsMock: jest.Mock
+
+    beforeEach(() => {
+      ;(useAllOwnedSafes as jest.MockedFunction<typeof useAllOwnedSafes>).mockReturnValue([
+        { '1': [safeAddress, otherSafeAddress] },
+        undefined,
+        false,
+      ] as ReturnType<typeof useAllOwnedSafes>)
+      ;(useNotificationPreferences as jest.MockedFunction<typeof useNotificationPreferences>).mockReturnValue({
+        uuid: 'uuid',
+        getAllPreferences: jest.fn(() => subscribedPreferences),
+        getPreferences: jest.fn(() => undefined),
+        updatePreferences: jest.fn(),
+        createPreferences: jest.fn(),
+        deletePreferences: jest.fn(),
+        deleteAllChainPreferences: jest.fn(),
+        _getAllPreferenceEntries: jest.fn(() => Promise.resolve([])),
+        _deleteManyPreferenceKeys: jest.fn(),
+        getChainPreferences: jest.fn(() => []),
+      })
+
+      registerNotificationsMock = jest.fn()
+      unregisterSafeNotificationsMock = jest.fn().mockResolvedValue(true)
+      unregisterDeviceNotificationsMock = jest.fn().mockResolvedValue(true)
+      ;(useNotificationRegistrations as jest.MockedFunction<typeof useNotificationRegistrations>).mockReturnValue({
+        registerNotifications: registerNotificationsMock,
+        unregisterSafeNotifications: unregisterSafeNotificationsMock,
+        unregisterDeviceNotifications: unregisterDeviceNotificationsMock,
+      } as ReturnType<typeof useNotificationRegistrations>)
+    })
+
+    // Deselect the currently subscribed Safe and select a new one, then save
+    const saveMixedChanges = () => {
+      render(createElement(GlobalPushNotifications))
+
+      fireEvent.click(screen.getByText(otherSafeAddress))
+      fireEvent.click(screen.getByText(safeAddress))
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    }
+
+    it('does not unregister existing subscriptions if registration fails', async () => {
+      registerNotificationsMock.mockResolvedValue(false)
+
+      saveMixedChanges()
+
+      await waitFor(() => {
+        expect(registerNotificationsMock).toHaveBeenCalledWith({ '1': [otherSafeAddress] })
+      })
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
+      })
+
+      expect(unregisterSafeNotificationsMock).not.toHaveBeenCalled()
+      expect(unregisterDeviceNotificationsMock).not.toHaveBeenCalled()
+    })
+
+    it('unregisters only the deselected Safe when the chain keeps a replacement', async () => {
+      registerNotificationsMock.mockResolvedValue(true)
+
+      saveMixedChanges()
+
+      await waitFor(() => {
+        expect(unregisterSafeNotificationsMock).toHaveBeenCalledWith('1', safeAddress)
+      })
+      expect(registerNotificationsMock).toHaveBeenCalledWith({ '1': [otherSafeAddress] })
+      // Unregistering the device would wipe the replacement registered moments earlier
+      expect(unregisterDeviceNotificationsMock).not.toHaveBeenCalled()
+    })
+
+    it('unregisters the device when no Safe remains selected on the chain', async () => {
+      render(createElement(GlobalPushNotifications))
+
+      fireEvent.click(screen.getByText(safeAddress))
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+      await waitFor(() => {
+        expect(unregisterDeviceNotificationsMock).toHaveBeenCalledWith('1')
+      })
+      expect(registerNotificationsMock).not.toHaveBeenCalled()
+      expect(unregisterSafeNotificationsMock).not.toHaveBeenCalled()
+    })
+
+    it('does not renew a deselected Safe before unregistering the device', async () => {
+      ;(useNotificationsRenewal as jest.MockedFunction<typeof useNotificationsRenewal>).mockReturnValue({
+        safesForRenewal: { '1': [safeAddress] },
+        numberChainsForRenewal: 1,
+        numberSafesForRenewal: 1,
+        renewNotifications: jest.fn(),
+        needsRenewal: true,
+      })
+      render(createElement(GlobalPushNotifications))
+
+      fireEvent.click(screen.getByText(safeAddress))
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+      await waitFor(() => {
+        expect(unregisterDeviceNotificationsMock).toHaveBeenCalledWith('1')
+      })
+      expect(registerNotificationsMock).not.toHaveBeenCalled()
+      expect(unregisterSafeNotificationsMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('transformAddedSafes', () => {
+    it('should transform added safes into notifiable safes', () => {
+      const addedSafes = {
+        '1': {
+          '0x123': {},
+          '0x456': {},
+        },
+        '4': {
+          '0x789': {},
+        },
+      } as unknown as AddedSafesState
+
+      const expectedNotifiableSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      expect(_transformAddedSafes(addedSafes)).toEqual(expectedNotifiableSafes)
+    })
+  })
+
+  describe('mergeNotifiableSafes', () => {
+    it('should merge added safes and current subscriptions, removing unowned safes', () => {
+      const currentSubscriptions = {
+        '1': ['0x111', '0x222'],
+        '4': ['0x111'],
+      }
+
+      const addedSafes = {
+        '1': {
+          '0x111': {},
+          '0x333': {},
+        },
+        '4': {
+          '0x222': {},
+          '0x333': {},
+        },
+      } as unknown as AddedSafesState
+
+      const ownedSafes = {
+        '1': ['0x111', '0x444'],
+        '4': ['0x222'],
+      } as unknown as AllOwnedSafes
+
+      const expectedNotifiableSafes = {
+        '1': ['0x111', '0x222', '0x444'],
+        '4': ['0x111', '0x222'],
+      }
+
+      expect(_mergeNotifiableSafes(ownedSafes, addedSafes, currentSubscriptions)).toEqual(expectedNotifiableSafes)
+    })
+
+    it('should remove unowned safes and display added safes first', () => {
+      const addedSafes = {
+        '1': {
+          '0x222': {},
+        },
+        '4': {
+          '0x222': {},
+          '0x333': {},
+        },
+      } as unknown as AddedSafesState
+
+      const ownedSafes = {
+        '1': ['0x111', '0x222', '0x333', '0x444'],
+        '4': ['0x222'],
+      } as unknown as AllOwnedSafes
+
+      const expectedNotifiableSafes = {
+        '1': ['0x222', '0x111', '0x333', '0x444'],
+        '4': ['0x222'],
+      }
+
+      expect(_mergeNotifiableSafes(ownedSafes, addedSafes)).toEqual(expectedNotifiableSafes)
+    })
+
+    it('should display an empty array of safes for a chain with unowned safes = null ', () => {
+      const currentSubscriptions = {
+        '1': ['0x111', '0x222'],
+        '4': ['0x111'],
+      }
+
+      const addedSafes = {
+        '1': {
+          '0x111': {},
+          '0x333': {},
+        },
+        '4': {
+          '0x222': {},
+          '0x333': {},
+        },
+      } as unknown as AddedSafesState
+
+      const ownedSafes = {
+        '1': ['0x111', '0x444'],
+        '3': null,
+        '4': null,
+      } as unknown as AllOwnedSafes
+
+      const expectedNotifiableSafes = {
+        '1': ['0x111', '0x222', '0x444'],
+        '3': [],
+        '4': ['0x111'],
+      }
+
+      expect(_mergeNotifiableSafes(ownedSafes, addedSafes, currentSubscriptions)).toEqual(expectedNotifiableSafes)
+    })
+  })
+
+  describe('filterUndeployedSafes', () => {
+    it('should remove Safes that are not deployed', () => {
+      const notifiableSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0xabc'],
+      }
+
+      const undeployedSafes = {
+        '1': {
+          '0x456': {
+            props: {
+              safeAccountConfig: {},
+              safeDeploymentConfig: {},
+            },
+            status: {},
+          } as UndeployedSafe,
+        },
+      }
+
+      const expected = {
+        '1': ['0x123'],
+        '4': ['0xabc'],
+      }
+
+      expect(_filterUndeployedSafes(notifiableSafes, undeployedSafes)).toEqual(expected)
+    })
+  })
+
+  describe('sanitizeNotifiableSafes', () => {
+    it('should remove Safes that are not on a supported chain', () => {
+      const chains = [{ chainId: '1', name: 'Mainnet' }] as unknown as Array<Chain>
+
+      const notifiableSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0xabc'],
+      }
+
+      const expected = {
+        '1': ['0x123', '0x456'],
+      }
+
+      expect(_sanitizeNotifiableSafes(chains, notifiableSafes)).toEqual(expected)
+    })
+  })
+
+  describe('transformCurrentSubscribedSafes', () => {
+    it('should transform current subscriptions into notifiable safes', () => {
+      const currentSubscriptions = {
+        '0x123': {
+          chainId: '1',
+          safeAddress: '0x123',
+        },
+        '0x456': {
+          chainId: '1',
+          safeAddress: '0x456',
+        },
+        '0x789': {
+          chainId: '4',
+          safeAddress: '0x789',
+        },
+      }
+
+      const expectedNotifiableSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      expect(_transformCurrentSubscribedSafes(currentSubscriptions)).toEqual(expectedNotifiableSafes)
+    })
+
+    it('should return undefined if there are no current subscriptions', () => {
+      expect(_transformCurrentSubscribedSafes()).toBeUndefined()
+    })
+  })
+
+  describe('getTotalNotifiableSafes', () => {
+    it('should return the total number of notifiable safes', () => {
+      const notifiableSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      expect(_getTotalNotifiableSafes(notifiableSafes)).toEqual(3)
+    })
+
+    it('should return 0 if there are no notifiable safes', () => {
+      expect(_getTotalNotifiableSafes({})).toEqual(0)
+    })
+  })
+
+  describe('areAllSafesSelected', () => {
+    it('should return true if all notifiable safes are selected', () => {
+      const notifiableSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      expect(_areAllSafesSelected(notifiableSafes, selectedSafes)).toEqual(true)
+    })
+
+    it('should return false if not all notifiable safes are selected', () => {
+      const notifiableSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x123'],
+      }
+
+      expect(_areAllSafesSelected(notifiableSafes, selectedSafes)).toEqual(false)
+    })
+
+    it('should return false if there are no notifiable safes', () => {
+      const notifiableSafes = {}
+
+      const selectedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      expect(_areAllSafesSelected(notifiableSafes, selectedSafes)).toEqual(false)
+    })
+  })
+
+  describe('getTotalSignaturesRequired', () => {
+    it('should return the total number of signatures required to register a new chain', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        ...currentNotifiedSafes,
+        '5': ['0xabc'],
+      }
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(1)
+    })
+
+    it('should return the total number of signatures required to register a new Safe', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123'],
+        '4': [...currentNotifiedSafes['4'], '0xabc'],
+      }
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(1)
+    })
+
+    it('should return the total number of signatures required to register new chains/Safes', () => {
+      const currentNotifiedSafes = {}
+
+      const selectedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789', '0xabc'],
+      }
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(2)
+    })
+
+    it('should not increase the count if a new chain is empty', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+      }
+
+      const selectedSafes = {
+        '1': currentNotifiedSafes['1'],
+        '5': [],
+      }
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(0)
+    })
+
+    it('should not increase the count if a chain was removed', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': currentNotifiedSafes['1'],
+      }
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(0)
+    })
+
+    it('should not increase the count if a Safe was removed', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': currentNotifiedSafes['1'].slice(0, 1),
+        '4': ['0x789'],
+      }
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(0)
+    })
+
+    it('should not increase the count if a chain/Safe was removed', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789', '0xabc'],
+      }
+
+      const selectedSafes = {}
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(0)
+    })
+
+    it('should return 0 if there are no selected safes', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {}
+
+      expect(_getTotalSignaturesRequired(selectedSafes, currentNotifiedSafes)).toEqual(0)
+    })
+  })
+
+  describe('shouldRegisterSelectedSafes', () => {
+    it('should return true if there are safes to register', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const result = _shouldRegisterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(true)
+    })
+
+    it('should return true if there are chains to register', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const result = _shouldRegisterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(true)
+    })
+
+    it('should return true if there are safes/chains to register', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123', '0x456', '0x789'],
+        '4': ['0x789'],
+      }
+
+      const result = _shouldRegisterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(true)
+    })
+
+    it('should return false if there are no safes to register', () => {
+      const selectedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const currentNotifiedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const result = _shouldRegisterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('shouldUnregisterSelectedSafes', () => {
+    it('should return true if there are safes to unregister', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const result = _shouldUnregsiterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(true)
+    })
+
+    it('should return true if there are chains to unregister', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789', '0xabc'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123', '0x456'],
+      }
+
+      const result = _shouldUnregsiterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(true)
+    })
+
+    it('should return true if there are safes/chains to unregister', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123', '0x456'],
+        '4': ['0x789', '0xabc'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123'],
+      }
+
+      const result = _shouldUnregsiterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(true)
+    })
+
+    it('should return false if there are no safes to unregister', () => {
+      const currentNotifiedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const selectedSafes = {
+        '1': ['0x123'],
+        '4': ['0x789'],
+      }
+
+      const result = _shouldUnregsiterSelectedSafes(selectedSafes, currentNotifiedSafes)
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('getSafesToRegister', () => {
+    it('returns the safes to register', () => {
+      const currentNotifiedSafes = {
+        1: ['0x123'],
+        2: ['0xabc'],
+        4: ['0x789', '0xdef'],
+      }
+      const selectedSafes = {
+        1: ['0x123', '0x456'],
+        4: ['0x789'],
+      }
+
+      const result = _getSafesToRegister(selectedSafes, currentNotifiedSafes)
+
+      expect(result).toEqual({
+        1: ['0x456'],
+      })
+    })
+
+    it('returns undefined if there are no safes to register', () => {
+      const currentNotifiedSafes = {
+        1: ['0x123'],
+        2: ['0xabc'],
+        4: ['0x789', '0xdef'],
+      }
+      const selectedSafes = {
+        1: ['0x123'],
+        2: ['0xabc'],
+        4: ['0x789', '0xdef'],
+      }
+
+      const result = _getSafesToRegister(selectedSafes, currentNotifiedSafes)
+
+      expect(result).toBeUndefined()
+    })
+  })
+
+  describe('filterSafesForRenewal', () => {
+    it('keeps only renewal Safes that remain selected', () => {
+      const selectedSafes = { '1': ['0x123'], '4': ['0x789'] }
+      const safesForRenewal = { '1': ['0x123', '0x456'], '5': ['0xabc'] }
+
+      expect(_filterSafesForRenewal(selectedSafes, safesForRenewal)).toEqual({ '1': ['0x123'] })
+    })
+
+    it('returns undefined when no renewal Safe remains selected', () => {
+      const selectedSafes = { '1': ['0x456'] }
+      const safesForRenewal = { '1': ['0x123'] }
+
+      expect(_filterSafesForRenewal(selectedSafes, safesForRenewal)).toBeUndefined()
+    })
+  })
+
+  describe('getSafesToUnregister', () => {
+    it('returns undefined if there are no current notified safes', () => {
+      const currentNotifiedSafes = undefined
+      const selectedSafes = {
+        1: ['0x123', '0x456'],
+        4: ['0x789'],
+      }
+
+      const result = _getSafesToUnregister(selectedSafes, currentNotifiedSafes)
+
+      expect(result).toBeUndefined()
+    })
+
+    it('returns the safes to unregister', () => {
+      const currentNotifiedSafes = {
+        1: ['0x123'],
+        2: ['0xabc'],
+        4: ['0x789', '0xdef'],
+      }
+      const selectedSafes = {
+        1: ['0x123', '0x456'],
+        4: ['0x789'],
+      }
+
+      const result = _getSafesToUnregister(selectedSafes, currentNotifiedSafes)
+
+      expect(result).toEqual({
+        2: ['0xabc'],
+        4: ['0xdef'],
+      })
+    })
+
+    it('returns undefined if there are no safes to unregister', () => {
+      const currentNotifiedSafes = {
+        1: ['0x123'],
+        2: ['0xabc'],
+        4: ['0x789', '0xdef'],
+      }
+      const selectedSafes = {
+        1: ['0x123'],
+        2: ['0xabc'],
+        4: ['0x789', '0xdef'],
+      }
+
+      const result = _getSafesToUnregister(selectedSafes, currentNotifiedSafes)
+
+      expect(result).toBeUndefined()
+    })
+  })
+
+  describe('shouldUnregisterDevice', () => {
+    const chainId = '1'
+
+    it('returns true if no Safe remains selected on the chain', () => {
+      const result = _shouldUnregisterDevice(chainId, { '1': [], '4': ['0x789'] })
+      expect(result).toBe(true)
+    })
+
+    it('returns true if the chain is absent from the selection', () => {
+      const result = _shouldUnregisterDevice(chainId, { '4': ['0x789'] })
+      expect(result).toBe(true)
+    })
+
+    it('returns false if a Safe remains selected on the chain', () => {
+      const result = _shouldUnregisterDevice(chainId, { '1': ['0x456'] })
+      expect(result).toBe(false)
+    })
+
+    it('returns false if the chain keeps a replacement Safe while another is removed', () => {
+      const result = _shouldUnregisterDevice(chainId, { '1': ['0x456'], '4': [] })
+      expect(result).toBe(false)
+    })
+  })
+})

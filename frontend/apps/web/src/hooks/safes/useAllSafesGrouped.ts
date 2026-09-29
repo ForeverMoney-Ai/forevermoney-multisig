@@ -1,0 +1,125 @@
+import type { AllOwnedSafes } from '@safe-global/store/gateway/types'
+import groupBy from 'lodash/groupBy'
+import useAllSafes, { type SafeItem, type SafeItems } from './useAllSafes'
+import { useMemo } from 'react'
+import { sameAddress } from '@safe-global/utils/utils/addresses'
+import { type AddressBookState, selectAllAddressBooks } from '@/store/addressBookSlice'
+import type { VisitedSafesState } from '@/store/slices'
+import useWallet from '@/hooks/wallets/useWallet'
+import useAllOwnedSafes from './useAllOwnedSafes'
+import { useAppSelector } from '@/store'
+import { isMultiChainSafeItem } from './isMultiChainSafeItem'
+
+export type MultiChainSafeItem = {
+  address: string
+  safes: SafeItem[]
+  isPinned: boolean
+  lastVisited: number
+  name: string | undefined
+}
+
+export type AllSafeItemsGrouped = {
+  allSingleSafes: SafeItems | undefined
+  allMultiChainSafes: MultiChainSafeItem[] | undefined
+}
+
+export type AllSafeItems = Array<SafeItem | MultiChainSafeItem>
+
+// Defined in a dependency-free leaf module to avoid an import cycle; re-exported here (and via the
+// `@/hooks/safes` barrel) so existing consumers keep importing it from the same place.
+export { isMultiChainSafeItem }
+
+export const _buildMultiChainSafeItem = (address: string, safes: SafeItems): MultiChainSafeItem => {
+  const isPinned = safes.some((safe) => safe.isPinned)
+  const lastVisited = safes.reduce((acc, safe) => Math.max(acc, safe.lastVisited || 0), 0)
+  const name = safes.find((safe) => safe.name !== undefined)?.name
+
+  return { address, safes, isPinned, lastVisited, name }
+}
+
+export function _buildSafeItems(
+  safes: Record<string, string[] | null>,
+  allSafeNames: AddressBookState,
+  allOwned?: AllOwnedSafes,
+  allVisitedSafes?: VisitedSafesState,
+): SafeItem[] {
+  const result: SafeItem[] = []
+
+  for (const chainId in safes) {
+    const addresses = safes[chainId]
+
+    addresses?.forEach((address) => {
+      const isReadOnly = !!allOwned && !(allOwned[chainId] || []).some((owned) => sameAddress(owned, address))
+      const name = allSafeNames[chainId]?.[address]
+      const lastVisited = allVisitedSafes?.[chainId]?.[address]?.lastVisited || 0
+
+      result.push({
+        chainId,
+        address,
+        isReadOnly,
+        isPinned: false,
+        lastVisited,
+        name,
+      })
+    })
+  }
+
+  return result
+}
+
+export function flattenSafeItems(items: Array<SafeItem | MultiChainSafeItem>): SafeItem[] {
+  return items.flatMap((item) => (isMultiChainSafeItem(item) ? item.safes : [item]))
+}
+
+export const _getMultiChainAccounts = (safes: SafeItems): MultiChainSafeItem[] => {
+  const groupedByAddress = groupBy(safes, (safe) => safe.address)
+
+  return Object.entries(groupedByAddress)
+    .filter((entry) => entry[1].length > 1)
+    .map((entry) => {
+      const [address, safes] = entry
+
+      return _buildMultiChainSafeItem(address, safes)
+    })
+}
+
+export const _getSingleChainAccounts = (safes: SafeItems, allMultiChainSafes: MultiChainSafeItem[]) => {
+  return safes.filter((safe) => !allMultiChainSafes.some((multiSafe) => sameAddress(multiSafe.address, safe.address)))
+}
+
+export const _groupAndSort = (
+  items: SafeItems,
+  sortComparator: (a: AllSafeItems[number], b: AllSafeItems[number]) => number,
+): AllSafeItems => {
+  const multi = _getMultiChainAccounts(items)
+  const single = _getSingleChainAccounts(items, multi)
+  return [...multi, ...single].sort(sortComparator)
+}
+
+export const useAllSafesGrouped = (customSafes?: SafeItems, fetchOwnedSafes = true) => {
+  const safes = useAllSafes(fetchOwnedSafes)
+  const allSafes = customSafes ?? safes
+
+  return useMemo<AllSafeItemsGrouped>(() => {
+    if (!allSafes) {
+      return { allMultiChainSafes: undefined, allSingleSafes: undefined }
+    }
+
+    const allMultiChainSafes = _getMultiChainAccounts(allSafes)
+    const allSingleSafes = _getSingleChainAccounts(allSafes, allMultiChainSafes)
+
+    return {
+      allMultiChainSafes,
+      allSingleSafes,
+    }
+  }, [allSafes])
+}
+
+export const useOwnedSafesGrouped = () => {
+  const { address: walletAddress = '' } = useWallet() || {}
+  const [allOwned = {}] = useAllOwnedSafes(walletAddress)
+  const allSafeNames = useAppSelector(selectAllAddressBooks)
+  const safeItems = _buildSafeItems(allOwned, allSafeNames)
+
+  return useAllSafesGrouped(safeItems)
+}

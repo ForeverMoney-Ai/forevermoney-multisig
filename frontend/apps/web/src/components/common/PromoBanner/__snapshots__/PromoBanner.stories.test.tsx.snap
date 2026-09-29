@@ -1,0 +1,438 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`./PromoBanner.stories Default 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="banner"
+    >
+      <div
+        class="flex flex-row gap-4 bannerStack"
+      >
+        <img
+          alt="Promo image"
+          class="bannerImage"
+          data-nimg="1"
+          decoding="async"
+          height="95"
+          loading="lazy"
+          src="/_next/image?url=%2Fimg.jpg&w=256&q=75"
+          srcset="/_next/image?url=%2Fimg.jpg&w=96&q=75 1x, /_next/image?url=%2Fimg.jpg&w=256&q=75 2x"
+          style="color: transparent;"
+          width="95"
+        />
+        <div
+          class="bannerContent"
+        >
+          <h4
+            class="m-0 scroll-m-20 text-xl font-semibold leading-6 tracking-normal bannerText bannerTitle"
+            data-slot="typography"
+            data-variant="h4"
+          >
+            Discover new features
+          </h4>
+          <div
+            class="m-0 text-sm leading-5 font-normal bannerText bannerDescription"
+            data-slot="typography"
+            data-variant="paragraph-small"
+          >
+            Learn about the latest updates and improvements to Safe
+          </div>
+          <a
+            class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-4 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 bannerCtaText"
+            data-slot="button"
+            href="#"
+          >
+            Learn more
+          </a>
+        </div>
+      </div>
+      <button
+        aria-label="close"
+        class="closeButton"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-6 closeIcon"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./PromoBanner.stories ShortText 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="banner"
+    >
+      <div
+        class="flex flex-row gap-4 bannerStack"
+      >
+        <div
+          class="bannerContent"
+        >
+          <h4
+            class="m-0 scroll-m-20 text-xl font-semibold leading-6 tracking-normal bannerText bannerTitle"
+            data-slot="typography"
+            data-variant="h4"
+          >
+            New update available
+          </h4>
+          <a
+            class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-4 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 bannerCtaText"
+            data-slot="button"
+            href="#"
+          >
+            Update
+          </a>
+        </div>
+      </div>
+      <button
+        aria-label="close"
+        class="closeButton"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-6 closeIcon"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./PromoBanner.stories WithCustomColors 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="banner"
+    >
+      <div
+        class="flex flex-row gap-4 bannerStack"
+      >
+        <img
+          alt="Special offer"
+          class="bannerImage"
+          data-nimg="1"
+          decoding="async"
+          height="95"
+          loading="lazy"
+          src="/_next/image?url=%2Fimg.jpg&w=256&q=75"
+          srcset="/_next/image?url=%2Fimg.jpg&w=96&q=75 1x, /_next/image?url=%2Fimg.jpg&w=256&q=75 2x"
+          style="color: transparent;"
+          width="95"
+        />
+        <div
+          class="bannerContent"
+        >
+          <h4
+            class="m-0 scroll-m-20 text-xl font-semibold leading-6 tracking-normal bannerText bannerTitle"
+            data-slot="typography"
+            data-variant="h4"
+          >
+            Special offer
+          </h4>
+          <div
+            class="m-0 text-sm leading-5 font-normal bannerText bannerDescription"
+            data-slot="typography"
+            data-variant="paragraph-small"
+            style="color: rgb(255, 215, 0);"
+          >
+            Limited time promotion for Safe users
+          </div>
+          <a
+            class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-4 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 bannerCtaText"
+            data-slot="button"
+            href="#"
+          >
+            Claim now
+          </a>
+        </div>
+      </div>
+      <button
+        aria-label="close"
+        class="closeButton"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-6 closeIcon"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./PromoBanner.stories WithOnClick 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="banner"
+    >
+      <div
+        class="flex flex-row gap-4 bannerStack"
+      >
+        <img
+          alt="Action required"
+          class="bannerImage"
+          data-nimg="1"
+          decoding="async"
+          height="95"
+          loading="lazy"
+          src="/_next/image?url=%2Fimg.jpg&w=256&q=75"
+          srcset="/_next/image?url=%2Fimg.jpg&w=96&q=75 1x, /_next/image?url=%2Fimg.jpg&w=256&q=75 2x"
+          style="color: transparent;"
+          width="95"
+        />
+        <div
+          class="bannerContent"
+        >
+          <h4
+            class="m-0 scroll-m-20 text-xl font-semibold leading-6 tracking-normal bannerText bannerTitle"
+            data-slot="typography"
+            data-variant="h4"
+          >
+            Take action now
+          </h4>
+          <div
+            class="m-0 text-sm leading-5 font-normal bannerText bannerDescription"
+            data-slot="typography"
+            data-variant="paragraph-small"
+          >
+            Click the button to perform a custom action
+          </div>
+          <button
+            class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none border-border bg-transparent hover:bg-foreground/[0.06] hover:text-foreground dark:border-border aria-expanded:bg-foreground/[0.06] aria-expanded:text-foreground shadow-xs h-8 gap-1 px-4 in-data-[slot=button-group]:rounded-sm has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 bannerCtaContained"
+            data-slot="button"
+            tabindex="0"
+            type="button"
+          >
+            Click me
+          </button>
+        </div>
+      </div>
+      <button
+        aria-label="close"
+        class="closeButton"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-6 closeIcon"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./PromoBanner.stories WithoutDismiss 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="banner"
+    >
+      <div
+        class="flex flex-row gap-4 bannerStack"
+      >
+        <img
+          alt="Welcome"
+          class="bannerImage"
+          data-nimg="1"
+          decoding="async"
+          height="95"
+          loading="lazy"
+          src="/_next/image?url=%2Fimg.jpg&w=256&q=75"
+          srcset="/_next/image?url=%2Fimg.jpg&w=96&q=75 1x, /_next/image?url=%2Fimg.jpg&w=256&q=75 2x"
+          style="color: transparent;"
+          width="95"
+        />
+        <div
+          class="bannerContent"
+        >
+          <h4
+            class="m-0 scroll-m-20 text-xl font-semibold leading-6 tracking-normal bannerText bannerTitle"
+            data-slot="typography"
+            data-variant="h4"
+          >
+            Welcome to Safe
+          </h4>
+          <div
+            class="m-0 text-sm leading-5 font-normal bannerText bannerDescription"
+            data-slot="typography"
+            data-variant="paragraph-small"
+          >
+            Your gateway to secure digital asset management
+          </div>
+          <a
+            class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-4 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 bannerCtaText"
+            data-slot="button"
+            href="#"
+          >
+            Get started
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`./PromoBanner.stories WithoutImage 1`] = `
+<div
+  style="background-color: rgb(255, 255, 255); padding: 1rem;"
+>
+  <div
+    class="shadcn-scope"
+  >
+    <div
+      class="banner"
+    >
+      <div
+        class="flex flex-row gap-4 bannerStack"
+      >
+        <div
+          class="bannerContent"
+        >
+          <h4
+            class="m-0 scroll-m-20 text-xl font-semibold leading-6 tracking-normal bannerText bannerTitle"
+            data-slot="typography"
+            data-variant="h4"
+          >
+            Important announcement
+          </h4>
+          <div
+            class="m-0 text-sm leading-5 font-normal bannerText bannerDescription"
+            data-slot="typography"
+            data-variant="paragraph-small"
+          >
+            Check out our latest security features
+          </div>
+          <a
+            class="focus-visible:border-ring cursor-pointer focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground h-9 gap-1.5 px-4 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 bannerCtaText"
+            data-slot="button"
+            href="#"
+          >
+            View details
+          </a>
+        </div>
+      </div>
+      <button
+        aria-label="close"
+        class="closeButton"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-6 closeIcon"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;

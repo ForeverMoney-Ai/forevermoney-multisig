@@ -1,0 +1,149 @@
+import { useCounter } from '@/components/common/Notifications/useCounter'
+import type { StepRenderProps } from '@/components/new-safe/CardStepper/useCardStepper'
+import type { NewSafeFormData } from '@/components/new-safe/create'
+import { getRedirect, pollSafeInfo } from '@/components/new-safe/create/logic'
+import StatusMessage from '@/components/new-safe/create/steps/StatusStep/StatusMessage'
+import useUndeployedSafe from '@/components/new-safe/create/steps/StatusStep/useUndeployedSafe'
+import { lightPalette } from '@safe-global/theme/palettes'
+import { AppRoutes } from '@/config/routes'
+import { safeCreationPendingStatuses } from '@/features/counterfactual'
+import { SafeCreationEvent, safeCreationSubscribe, isPredictedSafeProps } from '@/features/counterfactual/services'
+import { useCurrentChain } from '@/hooks/useChains'
+import Rocket from '@/public/images/common/rocket.svg'
+import { CREATE_SAFE_EVENTS, trackEvent } from '@/services/analytics'
+import { useAppDispatch } from '@/store'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { getLatestSafeVersion } from '@safe-global/utils/utils/chains'
+
+const SPEED_UP_THRESHOLD_IN_SECONDS = 15
+
+export const CreateSafeStatus = ({
+  data,
+  setProgressColor,
+  setStep,
+  setStepData,
+}: StepRenderProps<NewSafeFormData>) => {
+  const [status, setStatus] = useState<SafeCreationEvent>(SafeCreationEvent.PROCESSING)
+  const [pendingAddress, pendingSafe] = useUndeployedSafe()
+  // Completion must survive removal of the pending deployment record.
+  const [rememberedAddress, setRememberedAddress] = useState(data.safeAddress || pendingAddress)
+  const safeAddress = data.safeAddress || rememberedAddress || pendingAddress
+  const router = useRouter()
+  const chain = useCurrentChain()
+  const dispatch = useAppDispatch()
+
+  const counter = useCounter(pendingSafe?.status.submittedAt)
+
+  const isError = status === SafeCreationEvent.FAILED || status === SafeCreationEvent.REVERTED
+
+  useEffect(() => {
+    if (pendingAddress && !rememberedAddress) setRememberedAddress(pendingAddress)
+  }, [pendingAddress, rememberedAddress])
+
+  useEffect(() => {
+    const unsubFns = Object.entries(safeCreationPendingStatuses).map(([event]) =>
+      safeCreationSubscribe(event as SafeCreationEvent, (detail) => {
+        if (!safeAddress || detail.safeAddress.toLowerCase() !== safeAddress.toLowerCase()) return
+        if ('chainId' in detail && detail.chainId !== chain?.chainId) return
+        // INDEXED is also successful, never regress back into a waiting screen.
+        setStatus(event === SafeCreationEvent.INDEXED ? SafeCreationEvent.SUCCESS : event as SafeCreationEvent)
+      }),
+    )
+    return () => unsubFns.forEach((unsub) => unsub())
+  }, [safeAddress, chain?.chainId])
+
+  // Recover if the one-shot success event was emitted before this screen mounted.
+  useEffect(() => {
+    if (!chain || !safeAddress) return
+    let cancelled = false
+    let retry: ReturnType<typeof setTimeout>
+    const check = () => {
+      void pollSafeInfo(chain.chainId, safeAddress).then(() => {
+        if (!cancelled) setStatus(SafeCreationEvent.SUCCESS)
+      }).catch(() => {
+        if (!cancelled) retry = setTimeout(check, 15000)
+      })
+    }
+    check()
+    return () => { cancelled = true; clearTimeout(retry) }
+  }, [chain?.chainId, safeAddress])
+
+  useEffect(() => {
+    if (!chain || !safeAddress) return
+
+    if (status === SafeCreationEvent.SUCCESS) {
+      const redirect = getRedirect(chain.shortName, safeAddress, router.query?.safeViewRedirectURL)
+      if (typeof redirect !== 'string' || redirect.startsWith('/')) {
+        router.push(redirect)
+      }
+    }
+  }, [dispatch, chain, data.name, data.owners, data.threshold, router, safeAddress, status])
+
+  useEffect(() => {
+    if (!setProgressColor) return
+
+    if (isError) {
+      setProgressColor(lightPalette.error.main)
+    } else {
+      setProgressColor(lightPalette.secondary.main)
+    }
+  }, [isError, setProgressColor])
+
+  const tryAgain = () => {
+    trackEvent(CREATE_SAFE_EVENTS.RETRY_CREATE_SAFE)
+
+    if (!pendingSafe || !isPredictedSafeProps(pendingSafe.props)) {
+      setStep(0)
+      return
+    }
+
+    setProgressColor?.(lightPalette.secondary.main)
+    setStep(2)
+    setStepData?.({
+      owners: pendingSafe.props.safeAccountConfig.owners.map((owner) => ({ name: '', address: owner })),
+      name: '',
+      networks: [],
+      threshold: pendingSafe.props.safeAccountConfig.threshold,
+      saltNonce: Number(pendingSafe.props.safeDeploymentConfig?.saltNonce),
+      safeAddress,
+      safeVersion: pendingSafe.props.safeDeploymentConfig?.safeVersion ?? getLatestSafeVersion(chain),
+    })
+  }
+
+  const onCancel = () => {
+    trackEvent(CREATE_SAFE_EVENTS.CANCEL_CREATE_SAFE)
+  }
+
+  return (
+    <div className="bg-card text-card-foreground overflow-hidden rounded-xl text-center">
+      <div className="p-4 sm:p-16">
+        <StatusMessage status={status} isError={isError} pendingSafe={pendingSafe} />
+
+        {counter && counter > SPEED_UP_THRESHOLD_IN_SECONDS && !isError && (
+          <Alert variant="warning" outlined={false} className="mt-10">
+            <Rocket />
+            <AlertTitle className="text-left font-bold">Transaction is taking too long</AlertTitle>
+            <AlertDescription className="text-left">
+              Try to speed it up with better gas parameters in your wallet.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {isError && (
+          <div className="flex flex-row justify-center gap-4">
+            <Button variant="outline" onClick={onCancel} render={<Link href={AppRoutes.index} />}>
+              Go to homepage
+            </Button>
+            <Button variant="default" onClick={tryAgain}>
+              Try again
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

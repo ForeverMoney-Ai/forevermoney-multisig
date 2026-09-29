@@ -1,0 +1,135 @@
+# dependencies
+/node_modules
+**/node_modules/*
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+/packages/utils/coverage
+/reports
+report.json
+
+# generated types
+/packages/utils/src/types/contracts
+
+# next.js
+**/.next/
+/out/
+
+# production
+/build
+
+# tanstack migration experiment
+apps/web-tanstack/dist/
+.playwright-mcp/
+
+# misc
+.DS_Store
+*.pem
+.idea
+
+# beads
+.beads/
+
+# Yarn v4 / tooling cache (redirected inside workspace in container envs)
+.cache-tmp/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# expo
+**/.expo/*
+
+# tamagui
+**/.tamagui/*
+
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+
+.env
+.env.local
+.env.local*
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+
+# vercel
+.vercel
+
+# turborepo
+.turbo/
+**/.turbo/
+
+# typescript
+*.tsbuildinfo
+
+# yalc
+.yalc
+yalc.lock
+
+certificates
+
+# storybook
+**/storybook-static/
+*storybook.log
+
+# visual regression (baselines stored on separate branches)
+**/__visual_snapshots__/
+
+# os
+THUMBS_DB
+thumbs.db
+
+# web
+apps/web/.next/*
+apps/web/out/*
+apps/web/public/work*.js
+apps/web/public/sw.js
+apps/web/public/firebase*.js
+apps/web/public/fallback*.js
+
+apps/web/src/types/
+apps/web/tsconfig.tsbuildinfo
+node_modules/*
+out/*
+tsconfig.tsbuildinfo
+apps/web/.env
+apps/web/node_modules/*
+apps/web/public/fallback-development.js
+apps/web/.env
+apps/web/src/types/contracts/*
+
+# expo-plugins/notifications-service-ios
+/expo-plugins/notification-service-ios/dist/*
+
+
+# tx-builder
+apps/tx-builder/build/*
+apps/tx-builder/vite.config.js
+apps/tx-builder/vite.config.d.ts
+
+# claude-workflows
+todos/*
+/docs/plans/
+/docs/todos/
+/docs/brainstorms/
+/docs/superpowers/
+/docs/migration/
+
+.codemod
+.serena
+
+# Claude Code worktrees
+.claude/worktrees/
+.claude/settings.local.json

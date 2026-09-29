@@ -1,0 +1,162 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 0;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.containerContrast {
+  box-shadow: none;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.detailsWrapper {
+  position: relative;
+}
+
+.details {
+  width: 66.6%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.shareLink {
+  display: flex;
+  justify-content: flex-end;
+  margin: var(--space-1);
+  margin-bottom: -40px;
+  position: relative;
+  z-index: 1;
+}
+
+.inlineSimulation {
+  display: flex;
+  justify-content: flex-end;
+  margin: var(--space-2) var(--space-2) 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+
+/* QueuedTxSimulation renders nothing when it cannot simulate, 
+   and below 1350px this wrapper is in flow — so its margin left a gap. */
+.inlineSimulation:empty {
+  display: none;
+}
+
+/* `--tx-details-edge-inset` is the horizontal padding the transaction list item drops so these
+   borders span the card; 0 elsewhere. Blocks re-add it where their text would otherwise hug an edge:
+   a border spans the border box, so padding moves the text without moving the line. */
+
+.txNote {
+  margin: var(--space-1) 0;
+  padding: 0 var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.txNote:empty {
+  display: none;
+}
+
+.txData,
+.txSummary,
+.advancedDetails,
+.txModule {
+  padding: var(--space-2);
+}
+
+/* No column split in these states, so both sides sit on a card edge. */
+.loading,
+.error {
+  padding: var(--space-2) calc(var(--space-2) + var(--tx-details-edge-inset, 0px));
+}
+
+.txData {
+  border-bottom: 1px solid var(--border);
+}
+
+.txData:empty {
+  display: none;
+}
+
+.txSummary,
+.advancedDetails {
+  height: 100%;
+}
+
+.txSigners {
+  display: flex;
+  width: 33.3%;
+  flex-direction: column;
+  padding: var(--space-3);
+  border-left: 1px solid var(--border);
+  gap: var(--space-2);
+  position: relative;
+}
+
+.delegateCall .alert {
+  width: fit-content;
+  padding: 0 var(--space-1);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.buttons > * {
+  flex: 1;
+}
+
+.buttons button {
+  width: 100%;
+}
+
+@media (max-width: 599.95px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .details {
+    width: 100%;
+  }
+
+  .txSigners {
+    width: 100%;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .txNote,
+  .txData,
+  .txSummary,
+  .advancedDetails,
+  .txModule {
+    padding-right: calc(var(--space-2) + var(--tx-details-edge-inset, 0px));
+  }
+
+  .multiSend {
+    padding-right: var(--tx-details-edge-inset, 0px);
+  }
+
+  /* Pinned to the details column, whose right edge is the card's once the columns stack. */
+  .inlineSimulation {
+    margin-right: calc(var(--space-2) + var(--tx-details-edge-inset, 0px));
+  }
+}
+
+@media (max-width: 1350px) {
+  .inlineSimulation {
+    position: relative;
+  }
+}

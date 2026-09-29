@@ -1,0 +1,147 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "address-resolver-runtime",
+        "namespace": "bittensor-safe"
+      },
+      "data": {
+        "address-resolver.py": "\"\"\"Read-only Finney URL resolver. No RPC calls or signing operations.\"\"\"\nimport hashlib\nimport json\nimport os\nimport re\nimport threading\nimport time\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\nfrom urllib.parse import urlsplit, parse_qs\n\nALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'\n\ndef ss58(evm):\n    key = hashlib.blake2b(b'evm:' + bytes.fromhex(evm[2:]), digest_size=32).digest()\n    body = bytes([42]) + key\n    data = body + hashlib.blake2b(b'SS58PRE' + body, digest_size=64).digest()[:2]\n    n = int.from_bytes(data, 'big')\n    encoded = ''\n    while n:\n        n, r = divmod(n, 58)\n        encoded = ALPHABET[r] + encoded\n    return encoded\n\ndef valid_ss58(value):\n    if len(value) != 48 or any(c not in ALPHABET for c in value):\n        return False\n    n = 0\n    for c in value:\n        n = n * 58 + ALPHABET.index(c)\n    data = n.to_bytes((n.bit_length() + 7) // 8, 'big')\n    return len(data) == 35 and data[0] == 42 and data[-2:] == hashlib.blake2b(b'SS58PRE' + data[:-2], digest_size=64).digest()[:2]\n\ndef main():\n    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.production')\n    import django\n    django.setup()\n    from django.db import close_old_connections\n    from safe_transaction_service.history.models import SafeContract\n    from web3 import Web3\n\n    lock = threading.Lock()\n    cache = {}\n    refreshed = 0\n\n    def resolve(value):\n        nonlocal cache, refreshed\n        if re.fullmatch(r'0x[0-9a-fA-F]{40}', value):\n            address = Web3.to_checksum_address(value)\n            return {'chainId': '964', 'evm': address, 'ss58': ss58(address)}\n        if not valid_ss58(value):\n            raise ValueError('Invalid Finney address')\n        with lock:\n            if time.monotonic() - refreshed > 5:\n                close_old_connections()\n                cache = {ss58(a): a for a in SafeContract.objects.values_list('address', flat=True).iterator(chunk_size=1000)}\n                refreshed = time.monotonic()\n                close_old_connections()\n            address = cache.get(value)\n        if not address:\n            return None\n        return {'chainId': '964', 'evm': address, 'ss58': value}\n\n    class Handler(BaseHTTPRequestHandler):\n        def do_GET(self):\n            path = urlsplit(self.path)\n            if path.path == '/healthz':\n                return self.reply(200, {'ok': True})\n            if path.path != '/resolve':\n                return self.reply(404, {'error': 'Not found'})\n            try:\n                value = parse_qs(path.query).get('address', [''])[0]\n                result = resolve(value)\n                self.reply(200 if result else 404, result or {'error': 'This SS58 address has not been discovered yet. Open the Safe using its EVM address.'})\n            except ValueError:\n                self.reply(400, {'error': 'Invalid Finney address'})\n            except Exception:\n                self.reply(503, {'error': 'Address lookup temporarily unavailable'})\n\n        def reply(self, status, data):\n            encoded = json.dumps(data).encode()\n            self.send_response(status)\n            self.send_header('Content-Type', 'application/json')\n            self.send_header('Cache-Control', 'no-store')\n            self.send_header('Content-Length', str(len(encoded)))\n            self.end_headers()\n            self.wfile.write(encoded)\n\n        def log_message(self, *args):\n            pass\n\n    ThreadingHTTPServer(('0.0.0.0', 8090), Handler).serve_forever()\n\nif __name__ == '__main__':\n    main()\n"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "address-resolver",
+        "namespace": "bittensor-safe",
+        "labels": {
+          "app.kubernetes.io/part-of": "bittensor-safe"
+        }
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "address-resolver"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "address-resolver"
+            },
+            "annotations": {
+              "checksum/code": "2bcf60c8e9c776b9dc5967a4ca7634300b4b13fcb43992373144bcdda010dce1"
+            }
+          },
+          "spec": {
+            "enableServiceLinks": false,
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "name": "address-resolver",
+                "image": "ghcr.io/safe-global/safe-transaction-service:v5.42.1@sha256:5d177ed215decd3525c5757358076a88d24941ca54e2ee8c5afe80f52179b3d6",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                  }
+                },
+                "ports": [
+                  {
+                    "containerPort": 8090
+                  }
+                ],
+                "command": [
+                  "python",
+                  "/runtime/address-resolver.py"
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "txs"
+                    }
+                  },
+                  {
+                    "secretRef": {
+                      "name": "txs"
+                    }
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/healthz",
+                    "port": 8090
+                  },
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 5
+                },
+                "volumeMounts": [
+                  {
+                    "name": "runtime",
+                    "mountPath": "/runtime",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "runtime",
+                "configMap": {
+                  "name": "address-resolver-runtime"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "address-resolver",
+        "namespace": "bittensor-safe"
+      },
+      "spec": {
+        "selector": {
+          "app": "address-resolver"
+        },
+        "ports": [
+          {
+            "port": 8090,
+            "targetPort": 8090
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "ui-nginx",
+        "namespace": "bittensor-safe",
+        "labels": {
+          "app.kubernetes.io/part-of": "bittensor-safe"
+        }
+      },
+      "data": {
+        "nginx.conf": "events {}\nhttp {\n include /etc/nginx/mime.types;\n server {\n listen 8080;\n server_tokens off;\n root /usr/share/nginx/html;\n location = /healthz { return 200 'ok'; }\n location /address-resolver/ { proxy_pass http://address-resolver:8090/; proxy_set_header Host $host; }\n location /cgw/ { proxy_pass http://cgw:3000/; proxy_set_header Host $host; proxy_set_header X-Forwarded-Proto $scheme; }\n location /txs/api/ { proxy_pass http://txs:8888/api/; proxy_set_header Host $host; }\n location / { try_files $uri $uri.html $uri/ =404; }\n }\n}\n"
+      }
+    }
+  ]
+}

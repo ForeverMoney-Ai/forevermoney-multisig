@@ -1,0 +1,7 @@
+.safeAppTagContainer {
+  padding-top: var(--space-2);
+}
+
+.compact {
+  padding-top: var(--space-1);
+}
