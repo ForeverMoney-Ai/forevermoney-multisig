@@ -1,9 +1,11 @@
 .popup {
   position: fixed;
-  z-index: 1300;
+  z-index: 1402;
   bottom: var(--space-2);
   right: var(--space-2);
-  max-width: 400px;
+  max-width: min(400px, 100vw);
+  max-height: calc(100dvh - 2 * var(--space-2));
+  overflow-y: auto;
 }
 
 .container {

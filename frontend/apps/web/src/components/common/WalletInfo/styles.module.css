@@ -33,7 +33,9 @@
 }
 
 .address {
-  height: 40px;
+  min-height: 40px;
+  min-width: 0;
+  flex: 1;
 }
 
 .address div[title] {
