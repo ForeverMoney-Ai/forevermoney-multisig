@@ -128,4 +128,34 @@ describe('HeaderNavigation', () => {
     await userEvent.click(screen.getByLabelText('Notifications'))
     expect(onNotificationsClick).toHaveBeenCalledTimes(1)
   })
+
+  describe('Finney addresses', () => {
+    const ss58 = '5DXq7SabcdefghijkmnopqrstuvwxyzABCDEFGHJKLMLvH6tK'
+
+    it('shows copyable SS58 and TAO EVM rows and a separate details button', async () => {
+      const writeText = jest.fn().mockResolvedValue(undefined)
+      Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+      const onWalletClick = jest.fn()
+      render(<HeaderNavigation {...defaultProps} walletSs58={ss58} onWalletClick={onWalletClick} />)
+
+      expect(screen.getByText('SS58')).toBeInTheDocument()
+      expect(screen.getByText('TAO EVM')).toBeInTheDocument()
+
+      await userEvent.click(screen.getByRole('button', { name: 'Copy SS58 address' }))
+      expect(writeText).toHaveBeenLastCalledWith(ss58)
+      await userEvent.click(screen.getByRole('button', { name: 'Copy TAO EVM address' }))
+      expect(writeText).toHaveBeenLastCalledWith(defaultProps.walletAddress)
+      expect(onWalletClick).not.toHaveBeenCalled()
+
+      await userEvent.click(screen.getByRole('button', { name: 'Open wallet details' }))
+      expect(onWalletClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps the single-address pill when no SS58 address is given', () => {
+      render(<HeaderNavigation {...defaultProps} />)
+
+      expect(screen.queryByText('SS58')).not.toBeInTheDocument()
+      expect(screen.getByText('0x1234...5678')).toBeInTheDocument()
+    })
+  })
 })

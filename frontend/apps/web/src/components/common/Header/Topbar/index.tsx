@@ -31,6 +31,8 @@ import SafenetStakingButton from './SafenetStakingButton'
 import { useSafeTokenEnabled } from '@/hooks/useSafeTokenEnabled'
 import { TxModalContext } from '@/components/tx-flow'
 import { cn } from '@/utils/cn'
+import useChainId from '@/hooks/useChainId'
+import { evmToSs58 } from '@/components/common/SpaceSafeBar/BittensorAddress'
 
 // The context (left) and actions card (right) share one row until they genuinely stop fitting, then
 // the actions keep the top row and the context drops underneath — `order-last` + `basis-full` on the
@@ -73,6 +75,8 @@ const Topbar = ({ onMenuToggle, onBatchToggle }: TopbarProps): ReactElement => {
     handleClose: handleWalletClose,
   } = useWalletPopover()
   const walletName = useWalletName(wallet)
+  const chainId = useChainId()
+  const walletSs58 = wallet && chainId === '964' ? evmToSs58(wallet.address) : undefined
   const { WalletPopover } = useLoadFeature(WalletFeature)
   const { GlobalSearchModal, GlobalSearchInput } = useLoadFeature(GlobalSearchFeature)
   const { WalletConnectWidget } = useLoadFeature(WalletConnectFeature)
@@ -182,6 +186,7 @@ const Topbar = ({ onMenuToggle, onBatchToggle }: TopbarProps): ReactElement => {
           <HeaderNavigation
             walletAddress={wallet?.address ?? ''}
             walletEns={walletName}
+            walletSs58={walletSs58}
             isConnected={Boolean(wallet)}
             walletIcon={wallet?.icon}
             walletLabel={wallet?.label}

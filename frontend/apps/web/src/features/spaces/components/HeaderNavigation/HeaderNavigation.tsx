@@ -1,10 +1,11 @@
 import type { MouseEvent, ReactNode } from 'react'
 import { useMemo } from 'react'
-import { Search, Bell, Wallet, Layers, ChevronUp, ChevronDown } from 'lucide-react'
+import { Search, Bell, Wallet, Layers, ChevronUp, ChevronDown, Copy } from 'lucide-react'
 import { blo } from 'blo'
 import { isAddress } from 'ethers'
 import { Button } from '@/components/ui/button'
 import IconAction from '@/components/common/IconAction'
+import CopyTooltip from '@/components/common/CopyTooltip'
 import { ICON_STROKE } from '@/components/common/iconStroke'
 import { cn } from '@/utils/cn'
 import Track from '@/components/common/Track'
@@ -20,6 +21,11 @@ export interface HeaderNavigationProps {
    * ENS name to display instead of truncated address
    */
   walletEns?: string
+  /**
+   * SS58 mirror of the wallet address (Finney). When set, the wallet pill shows
+   * copyable SS58 and TAO EVM rows instead of a single address.
+   */
+  walletSs58?: string
   /**
    * Whether a wallet is connected
    */
@@ -73,6 +79,7 @@ export interface HeaderNavigationProps {
 export function HeaderNavigation({
   walletAddress,
   walletEns,
+  walletSs58,
   isConnected = false,
   walletIcon,
   walletLabel,
@@ -107,6 +114,25 @@ export function HeaderNavigation({
     if (!walletIcon) return null
     return walletIcon.startsWith('data:') ? walletIcon : `data:image/svg+xml;utf8,${encodeURIComponent(walletIcon)}`
   }, [walletIcon])
+
+  const walletAvatar = identiconUrl ? (
+    <div className="relative shrink-0">
+      <img src={identiconUrl} alt="Wallet identicon" className="size-6 rounded-full" />
+      {providerIconSrc && (
+        <img
+          src={providerIconSrc}
+          alt={`${walletLabel ?? 'Wallet'} logo`}
+          className="absolute -bottom-0.5 -right-0.5 size-3.5 rounded-full border-2 border-card bg-background p-px"
+        />
+      )}
+    </div>
+  ) : null
+
+  const walletChevron = walletOpen ? (
+    <ChevronUp className="size-3.5 text-muted-foreground" />
+  ) : (
+    <ChevronDown className="size-3.5 text-muted-foreground" />
+  )
 
   return (
     <div className={cn('flex items-center gap-1')}>
@@ -157,42 +183,68 @@ export function HeaderNavigation({
         </BatchTooltip>
       )}
 
-      <Track label={OVERVIEW_LABELS.top_bar} {...OVERVIEW_EVENTS.OPEN_ONBOARD}>
-        <div className="flex items-center rounded-lg bg-muted">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onWalletClick}
-            className="gap-1.5 m-1"
-            aria-label={isConnected ? `Wallet ${walletDisplayName}` : 'Connect wallet'}
-            data-testid={isConnected ? 'open-account-center' : 'connect-wallet-btn'}
-          >
-            {isConnected && identiconUrl ? (
-              <div className="relative shrink-0">
-                <img src={identiconUrl} alt="Wallet identicon" className="size-6 rounded-full" />
-                {providerIconSrc && (
-                  <img
-                    src={providerIconSrc}
-                    alt={`${walletLabel ?? 'Wallet'} logo`}
-                    className="absolute -bottom-0.5 -right-0.5 size-3.5 rounded-full border-2 border-card bg-background p-px"
-                  />
-                )}
-              </div>
-            ) : (
-              <Wallet className="size-5 text-muted-foreground" strokeWidth={ICON_STROKE} />
-            )}
-            <span className="text-xs text-muted-foreground font-normal">
-              {isConnected ? walletDisplayName : 'Connect Wallet'}
-            </span>
-            {isConnected &&
-              (walletOpen ? (
-                <ChevronUp className="size-3.5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="size-3.5 text-muted-foreground" />
-              ))}
-          </Button>
+      {isConnected && walletSs58 ? (
+        <div
+          className="flex items-center gap-2 rounded-lg bg-muted py-1 pl-2.5 pr-1"
+          data-testid="wallet-finney-addresses"
+        >
+          {walletAvatar}
+          <div className="flex min-w-0 flex-col">
+            {[
+              { label: 'SS58', address: walletSs58 },
+              { label: 'TAO EVM', address: walletAddress },
+            ].map(({ label, address }) => (
+              <CopyTooltip key={label} text={address} initialToolTipText={`Copy ${label} address`}>
+                <button
+                  type="button"
+                  aria-label={`Copy ${label} address`}
+                  className="flex min-w-0 items-center gap-1.5 text-xs leading-4 text-muted-foreground hover:text-foreground"
+                >
+                  <span className="w-14 shrink-0 whitespace-nowrap text-right">{label}</span>
+                  <span className="truncate text-foreground">
+                    {address.slice(0, 6)}…{address.slice(-6)}
+                  </span>
+                  <Copy className="size-3 shrink-0" />
+                </button>
+              </CopyTooltip>
+            ))}
+          </div>
+          <Track label={OVERVIEW_LABELS.top_bar} {...OVERVIEW_EVENTS.OPEN_ONBOARD}>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onWalletClick}
+              aria-label="Open wallet details"
+              data-testid="open-account-center"
+            >
+              {walletChevron}
+            </Button>
+          </Track>
         </div>
-      </Track>
+      ) : (
+        <Track label={OVERVIEW_LABELS.top_bar} {...OVERVIEW_EVENTS.OPEN_ONBOARD}>
+          <div className="flex items-center rounded-lg bg-muted">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onWalletClick}
+              className="gap-1.5 m-1"
+              aria-label={isConnected ? `Wallet ${walletDisplayName}` : 'Connect wallet'}
+              data-testid={isConnected ? 'open-account-center' : 'connect-wallet-btn'}
+            >
+              {isConnected && walletAvatar ? (
+                walletAvatar
+              ) : (
+                <Wallet className="size-5 text-muted-foreground" strokeWidth={ICON_STROKE} />
+              )}
+              <span className="text-xs text-muted-foreground font-normal">
+                {isConnected ? walletDisplayName : 'Connect Wallet'}
+              </span>
+              {isConnected && walletChevron}
+            </Button>
+          </div>
+        </Track>
+      )}
     </div>
   )
 }

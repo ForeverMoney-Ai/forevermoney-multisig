@@ -83,6 +83,19 @@ export const Default: Story = {
 }
 
 /**
+ * Finney: copyable SS58 and TAO EVM addresses, chevron opens wallet details
+ */
+export const FinneyAddresses: Story = {
+  args: {
+    walletAddress: '0x814c3f5b2e1a9d7c6b4a3e2f1d0c9b8a77708f8e',
+    walletSs58: '5DXq7SabcdefghijkmnopqrstuvwxyzABCDEFGHJKLMLvH6tK',
+    walletLabel: 'Talisman',
+    isConnected: true,
+    showBatch: true,
+  },
+}
+
+/**
  * Header navigation with ENS name
  */
 export const WithEns: Story = {
