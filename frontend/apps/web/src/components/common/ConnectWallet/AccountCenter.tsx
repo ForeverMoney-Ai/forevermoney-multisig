@@ -7,11 +7,13 @@ import WalletOverview, { WalletIdenticon } from '../WalletOverview'
 import CopyTooltip from '@/components/common/CopyTooltip'
 import { evmToSs58 } from '@/components/common/SpaceSafeBar/BittensorAddress'
 import WalletInfo from '@/components/common/WalletInfo'
+import useChainId from '@/hooks/useChainId'
 
 const AccountCenter = ({ wallet }: { wallet: ConnectedWallet }) => {
   const [open, setOpen] = useState(false)
   const { balance } = wallet
-  const ss58 = wallet.chainId === '964' ? evmToSs58(wallet.address) : undefined
+  const chainId = useChainId()
+  const ss58 = chainId === '964' || wallet.chainId === '964' ? evmToSs58(wallet.address) : undefined
 
   const closeWalletInfo = () => {
     setOpen(false)

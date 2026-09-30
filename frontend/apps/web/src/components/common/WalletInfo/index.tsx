@@ -58,7 +58,7 @@ export const WalletInfo = ({
 
   return (
     <>
-      <div className="flex gap-3">
+      <div className="flex items-start gap-3">
         <WalletIdenticon wallet={wallet} size={36} />
 
         <div className={css.address}>

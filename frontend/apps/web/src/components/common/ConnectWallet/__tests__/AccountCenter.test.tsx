@@ -50,3 +50,10 @@ it('copies both Finney address formats without opening wallet details', async ()
   fireEvent.click(getByRole('button', { name: 'Open wallet details' }))
   await waitFor(() => expect(queryByText('Disconnect')).toBeInTheDocument())
 })
+
+it('shows both Finney address formats when the app is on Finney but the wallet reports another chain', () => {
+  jest.spyOn(require('@/hooks/useChainId'), 'default').mockReturnValue('964')
+  const { getByRole } = render(<AccountCenter wallet={{ ...mockWallet, chainId: '1' }} />)
+  expect(getByRole('button', { name: 'Copy SS58 address' })).toBeInTheDocument()
+  expect(getByRole('button', { name: 'Copy TAO EVM address' })).toBeInTheDocument()
+})
