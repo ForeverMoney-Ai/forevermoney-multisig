@@ -143,6 +143,8 @@ describe('HeaderNavigation', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Copy SS58 address' }))
       expect(writeText).toHaveBeenLastCalledWith(ss58)
+      expect(screen.getByTestId('copy-btn-check')).toBeInTheDocument()
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
       await userEvent.click(screen.getByRole('button', { name: 'Copy TAO EVM address' }))
       expect(writeText).toHaveBeenLastCalledWith(defaultProps.walletAddress)
       expect(onWalletClick).not.toHaveBeenCalled()

@@ -1,11 +1,12 @@
 import type { MouseEvent, ReactNode } from 'react'
 import { useMemo } from 'react'
-import { Search, Bell, Wallet, Layers, ChevronUp, ChevronDown, Copy } from 'lucide-react'
+import { Search, Bell, Wallet, Layers, ChevronUp, ChevronDown, Check } from 'lucide-react'
 import { blo } from 'blo'
 import { isAddress } from 'ethers'
 import { Button } from '@/components/ui/button'
 import IconAction from '@/components/common/IconAction'
-import CopyTooltip from '@/components/common/CopyTooltip'
+import CopyIcon from '@/public/images/common/copy.svg'
+import useCopyToClipboard from '@/hooks/useCopyToClipboard'
 import { ICON_STROKE } from '@/components/common/iconStroke'
 import { cn } from '@/utils/cn'
 import Track from '@/components/common/Track'
@@ -70,6 +71,33 @@ export interface HeaderNavigationProps {
   onBatchClick?: () => void
   /** Number of items in the draft batch (shown as badge) */
   batchCount?: number
+}
+
+/** One copyable address row in the Finney wallet pill: copy icon flips to a tick on copy, no tooltip. */
+function WalletAddressCopyRow({ label, address }: { label: string; address: string }) {
+  const { copied, copy } = useCopyToClipboard()
+
+  return (
+    <button
+      type="button"
+      aria-label={`Copy ${label} address`}
+      onClick={(e) => {
+        e.stopPropagation()
+        void copy(address)
+      }}
+      className="flex min-w-0 items-center gap-1.5 text-xs leading-4 text-muted-foreground hover:text-foreground"
+    >
+      <span className="w-14 shrink-0 whitespace-nowrap text-right">{label}</span>
+      <span className="truncate text-foreground">
+        {address.slice(0, 6)}…{address.slice(-6)}
+      </span>
+      {copied ? (
+        <Check data-testid="copy-btn-check" className="size-3.5 shrink-0 text-green-600" />
+      ) : (
+        <CopyIcon data-testid="copy-btn-icon" className="size-3.5 shrink-0 text-[var(--color-border-main)]" />
+      )}
+    </button>
+  )
 }
 
 /**
@@ -194,19 +222,7 @@ export function HeaderNavigation({
               { label: 'SS58', address: walletSs58 },
               { label: 'TAO EVM', address: walletAddress },
             ].map(({ label, address }) => (
-              <CopyTooltip key={label} text={address} initialToolTipText={`Copy ${label} address`}>
-                <button
-                  type="button"
-                  aria-label={`Copy ${label} address`}
-                  className="flex min-w-0 items-center gap-1.5 text-xs leading-4 text-muted-foreground hover:text-foreground"
-                >
-                  <span className="w-14 shrink-0 whitespace-nowrap text-right">{label}</span>
-                  <span className="truncate text-foreground">
-                    {address.slice(0, 6)}…{address.slice(-6)}
-                  </span>
-                  <Copy className="size-3 shrink-0" />
-                </button>
-              </CopyTooltip>
+              <WalletAddressCopyRow key={label} label={label} address={address} />
             ))}
           </div>
           <Track label={OVERVIEW_LABELS.top_bar} {...OVERVIEW_EVENTS.OPEN_ONBOARD}>
