@@ -38,7 +38,14 @@ const CopyButton = ({
   }, [onCopy])
 
   return (
-    <CopyTooltip text={text} onCopy={handleCopy} initialToolTipText={initialToolTipText} dialogContent={dialogContent}>
+    <CopyTooltip
+      text={text}
+      onCopy={handleCopy}
+      initialToolTipText={initialToolTipText}
+      dialogContent={dialogContent}
+      // The icon flips to a tick on copy, so the tooltip is redundant; custom children keep it as their only feedback.
+      hideTooltip={!children}
+    >
       {children ?? (
         <Button variant="ghost" size="icon-xs" aria-label={initialToolTipText} className={className}>
           {isCopied ? (

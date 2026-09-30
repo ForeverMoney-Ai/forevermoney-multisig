@@ -9,12 +9,15 @@ const CopyTooltip = ({
   initialToolTipText = 'Copy to clipboard',
   onCopy,
   dialogContent,
+  hideTooltip = false,
 }: {
   text: string
   children?: ReactNode
   initialToolTipText?: string
   onCopy?: () => void
   dialogContent?: ReactElement
+  /** Copy on click without the hover/"Copied" tooltip — for triggers that show their own feedback. */
+  hideTooltip?: boolean
 }): ReactElement => {
   const [tooltipText, setTooltipText] = useState(initialToolTipText)
   const [showTooltip, setShowTooltip] = useState(false)
@@ -55,15 +58,23 @@ const CopyTooltip = ({
 
   return (
     <>
-      <Tooltip open={showTooltip} onOpenChange={setShowTooltip}>
-        {/* The tooltip alone is not an accessible name — keep the copy affordance labelled. */}
-        <TooltipTrigger
-          render={<span className="inline-flex cursor-pointer" aria-label={initialToolTipText} onClick={handleCopy} />}
-        >
+      {hideTooltip ? (
+        <span className="inline-flex cursor-pointer" aria-label={initialToolTipText} onClick={handleCopy}>
           {children}
-        </TooltipTrigger>
-        <TooltipContent side="top">{tooltipText}</TooltipContent>
-      </Tooltip>
+        </span>
+      ) : (
+        <Tooltip open={showTooltip} onOpenChange={setShowTooltip}>
+          {/* The tooltip alone is not an accessible name — keep the copy affordance labelled. */}
+          <TooltipTrigger
+            render={
+              <span className="inline-flex cursor-pointer" aria-label={initialToolTipText} onClick={handleCopy} />
+            }
+          >
+            {children}
+          </TooltipTrigger>
+          <TooltipContent side="top">{tooltipText}</TooltipContent>
+        </Tooltip>
+      )}
       {dialogContent !== undefined && (
         <ConfirmCopyModal onClose={() => setShowConfirmation(false)} onCopy={handleCopy} open={showConfirmation}>
           {dialogContent}

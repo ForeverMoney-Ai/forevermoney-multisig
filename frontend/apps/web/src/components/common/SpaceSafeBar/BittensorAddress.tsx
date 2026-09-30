@@ -1,8 +1,9 @@
 import { blake2b } from '@noble/hashes/blake2b'
-import { Copy } from 'lucide-react'
+import { Check } from 'lucide-react'
+import CopyIcon from '@/public/images/common/copy.svg'
+import useCopyToClipboard from '@/hooks/useCopyToClipboard'
 import useSafeAddress from '@/hooks/useSafeAddress'
 import useChainId from '@/hooks/useChainId'
-import CopyTooltip from '@/components/common/CopyTooltip'
 
 // Bittensor's EVM mirror: blake2_256("evm:" ++ H160), SS58 prefix 42.
 export function evmToSs58(address: string): string | undefined {
@@ -26,22 +27,36 @@ export default function BittensorAddress() {
   const address = useSafeAddress()
   const chainId = useChainId()
   const ss58 = chainId === '964' ? evmToSs58(address) : undefined
+  const { copied, copy } = useCopyToClipboard()
   if (!ss58) return null
 
   return (
     <div className="flex min-w-0 items-center gap-3 rounded-lg bg-muted px-3 py-2" data-testid="safe-ss58-address">
-      <img src="/assets/metadata/tao.png" alt="Bittensor" width={32} height={32} className="size-8 shrink-0 rounded-full bg-white" />
+      <img
+        src="/assets/metadata/tao.png"
+        alt="Bittensor"
+        width={32}
+        height={32}
+        className="size-8 shrink-0 rounded-full bg-white"
+      />
       <div className="min-w-0 flex-1">
         <div className="text-xs font-medium text-muted-foreground">Bittensor SS58</div>
         <div className="flex min-w-0 items-center gap-2" title={ss58}>
           <code className="min-w-0 truncate font-mono text-sm text-foreground select-all">{ss58}</code>
         </div>
       </div>
-      <CopyTooltip text={ss58} initialToolTipText="Copy SS58 address">
-        <button type="button" aria-label="Copy SS58 address" className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <Copy className="size-4" />
-        </button>
-      </CopyTooltip>
+      <button
+        type="button"
+        aria-label="Copy SS58 address"
+        onClick={() => void copy(ss58)}
+        className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {copied ? (
+          <Check data-testid="copy-btn-check" className="size-4 text-green-600" />
+        ) : (
+          <CopyIcon data-testid="copy-btn-icon" className="size-4" />
+        )}
+      </button>
     </div>
   )
 }
