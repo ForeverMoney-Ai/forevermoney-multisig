@@ -19,8 +19,8 @@ for addr,version in [('0x40A2aCCbd92BCA938b02010E17A5b8929b49130D','1.3.0'),('0x
  }}''')
 locations.append(''' location /finney-decoder/ {
   proxy_ssl_server_name on;
-  proxy_set_header Host safe-decoder.safe.global;
-  proxy_pass https://safe-decoder.safe.global/;
+  proxy_set_header Host api.safe.global;
+  proxy_pass https://api.safe.global/decoder/;
  }''')
 conf=conf.replace(' location = /healthz',start+'\n'+'\n'.join(locations)+'\n'+end+'\n location = /healthz',1)
 Path('artifacts/ui-nginx-trusted-batches.conf').write_text(conf)
