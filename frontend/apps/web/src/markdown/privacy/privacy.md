@@ -1,462 +1,229 @@
-# PRIVACY POLICY
+# ForeverMoney.ai Privacy Policy
 
-**Last Revised: Dec 10, 2025**
+**Last updated: 13 October 2026**
 
-This Privacy Policy (“Policy”) explains how Tortoise Labs Ltd. (“Tortoise Labs”, “we”, “us”, or “our”) collects, uses, discloses, and protects personal data when you access or use:
+This Privacy Policy explains how **Tortoise Labs Ltd.**, a company incorporated in the British Virgin Islands (**“Tortoise Labs,” “we,” “us,”** or **“our”**), processes personal data as the operator of **ForeverMoney.ai**.
 
-* our website located at [https://forevermoney.ai](https://forevermoney.ai) and any of its subdomains (the “Website”), and
+This Policy applies to https://forevermoney.ai and its subdomains, the ForeverMoney applications and interfaces, documentation, hosted application programming interfaces, hosted Model Context Protocol services, transaction-preparation tools and related services we make available (collectively, the **“Services”**).
 
-* any tools, dashboards, services, features, and functionalities we make available through the Website (together, the “Services”).
+Tortoise Labs is the controller of personal data it processes for its own purposes. A wallet provider, blockchain network, smart contract, decentralised protocol, RPC provider, block explorer or other third-party service may process data independently under its own terms and privacy notice.
 
-For purposes of applicable data protection laws, Tortoise Labs Ltd. is the “controller” of your personal data. In this Policy, “you” and “your” means any natural person who accesses, uses, connects to, or interacts with the Services.
+This Policy is a notice about our processing practices. It is not a request for blanket consent and does not grant access to any Service where access is prohibited under the [ForeverMoney.ai Terms of Service](/terms).
 
-Please read this Policy carefully so that you understand how we handle your personal data and what rights you may have. If you do not agree with this Policy, you should not use, access, connect to, or interact with the Services or otherwise provide personal data to us.
+## 1. Important characteristics of the Services
 
----
+ForeverMoney is non-custodial. We do not receive or store your private keys or seed phrases, and we do not maintain a customer account or off-chain asset balance for you.
 
-## **1\. Personal Data We Collect, Why We Use It, and Legal Bases**
+Public blockchain activity is generally visible to anyone. Wallet addresses, transactions, token balances, smart-contract interactions and related information may be permanently recorded on public blockchains. Tortoise Labs does not control public blockchains and cannot delete, correct or make private information recorded on them.
 
-When you access, use, connect to, or interact with the Services, we may collect personal data about you from various sources.
+We do not currently offer user accounts, user profiles, newsletters, direct marketing programmes or recruitment forms. If you sign a message with your wallet to sign in (for example, to use a referral link), we store a sign-in record linked to your public wallet address, as described in Section 2.2. We do not sell personal data or share it for cross-context behavioural advertising.
 
-### **1.1 Information You Provide to Us**
+## 2. Personal data we process
 
-Depending on how you use the Services, the personal data you provide may include:
+The data we process depends on how you use the Services.
 
-* **Wallet and technical identifiers**
+### 2.1 Wallet and transaction data
 
-  * Public blockchain addresses and related identifiers (e.g., TAO, Ethereum or other digital asset / smart contract / protocol addresses) (each a “Wallet”)  
-  * Any links or associations between Wallets or addresses  
-  * IP address and similar network identifiers
+When you connect a wallet or use a transactional feature, we or the technical providers used to deliver that feature may receive or observe:
 
-  * Geolocation-related data (at country or region level, where available)
+- your public wallet address and network;
+- public balances, positions, approvals and transaction history associated with that address;
+- transaction inputs you provide, such as assets, amounts, recipients, slippage settings and destination networks;
+- quotes, simulations, transaction plans and transaction-status information; and
+- transaction hashes, contract addresses and related public blockchain data.
 
-* **Profile and interaction data**
+We never ask you to provide a private key or seed phrase. Transactions are signed in your wallet or separate signing environment.
 
-  * Display name / username, profile name, avatar, and similar profile details  
-  * Social media handle(s) and related publicly available information  
-  * Preferences related to how you use the Services
+### 2.2 Wallet sign-in records
 
-* **On-chain and transaction-related data**
+If you sign in by signing a message with your wallet, we store:
 
-  * Blockchain transaction history linked to your Wallet or addresses you connect in the Services  
-  * Information necessary to facilitate or allocate tokens or rewards (e.g., Forevermoney- or subnet-related tokens or points)  
-  * Token holdings or positions as visible on-chain
+- your public wallet address;
+- a referral code generated for that address and, if you used another wallet’s referral link, a record linking the two wallets;
+- the date you first signed in and the dates on which you used the Services while signed in; and
+- a hashed session token used to keep you signed in.
 
-* **Marketing and communication data**
+We do not collect your name, email address or other contact details as part of sign-in.
 
-  * Email address and other contact details  
-    Preferences regarding marketing communications and notifications  
-  * Your responses to surveys, feedback, or forms related to the Services
+### 2.3 Website, device and log data
 
-* **Support and correspondence data**
+When you access a hosted Service, we and our hosting, security and delivery providers may automatically process:
 
-  * Content of emails or other communications you send to us, including any personal data you choose to include  
-    Metadata associated with your communications (time sent, technical headers, etc.)
+- IP address and approximate country or region derived from it;
+- date and time of access;
+- requested URL, referring URL and navigation path;
+- browser type, operating system, device type, language and screen information;
+- network, protocol, application and diagnostic information; and
+- security, error and performance logs.
 
-**How and why we use this information**
+Some of this information is necessary to deliver requests, maintain security and diagnose failures. To limit abuse, we briefly process a one-way hash of your IP address for rate limiting; these counters expire after about one minute. Our infrastructure providers may process it automatically even where Tortoise Labs does not retain it directly.
 
-We process the information you provide for the following purposes and legal bases:
+### 2.4 Analytics data
 
-1. **To provide and operate the Services**
+We currently use **Umami Cloud** to measure general use of the Website. In its standard configuration, Umami does not use cookies, does not store visitors’ IP addresses and does not track visitors across unrelated websites. It may process page paths, referrers, browser and device information, country or region, events and an anonymous session identifier. The IP address received with a request may be used transiently to derive location and an anonymous session identifier.
 
-   * To enable you to connect and use your Wallet in connection with the Services  
-   * To facilitate transactions and on-chain interactions you initiate  
-   * To provide dashboards, analytics, or tooling around liquidity and protocol-related activity  
-   * Legal basis: performance of a contract and our legitimate interests in providing efficient Services.
+We do not provide Umami with wallet addresses, email addresses or other direct identifiers as a distinct user identifier. We do not use analytics for advertising or direct marketing.
 
-2. **To communicate with you**
+### 2.5 Communications
 
-   * To respond to your inquiries and support requests  
-   * To send service, security, and administrative messages (non-marketing)  
-   * Legal basis: performance of a contract and our legitimate interests in maintaining our relationship with you.
+If you email us, we process your email address, the contents of your message, attachments and associated technical metadata so that we can respond, maintain security, keep appropriate records and establish or defend legal claims.
 
-3. **To send you marketing communications (where permitted)**
+We do not currently operate public contact, newsletter, account-registration or recruitment forms through the Services.
 
-   * To sign you up for alerts or newsletters if you request them  
-   * To inform you about products, features, events, or updates that may be relevant to you, where permitted by law  
-     Legal basis: your consent, or our legitimate interests where applicable law allows direct marketing on that basis. You may opt-out at any time.
+### 2.6 Public and third-party sources
 
-4. **To comply with legal obligations and manage risk**
+We may obtain information from:
 
-   * To screen for sanctions, restricted or prohibited users, or regions  
-   * To comply with applicable laws, regulations, or regulatory requests  
-   * Legal basis: compliance with legal obligations and our legitimate interests in protecting our business and ecosystem.
+- public blockchains and smart contracts;
+- blockchain nodes, RPC providers, indexers, explorers and market-data providers;
+- wallet and connection software you choose to use;
+- infrastructure, hosting, content-delivery, security and analytics providers; and
+- public sources and competent authorities where necessary to comply with law or protect the Services.
 
----
+## 3. Why we process personal data
 
-### **1.2 Information We Collect Automatically**
+We process personal data only where permitted by applicable law and for the following purposes:
 
-When you visit the Website or interact with the Services, our systems (and the systems of certain third-party providers) may automatically collect certain information, which may include:
+### 3.1 Providing the Services
 
-* IP address of the device accessing the Services  
-* Date and time of access  
-* URL of the page(s) accessed, and URL of the page that referred you to the Website  
-* Name of your internet access provider  
-* Country or region from which you access the Services  
-* Your device’s operating system and browser (provider, version, language)  
-* Transmission protocol (e.g., HTTP/1.1)  
-* Log files, usage logs, and related diagnostic information
+We process wallet, transaction, network and technical data to display relevant information, prepare requested transaction data, provide quotes or simulations, track transaction status, respond to requests and deliver the Services.
 
-**How and why we use this information**
+The applicable legal basis may include performance of our contract with you, taking steps at your request before entering a contract and our legitimate interests in providing requested technical services, where those bases are recognised by applicable law.
 
-1. **To enable your access and technical delivery of the Services**
+### 3.2 Security, integrity and abuse prevention
 
-   * To route your requests and serve content  
-   * To maintain and manage sessions
+We process technical, wallet and transaction information to secure the Services; detect errors, attacks, fraud and prohibited use; investigate incidents; enforce the Terms; and protect users, Tortoise Labs and third parties.
 
-   * Legal basis: performance of a contract and our legitimate interests in operating the Services.
+The applicable legal basis may include our legitimate interests in protecting the Services and compliance with legal obligations.
 
-2. **To identify restricted use and eligibility**
+### 3.3 Legal and regulatory compliance
 
-   * To help detect whether you may be a “prohibited person” or subject to restrictions or ineligible jurisdictions under our terms  
-   * To conduct limited geolocation checks to determine your eligibility for certain features  
-   * Legal basis: performance of a contract, compliance with legal obligations, and our legitimate interests in risk management and regulatory compliance.
+We may process information to respond to lawful requests, comply with court orders or applicable law, establish or defend legal claims and assess whether access or activity is prohibited under the Terms or applicable restrictions.
 
-3. **To maintain security, stability, and improve the Services**
+We do not currently use a third-party KYC provider, wallet-sanctions-screening provider or automated IP geoblocking system. If we introduce materially different compliance screening or location-based controls, we will update this Policy as required before or when that processing begins.
 
-   * To monitor, prevent, and detect security incidents and abuse  
-   * To perform troubleshooting, analytics, testing, and research  
-   * To optimize performance and user experience  
-   * Legal basis: our legitimate interests in securing and improving the Services.
+### 3.4 Analytics and improvement
 
-We may also aggregate, anonymize, or otherwise de-identify data collected automatically to create statistical or analytical information. Once data is anonymized so that it is no longer personal data, we may use it for any purpose permitted by applicable law.
+We process limited analytics and diagnostic information to understand aggregate use, improve functionality, measure performance and diagnose problems. The applicable legal basis is our legitimate interest in operating and improving the Services or consent where applicable law requires it.
 
----
+### 3.5 Communications and legal claims
 
-### **1.3 Information from Wallet Connections and Third-Party Tools**
+We process correspondence to respond to you, administer our relationship, comply with legal duties and establish, exercise or defend legal claims.
 
-To use certain aspects of the Services, you may be required to connect a compatible third-party Wallet or other blockchain-related tooling.
+We do not use personal data for direct marketing.
 
-* Your use of any third-party Wallet (e.g., browser extension, mobile wallet, or other protocol interface) is governed solely by the terms and privacy policy of that third-party provider.  
-* We do not operate, maintain, or control such Wallets and disclaim responsibility for how those third parties process or handle your personal data.
+## 4. When data is required
 
-When you connect a Wallet, we may view:
+Providing a wallet address and transaction inputs is voluntary, but transactional features cannot operate without the information necessary to prepare or display the requested interaction. Providing information in an email is voluntary, but we may be unable to respond or investigate a matter without sufficient detail.
 
-* The public address of your Wallet  
-* On-chain transaction history associated with that address  
-* Balances of tokens or assets held at that address (as visible on-chain)
+Technical request data may be processed automatically when you access a hosted Service. If you do not want that processing to occur, do not access the hosted Services. Open-source or locally installed software may operate separately, but Tortoise Labs processes data from it only if the software communicates with infrastructure or a hosted service operated for us.
 
-We use this information to:
+## 5. Disclosure of personal data
 
-* Provide the Services you request (for example, liquidity management tools, dashboards, or allocation logic)  
-* Determine eligibility for certain features, rewards, or subnet participation  
-* Monitor and protect the integrity of the protocol and ecosystem
+We may disclose personal data to the following classes of recipients where reasonably necessary:
 
-Legal basis: performance of a contract, our legitimate interests in operating and protecting the Services, and compliance with legal obligations where applicable.
+- hosting, cloud, content-delivery, cybersecurity and technical-infrastructure providers, including providers supporting the delivery of ForeverMoney.ai;
+- analytics providers, currently Umami Cloud;
+- blockchain nodes, RPC providers (such as Alchemy), swap aggregators (such as KyberSwap), market-data providers, indexers, explorers and protocols necessary to provide a feature you request;
+- wallet or connection providers you choose to use;
+- professional advisers, auditors, insurers and consultants;
+- courts, regulators, law-enforcement bodies and other competent authorities where disclosure is lawful or required;
+- a purchaser, investor, lender or adviser in connection with a proposed or completed merger, financing, restructuring or transfer of all or part of our business; and
+- affiliates and contractors that require access for a purpose described in this Policy and are subject to appropriate confidentiality and data-protection obligations.
 
----
+When you submit a blockchain transaction, information contained in that transaction is disclosed publicly to the applicable blockchain network and cannot be made private by us.
 
-### **1.4 Job Applications**
+We do not sell personal data or disclose it to data brokers. We do not disclose personal data for third-party direct marketing or cross-context behavioural advertising.
 
-If you apply for a role at Tortoise Labs (e.g., by email or via a recruiting tool or portal linked from our Website), we may process:
+## 6. Third-party services
 
-* Identification and contact details (name, email, phone, location)  
-* CV/resume, cover letters, and other documents you provide  
-* Information about your education, work history, and skills  
-* Preferences, availability, and compensation expectations  
-* Any other information you choose to provide in your application
+Wallets, blockchains, RPC providers, explorers, smart contracts, decentralised protocols, external websites and other third-party services are not controlled by Tortoise Labs. Their processing is governed by their own terms and privacy notices.
 
-We may also request additional information as permitted by law, such as references or background checks.
+Connecting a wallet or requesting an on-chain interaction may cause your wallet software and relevant network providers to receive your wallet address, IP address, transaction request and other technical information. Review their privacy practices before using them.
 
-We use this data to:
+## 7. International processing and transfers
 
-* Review and manage your application  
-* Communicate with you regarding interviews and hiring steps  
-* Plan and conduct recruitment and hiring decisions
+Tortoise Labs is incorporated in the British Virgin Islands, and the Services use providers and public networks that operate internationally. Personal data may therefore be processed in the British Virgin Islands, European Economic Area, United States and other jurisdictions whose data-protection laws may differ from those in your location.
 
-Legal basis: taking steps at your request prior to entering into an employment or service contract, performance of such contract, and our legitimate interests in managing recruitment and ensuring security, suitability, and compliance.
+Where applicable law requires a transfer mechanism, we will use an available lawful safeguard, such as an adequacy decision, approved standard contractual clauses, a binding legal derogation or another recognised mechanism. You may contact us for information about safeguards applicable to a particular transfer.
 
-You may object to this processing at any time; however, if you do so, we may not be able to consider your application.
+Public blockchain information is replicated globally through independent network participants. Tortoise Labs cannot control the locations in which those participants process public blockchain data.
 
----
+## 8. Retention
 
-## **2\. Your Data Protection Rights**
+We retain personal data only for as long as reasonably necessary for the purpose for which it was processed, including providing and securing the Services, complying with law, resolving disputes and enforcing agreements. In determining a retention period, we consider the nature and sensitivity of the data, the relevant purpose, security needs, applicable limitation periods and legal requirements.
 
-Depending on where you live and applicable law (for example, the GDPR in the EU/EEA and UK, or Swiss data protection law), you may have some or all of the following rights in relation to your personal data:
+In particular:
 
-1. **Right of access**  
-    To obtain confirmation of whether we process your personal data and, if so, to receive a copy and certain information about how it is processed.
+- wallet sign-in records (wallet address, referral code, referral link and first sign-in date) are retained while you continue to use the Services and are deleted on request, subject to the exceptions below;
+- records of the dates on which you used the Services are deleted after 12 months;
+- session tokens expire after 30 days and expired tokens are deleted daily;
+- support and legal correspondence is retained for as long as necessary to address the matter and any related legal or recordkeeping requirement;
+- application logs for ForeverMoney.ai are retained by our hosting provider for approximately one day; other technical, security and diagnostic logs are retained according to operational and security needs and are periodically deleted or aggregated when no longer required;
+- analytics data is retained according to our Umami Cloud configuration and is deleted or aggregated when it is no longer reasonably needed; and
+- public blockchain data may remain publicly available indefinitely outside our control.
 
-2. **Right to rectification**  
-    To request correction of inaccurate personal data and, taking into account the purposes of processing, completion of incomplete personal data.
+We may retain information for longer where reasonably necessary for an investigation, legal hold, dispute, security incident or binding legal obligation. Data that has been irreversibly anonymised may be retained and used without a fixed period because it is no longer personal data.
 
-3. **Right to erasure (“right to be forgotten”)**  
-    To request deletion of your personal data in certain circumstances (for example, where it is no longer necessary for the purposes for which it was collected, or you have withdrawn consent where consent was the legal basis).
+## 9. Cookies and similar technologies
 
-4. **Right to object**  
-    To object to processing that is based on our legitimate interests (including profiling), and to object at any time to the processing of your personal data for direct marketing.
+Our [Cookie Policy](/cookie) describes these technologies in more detail.
 
-5. **Right to restriction of processing**  
-    To request that we restrict processing of your personal data, so that it is only stored and not further processed, in certain circumstances.
+We do not currently use advertising or marketing cookies. Our current Umami analytics configuration is cookie-free.
 
-6. **Right to data portability**  
-    To receive certain personal data in a structured, commonly used, machine-readable format, and to have that data transmitted to another controller where technically feasible.
+If you sign in with your wallet, we set strictly necessary, httpOnly cookies that keep your signed-in session: a short-lived sign-in challenge cookie (10 minutes), a session cookie (24 hours) and a refresh cookie (30 days).
 
-7. **Right to withdraw consent**  
-    Where processing is based on your consent, you may withdraw your consent at any time. This will not affect the lawfulness of processing carried out before such withdrawal.
+The Services and wallet software may use browser storage or similar technologies where necessary to remember local preferences, wallet-connection state, network selection, security settings or other requested functionality. You can clear browser storage through your browser settings, although doing so may reset preferences or disrupt a connected session.
 
-To exercise any of these rights (where available), please contact us at: **[legal@forevermoney.ai](mailto:legal@forevermoney.ai)**. We may take reasonable steps to verify your identity before responding to your request.
+If we introduce non-essential cookies or similar technologies that require consent, we will provide an appropriate choice before using them where required by law and update this Policy.
 
-Please note:
+## 10. Automated processing
 
-* These rights may be subject to legal limitations and exceptions.
+We do not currently use personal data to make decisions based solely on automated processing that produce legal or similarly significant effects on an individual.
 
-* In particular, we may be required or permitted by law to retain certain personal data even if you request deletion or restriction, for example to comply with legal, regulatory, accounting, or audit obligations, or to defend legal claims.
+The Services may automatically validate transaction inputs, detect unsupported configurations or refuse malformed requests. These technical checks do not evaluate personal characteristics. If we introduce automated eligibility, sanctions or location decisions that materially affect access, we will provide the disclosures and safeguards required by applicable law, which may include a means to request human review.
 
-Where required by law, we will respond to your request within the applicable time frame (for example, within one month under the GDPR, extendable in certain cases).
+## 11. Security
 
----
+We use reasonable technical and organisational measures designed to protect personal data against unauthorised access, loss, misuse, alteration and disclosure. Measures may include access controls, encryption in transit, restricted administrative access, logging and security monitoring.
 
-## **3\. Sharing of Personal Data**
+No internet service, wallet, blockchain or storage system is completely secure. You are responsible for securing your devices, wallets, private keys, seed phrases and signing environment. Do not send us private keys, seed phrases or wallet passwords.
 
-We may share your personal data with third parties in the following circumstances:
+## 12. Your rights
 
-### **3.1 Service Providers and Vendors**
+Depending on the law applicable to you, you may have rights to:
 
-We engage third parties to provide services on our behalf, such as:
+- obtain information about whether and how we process your personal data;
+- request access to or a copy of personal data we hold about you;
+- request correction of inaccurate or incomplete data;
+- request deletion of personal data in applicable circumstances;
+- request restriction of processing;
+- object to processing based on legitimate interests;
+- receive certain data in a portable format;
+- withdraw consent where processing is based on consent, without affecting earlier lawful processing; and
+- complain to a competent data-protection authority.
 
-* Infrastructure and hosting providers  
-* Blockchain analysis and screening service providers  
-* Know-your-customer (KYC), sanctions, and risk-screening providers (where applicable)  
-* Analytics and performance monitoring providers  
-* Content delivery networks (CDNs)  
-* Developers and technical operations support  
-* Data storage, backup, and security services
+These rights are subject to applicable limitations and exemptions. We may ask for information reasonably necessary to verify your identity and locate the relevant data. Because we do not collect names or contact details, we may be unable to associate an anonymous technical record with you. We cannot delete or correct information stored on a public blockchain.
 
-These third parties process personal data on our instructions and are subject to contractual obligations to protect your personal data.
+To exercise a right or make a privacy complaint, email **legal@forevermoney.ai**. We will respond within the period required by applicable law.
 
-### **3.2 With Your Consent or at Your Direction**
+Residents of the European Economic Area may complain to the data-protection authority in the country where they live or work or where an alleged infringement occurred. Contacting us first is optional and does not affect that right.
 
-We may share your personal data with third parties when you explicitly ask or authorize us to do so, or where the sharing is necessary to perform a contract with you.
+## 13. Children
 
-### **3.3 Professional Advisors**
+The Services are intended only for persons aged 18 or older. We do not knowingly collect personal data from anyone under 18. If you believe that a person under 18 has provided personal data to us, contact **legal@forevermoney.ai**.
 
-We may share personal data with professional advisors such as lawyers, auditors, accountants, and cybersecurity or risk consultants, where necessary for legitimate business purposes and as required or permitted by law.
+## 14. Changes to this Policy
 
-### **3.4 Legal, Compliance, and Security**
+We may update this Policy to reflect changes in law, technology, providers or our processing practices. The revised Policy will state its effective date. Where required by law, we will provide additional notice or obtain consent before materially different processing begins.
 
-We may disclose personal data to regulators, courts, law enforcement, governmental bodies, or other competent authorities or third parties where we believe this is necessary:
+The version in effect when processing occurs governs that processing, subject to applicable law. We encourage you to review this Policy periodically.
 
-* To comply with applicable laws or regulatory obligations  
-* To respond to lawful requests, court orders, or legal processes  
-* To protect our rights, property, and safety, or those of our users, third parties, or the public  
-* To prevent, detect, or investigate fraud, abuse, or other harmful activity  
-* To enforce our terms and conditions or other applicable agreements
+## 15. Contact
 
-### **3.5 Affiliates**
-
-We may share personal data within our corporate group (our affiliates) where this is necessary to provide or improve the Services, for internal administration, or for other legitimate business purposes.
-
-### **3.6 Business Transactions**
-
-In the event of, or in preparation for, a potential or actual merger, acquisition, asset sale, restructuring, reorganization, financing, or similar corporate transaction, personal data may be disclosed to relevant counterparties and advisors, subject to appropriate confidentiality protections, and may be transferred as part of the transaction where permitted by law.
-
----
-
-## **4\. International Data Transfers**
-
-Due to the global nature of blockchain and the Services, your personal data may be transferred to, stored in, or processed in jurisdictions other than the one in which you reside. These may include countries outside the European Economic Area (“EEA”) and the United Kingdom (“UK”), and may not have the same data protection laws as the country from which you initially provided the data.
-
-Where required by law, we will implement appropriate safeguards to ensure that such cross-border transfers comply with applicable data protection requirements. These may include:
-
-* Standard Contractual Clauses (SCCs) approved by the European Commission for transfers from the EEA, and
-
-* The UK International Data Transfer Agreement / Addendum or analogous mechanisms approved by the UK Information Commissioner’s Office for transfers from the UK,
-
-unless the destination country is recognized as providing an adequate level of protection by the relevant authorities.
-
----
-
-## **5\. Retention of Personal Data**
-
-We retain personal data only for as long as reasonably necessary for the purposes described in this Policy or as required by law, including to:
-
-* Provide the Services  
-* Comply with legal and regulatory obligations  
-* Resolve disputes and enforce agreements
-
-By way of general guidance (which may be extended where required by law or for legitimate business needs):
-
-* **Account-related data**: stored for as long as your account or active relationship with the Services exists and for a reasonable period thereafter, where necessary.  
-* **Support communications**: typically retained for up to 12 months after the last relevant interaction, unless a longer period is required for legal or operational reasons.  
-* **Technical usage and analytics data**: often retained for up to 12 months in identifiable form, and may then be aggregated or anonymized.
-
-Where personal data is no longer required for the purposes for which it was collected and no longer needed for legal or legitimate business purposes, we will either delete it, anonymize it, or store it in a form that does not permit identification.
-
-We may retain anonymized or aggregated data indefinitely, as it no longer constitutes personal data.
-
----
-
-## **6\. Children’s Privacy**
-
-The Services are intended for adults and are not directed to, or intended for use by, individuals under eighteen (18) years of age.
-
-* We do not knowingly collect personal data from anyone under the age of 18, and specifically not from children under 13 (or 16 where applicable, such as in the EEA/UK).  
-* If we become aware that we have collected personal data from a child under this age threshold, we will take reasonable steps to delete such information.
-
-If you are a parent or guardian and believe that your child has provided personal data to us, please contact us at **[legal@forevermoney.ai](mailto:legal@forevermoney.ai)** so that we can take appropriate action.
-
----
-
-## **7\. Security Measures**
-
-We implement technical and organizational measures designed to protect personal data against unauthorized access, loss, misuse, alteration, or destruction. These measures may include:
-
-* Access controls and authentication  
-* Secure hosting and infrastructure practices  
-* Encryption in transit where appropriate  
-* Logging and monitoring of certain system activities
-
-However, no system or transmission over the internet can be guaranteed to be 100% secure. You are responsible for maintaining the security of your devices, Wallets, and login credentials, and for understanding that any transmission of information via the internet is at your own risk.
-
-We recommend that you also carefully review any risk factors or disclosures in our terms of service or related documentation before using the Services.
-
----
-
-## **8\. Cookies, Scripts, and Related Tracking Technologies**
-
-When you interact with the Services, we and certain third parties may use cookies and other tracking technologies (“Tracking Technologies”) to collect and store information, which may include personal data.
-
-### **8.1 Types of Tracking Technologies We Use**
-
-Tracking Technologies we may use include:
-
-* **Cookies**: small text files stored on your device by your browser  
-* **Pixels or tags**: small pieces of code on the Website that help measure usage and behavior  
-* **Scripts and SDKs**: code that enables functionality and captures certain data  
-* **Similar technologies**: technologies that perform comparable functions
-
-These may be “session” (deleted when you close your browser) or “persistent” (stored for a longer period), and may be:
-
-* **First-party** (set by us), or
-
-* **Third-party** (set by external service providers, such as analytics or advertising partners).
-
-### **8.2 How We Use Tracking Technologies**
-
-We may use Tracking Technologies for the following purposes:
-
-1. **Essential / Strictly Necessary**
-
-   * To enable core Website and Services functionality  
-   * To maintain security and session integrity  
-   * These are required for the Services to function and do not require your consent where allowed by law.
-
-2. **Functionality**
-
-   * To remember user preferences and settings  
-   * To provide enhanced, more personalized features
-
-3. **Performance and Analytics**
-
-   * To collect information on how you use the Services  
-   * To understand which pages or features are most used  
-   * To improve performance, usability, and design
-
-4. **Social Media and Integrations**
-
-   * To integrate content or features from social media platforms  
-   * To understand engagement with our content on those platforms
-
-Where required by law, we will obtain your consent before placing non-essential Tracking Technologies on your device.
-
-### **8.3 Managing Cookies and Tracking Technologies**
-
-You can usually configure your browser to:
-
-* Block all cookies  
-* Block cookies from specific sites  
-* Delete cookies when you close your browser
-
-For guidance on managing cookies in major browsers, you may consult resources such as [https://allaboutcookies.org/](https://allaboutcookies.org/).
-
-Please note:
-
-* If you disable or reject certain cookies, some features or functionality of the Services may not operate as intended.  
-* Some Tracking Technologies operated by third parties may also be managed via the third party’s own tools or browser plug-ins (e.g., opt-outs for analytics providers).
-
----
-
-## **9\. Analytics and Content Delivery Networks**
-
-### **9.1 Analytics**
-
-We may use analytics service providers to better understand how users interact with the Services. These providers may collect:
-
-* Navigation paths and pages visited  
-* Time spent on pages and on the Website  
-* The site that referred you to our Website  
-* Device type, browser type/version, and operating system  
-* Country/region of access  
-* IP address and related identifiers
-
-We use this data to:
-
-* Analyze usage and performance  
-* Improve the Services and user experience  
-* Develop and test new features
-
-Where required by law, the legal basis for using such analytics tools is your consent. You may withdraw your consent at any time, for example by adjusting your cookie settings or using available opt-out tools from those providers.
-
-### **9.2 Content Delivery Networks (CDNs)**
-
-We may use CDNs to deliver Website content more efficiently and securely. CDNs store cached copies of certain Website resources in multiple locations to reduce latency. In doing so, CDNs may process:
-
-* IP addresses
-
-* Request URLs, system configuration, and other technical log data
-
-We use CDNs on the basis of our legitimate interests in ensuring performance, security, and availability of the Services.
-
----
-
-## **10\. Social Media, Third-Party Sites, and External Tools**
-
-The Website may include links to third-party websites, dashboards, tooling, or social media platforms (such as X/Twitter, Medium, or others).
-
-* We do not control and are not responsible for the privacy or security practices of these third parties.  
-* Your use of any such third-party site or service is governed by that third party’s terms and privacy policy.
-
-When you click on a social media or external link:
-
-* The relevant third party may receive information that you visited our Website (including your IP address and technical data).  
-* If you are logged in to a social media account when you click, the platform may associate your visit with your account.
-
-We recommend that you log out of social media platforms before visiting our Website if you do not wish such data to be associated, and that you review the privacy policies of any third-party services you interact with.
-
----
-
-## **11\. Supervisory Authorities and Complaints**
-
-Depending on your location, you may have the right to lodge a complaint with a data protection supervisory authority if you believe that we have infringed applicable data protection laws.
-
-For example:
-
-* In the EU/EEA: with the data protection authority in the country where you live, work, or where the alleged infringement occurred.  
-* In the UK: with the UK Information Commissioner’s Office (ICO).  
-* In Switzerland: with the Federal Data Protection and Information Commissioner (FDPIC).
-
-We would, however, appreciate the chance to address your concerns directly first. You can contact us at **[legal@forevermoney.ai](mailto:legal@forevermoney.ai)**.
-
----
-
-## **12\. Changes to This Privacy Policy**
-
-We may update this Policy from time to time to reflect changes in law, technology, or how we operate the Services.
-
-* When we make material changes, we will update the “Last Revised” date at the top of this Policy and may provide additional notice (for example, by posting a prominent notice on the Website).  
-* Changes will apply only to information collected after the date the updated Policy takes effect, unless otherwise required by law.
-
-We encourage you to review this Policy periodically to stay informed about how we process your personal data.
-
----
-
-## **13\. Contact Us**
-
-If you have any questions, concerns, or complaints regarding this Policy or our data protection practices, or if you wish to exercise your rights, you can contact us at:
+Questions, requests and complaints concerning this Policy or our processing of personal data may be sent to:
 
 **Tortoise Labs Ltd.**  
- Email: **[legal@forevermoney.ai](mailto:legal@forevermoney.ai)**
-
-Please include sufficient detail for us to understand your request or concern, and we will respond in accordance with applicable law.
+British Virgin Islands  
+Email: **legal@forevermoney.ai**
 
