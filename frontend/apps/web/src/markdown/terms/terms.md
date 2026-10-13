@@ -1,163 +1,399 @@
-# TERMS OF SERVICE — FOREVERMONEY / TORTOISE LABS LTD.
+# ForeverMoney.ai Terms of Service
 
-**Last Revised: Dec 10, 2025**
+**Last updated: 13 October 2026**
 
-These Terms of Service (“Terms”) govern your access to the Forevermoney website, content, documentation, research materials, dashboards, and any pre-release or experimental interfaces provided by **Tortoise Labs Ltd.** (“Tortoise Labs”, “we”, “us”, or “our”).
+These Terms of Service (the **“Terms”**) are a legal agreement between you and **Tortoise Labs Ltd.**, a company incorporated in the British Virgin Islands (**“Tortoise Labs,” “we,” “us,”** or **“our”**), as the operator of **ForeverMoney.ai**. These Terms govern your access to and use of https://forevermoney.ai, the ForeverMoney applications, interfaces, documentation, software, application programming interfaces, software development kit, Model Context Protocol server, transaction-preparation tools and related services that we make available (collectively, the **“Services”**).
 
-By accessing or using any pages, materials, or preliminary Services, you agree to these Terms.  
- If you do not agree, you must not use the site or any associated applications.
+These Terms contain important provisions concerning eligibility, risks, disclaimers, limitations of liability and dispute resolution. **Section 18 requires most disputes to be resolved by binding individual arbitration in the British Virgin Islands and includes a class-action waiver.** Please read these Terms carefully.
 
----
+By clicking to accept these Terms or accessing or using any Service after being presented with these Terms, you confirm that you have read, understood and agreed to them. If you do not agree, do not access or use the Services.
 
-## **1\. Scope (Pre-Launch Services Only)**
+## 1. The Services
 
-1.1  
- Before the release of any production or alpha protocol functionality, the Services consist solely of:
+### 1.1 Services covered
 
-* access to informational content, websites, research materials, and documentation,  
-* early-stage or prototype interfaces that may not be connected to live smart contracts,  
-* any other non-final or experimental materials.
+The Services may include:
 
-1.2  
- No features are guaranteed. All materials are provided **for information and testing only**.
+- interfaces for interacting with smart contracts that support transfers of TAO and supported Bittensor subnet tokens between Finney, Base, Robinhood Chain and other supported networks (the **“Bridge”**);
+- tools for transferring supported assets between a Bittensor Finney address and an account controlled through an EVM wallet;
+- interfaces that display digital assets, markets, charts, liquidity and other market information and enable users to initiate trades through third-party protocols;
+- interfaces for creating, funding, managing and withdrawing from smart-contract vaults that manage liquidity positions (the **“Liquidity Manager”**);
+- an interface for creating and interacting with Safe-based smart-contract accounts on Bittensor EVM (the **“Multi-sig Interface”**);
+- the `@forevermoney/sdk` software development kit (the **“SDK”**);
+- the ForeverMoney Model Context Protocol server and associated tools (the **“MCP Service”**);
+- unsigned transaction plans, quotes, simulations, status information and transaction-tracking tools;
+- contract-address directories, proof-of-reserves comparisons, documentation, security information, content and other informational materials; and
+- updates, additional networks, integrations or related functionality that we make available from time to time.
 
-1.3  
- When production features become available, including any smart-contract interactions, updated Terms will apply and will be published before such functionality is enabled.
+Features, supported assets and supported networks may vary or change. The current interface and documentation describe the functionality available at a particular time.
 
----
+### 1.2 Interface and protocol distinction
 
-## **2\. Experimental Materials Only**
+The Services provide software and interfaces through which you may view information and independently interact with public blockchain networks, smart contracts and third-party protocols. Tortoise Labs is not a party to transactions executed solely between you, smart contracts, blockchain networks or third-party protocols unless we expressly state otherwise in writing.
 
-2.1  
- All current Services are exploratory, incomplete, may not function, may be removed at any time, and may not represent final protocol behavior.
+Smart contracts may continue to exist or operate independently of the Services. We do not guarantee that we can modify, suspend, reverse or prevent direct interaction with any public blockchain or smart contract.
 
-2.2  
- Nothing provided through the Services constitutes:
+### 1.3 Non-custodial software; no VASP services
 
-* financial advice,  
-* investment recommendations,  
-* regulated services,  
-* solicitation,  
-* instructions to engage in blockchain transactions.
+Tortoise Labs provides non-custodial software, information and technical interfaces. **Tortoise Labs does not act as a virtual asset service provider, custodian, exchange, broker, dealer, money transmitter or other financial intermediary in connection with the Services.** In particular, Tortoise Labs does not, as part of the Services:
 
-2.3  
- You must verify all information independently.
+- receive, possess or control your wallet private keys or seed phrases;
+- maintain an account or off-chain balance for you;
+- accept custody of digital assets or fiat currency from you;
+- accept digital assets from one person for transmission to another person;
+- purchase, sell, exchange or transfer digital assets on your behalf;
+- operate an order book or matching engine;
+- act as principal, counterparty, broker, dealer or agent in your transaction;
+- select whether, when or on what terms you should transact; or
+- independently sign, submit, cancel, freeze, reverse or recover a transaction from your wallet.
 
----
+You initiate each transaction that originates from your wallet. You choose the action and material inputs made available by the relevant Service, and your wallet or separate local signing environment signs and submits the transaction to the relevant blockchain. Transaction preparation, routing information, default parameters, automation and calldata generated by the Services are technical functions only and do not constitute custody, order execution, brokerage, advice, discretion over your assets or a transaction undertaken on your behalf.
 
-## **3\. Eligibility & Restricted Jurisdictions**
+This Section describes the design and intended operation of the Services; it does not disapply any obligation imposed by applicable law or determine a regulatory classification contrary to the actual facts.
 
-3.1  
- By accessing the site, you confirm you are not located in, a resident of, or accessing from:
+### 1.4 Assets committed to smart contracts
 
-* any jurisdiction subject to comprehensive sanctions by the UN, EU, OFAC, or UK;  
-* jurisdictions with explicit bans or severe restrictions on DeFi;  
-* any jurisdiction we may add or restrict without notice.
+Digital assets may be locked, held, managed, staked, minted, burned, migrated or transferred by smart contracts or Third-Party Services according to their code, configuration and applicable administrative permissions. Once you submit a transaction, the applicable smart contract or protocol—not Tortoise Labs as an off-chain custodian—controls what happens to those assets.
 
-3.2  
- You agree not to use any VPN, proxy, or similar method to circumvent geographic or compliance-based restrictions.
+Certain smart contracts may include keeper, manager, pause, upgrade, recovery, migration, fee or other technical permissions. Those permissions are defined and constrained by the deployed code. They do not give Tortoise Labs access to your private keys or general authority to withdraw assets from your wallet. You must review the relevant contracts, documentation and administrative-control disclosures before interacting.
 
-3.3  
- If you become subject to sanctions or move into a restricted jurisdiction, you must stop using the Services immediately.
+Non-custodial operation does not mean that assets committed to a smart contract remain in your wallet, can always be withdrawn immediately, or are free from smart-contract, administrative-control, protocol or third-party risk.
 
----
+### 1.5 No account, agency or fiduciary relationship
 
-## **4\. Pre-Launch Status of the Services**
+You do not open a customer account with us by using the Services. Nothing in these Terms creates a partnership, joint venture, agency, fiduciary, trustee, advisory, brokerage, portfolio-management or employment relationship between you and Tortoise Labs. To the maximum extent permitted by law, Tortoise Labs owes no fiduciary duty to you, and any fiduciary duty that might otherwise be alleged is disclaimed and waived.
 
-As of the date of these Terms, the Services remain in a **pre-launch** and **experimental state**.  
- Functionality may be limited, inactive, incomplete, or unavailable.
+## 2. Eligibility and the United Kingdom Exclusion
 
-Future features that may involve access to smart contracts, deposits, automated mechanisms, or other on-chain interactions will be governed by **updated Terms** provided prior to enabling such functionality.
+### 2.1 General eligibility
 
-Nothing in these Terms shall be interpreted as a commitment or guarantee to make any specific feature available.
+To use the Services, you represent and warrant that:
 
----
+- you are at least 18 years old and have legal capacity to enter into these Terms;
+- if you act for an organisation, you have authority to bind it, and **“you”** includes that organisation;
+- your access to and use of the Services is lawful in every jurisdiction applicable to you;
+- you are legally permitted to own and transact in the relevant digital assets;
+- you possess sufficient technical and financial knowledge to understand the Services and the risks of digital assets, blockchains and smart contracts; and
+- you are not prohibited from using the Services under any applicable law, contract, court order or regulatory restriction.
 
-## **5\. Intellectual Property**
+### 2.2 United Kingdom excluded
 
-5.1  
- All Forevermoney branding, content, research, designs, documentation, and related materials are the property of Tortoise Labs unless otherwise stated.
+The Services are not offered to or for the benefit of any **“UK Person.”** A UK Person means:
 
-5.2  
- Open-source components remain subject to their respective licenses.
+- an individual who is a citizen or national of the United Kingdom;
+- an individual who is physically located, ordinarily resident or domiciled in the United Kingdom;
+- an entity incorporated, organised or registered under the laws of the United Kingdom or having its registered office, principal place of business or substantial operations there;
+- an entity directly or indirectly majority-owned or controlled by one or more persons described above; or
+- a person accessing or using the Services for, on behalf of, at the direction of or for the benefit of a person described above.
 
----
+You represent and warrant each time you access or use a Service that you are not a UK Person. You must stop using the Services immediately if that representation ceases to be true. You may not use a virtual private network, proxy, relay, false information, intermediary or any other method to conceal your location, identity, ownership or control or to evade this restriction.
 
-## **6\. No Warranty**
+### 2.3 Sanctions and restricted persons
 
-The Services are provided **“as is”** and **“as available”** without warranties of any kind, whether express or implied, including but not limited to merchantability, fitness for a particular purpose, accuracy, or non-infringement.
+You represent and warrant each time you access or use a Service that neither you nor any of your directors, officers, beneficial owners or controllers, nor any person for whom, at whose direction or for whose benefit you act, is a **“Restricted Person.”** A Restricted Person includes any person that is:
 
----
+- the subject or target of economic, financial or trade sanctions administered or enforced by the United Nations, United States (including the Office of Foreign Assets Control), European Union, any EU member state, United Kingdom, British Virgin Islands or any other authority whose sanctions apply to Tortoise Labs, the Services, you or the relevant transaction;
+- located, organised or ordinarily resident in a jurisdiction subject to comprehensive territorial sanctions applicable to the Services;
+- named on an applicable restricted-person or blocked-person list; or
+- owned or controlled, directly or indirectly, individually or in the aggregate, 50% or more by one or more Restricted Persons, or otherwise treated as sanctioned under applicable law.
 
-## **7\. Limitation of Liability**
+You may not access or use the Services through, for, at the direction of or for the benefit of a Restricted Person; use a blockchain address owned or controlled by a Restricted Person; use assets that you know or reasonably should know are blocked, frozen, stolen or derived from unlawful activity; evade sanctions; or facilitate a prohibited transaction. You must stop using the Services immediately if any representation in this Section ceases to be true.
 
-To the maximum extent permitted by law:
+### 2.4 Other restricted access
 
-7.1  
- Tortoise Labs shall not be liable for any direct, indirect, incidental, consequential, special, exemplary, or punitive damages arising from or related to:
+We may restrict access from additional jurisdictions or by additional categories of users when reasonably necessary for legal, compliance, security, reputational or operational reasons, including where providing access could require a licence, registration, authorisation or approval that we do not hold. We may use IP geolocation, wallet screening, blockchain analytics and other reasonable compliance controls and may request information reasonably necessary to assess eligibility. We may refuse, restrict or suspend access based on those controls, including while a review is pending.
 
-* your access to or use of pre-launch materials,
+We have no duty to identify every UK Person, Restricted Person or prohibited transaction. A restriction applies even if the interface does not technically prevent access, and our failure or delay in detecting, blocking or enforcing against prohibited access does not authorise that access or waive the restriction.
 
-* any inaccuracy, delay, or error in content or functionality,
+## 3. Your Wallet and Transactions
 
-* downtime or UI unavailability,
+### 3.1 Wallet security
 
-* reliance on any information or experimental features.
+You are solely responsible for:
 
-7.2  
- Your sole remedy for dissatisfaction with the Services is to discontinue use.
+- selecting and securing your wallet, device, private keys, seed phrases, credentials and local signing environment;
+- maintaining appropriate backups and access controls;
+- ensuring that each connected wallet and signing account belongs to you or that you are authorised to use it; and
+- all activity authorised with your wallet credentials.
 
----
+We will never ask you to submit a private key or seed phrase to the Services. We cannot recover a wallet, reset a private key, restore a seed phrase or reverse a transaction authorised by a compromised wallet.
 
-## **8\. Indemnification**
+### 3.2 Review before signing
 
-You agree to indemnify, defend, and hold harmless Tortoise Labs, its affiliates, directors, officers, employees, and contractors from any claims, liabilities, losses, or expenses arising out of:
+Before signing or submitting a transaction, you must independently verify the action, network, signing account, recipient, asset, token contract, amount, approval, spender, destination contract, calldata, native value, fees, slippage, minimum amount received and any other material transaction term.
 
-* your use of the Services,  
-* your breach of these Terms,  
-* your violation of any law or regulations,  
-* your violation of third-party rights.
+Quotes, simulations, estimates and transaction plans can become stale because blockchain state, fees, liquidity, prices and route conditions change. You must re-check material details immediately before signing.
 
----
+### 3.3 Finality and errors
 
-## **9\. AML, Sanctions & Compliance**
+Blockchain transactions may be irreversible and non-refundable. Transactions sent to an incorrect address, contract, asset or network may result in permanent loss. A pending, submitted or approved transaction is not necessarily complete. You are responsible for confirming the source-chain receipt and, where applicable, destination-chain delivery before initiating a duplicate or replacement transaction.
 
-9.1  
- You must not use the Services for:
+We do not guarantee that a transaction will be accepted, confirmed, executed, settled, delivered or recoverable.
 
-* money laundering,  
-* terrorist financing,  
-* sanctions evasion,  
-* fraud,  
-* or any unlawful activity.
+### 3.4 Approvals
 
-9.2  
- We may suspend or restrict access if we suspect or detect prohibited activity.
+Token approvals and other permissions may allow a smart contract to transfer assets from your wallet. You are responsible for understanding, limiting and revoking approvals. An approval transaction and a dependent protocol transaction are separate transactions, and you should wait for the approval to confirm before proceeding.
 
----
+### 3.5 Taxes
 
-## **10\. Modifications**
+You are solely responsible for determining, reporting and paying all taxes, duties and governmental charges arising from your use of the Services or transactions in digital assets. We do not provide tax advice or tax reporting unless expressly required by applicable law.
 
-10.1  
- We may modify or update these Terms at any time. Continued use after updates constitutes acceptance.
+## 4. Service-Specific Terms and Risks
 
-10.2  
- A full protocol-specific Terms of Service will replace this placeholder before alpha launch.
+### 4.1 Bridge
 
----
+The Bridge uses smart contracts and third-party cross-chain infrastructure to lock, mint, burn, release or deliver supported assets across networks. TAO or a subnet token represented on an EVM network is distinct from the corresponding native asset held at a Finney address.
 
-## **11\. Governing Law**
+You—not Tortoise Labs—initiate a Bridge transaction by signing and submitting it from your wallet. The relevant smart contracts and cross-chain infrastructure execute and settle it. Tortoise Labs does not take possession of the assets in your wallet, act as your counterparty, or guarantee redemption. Bridge contracts may include rate limits, multisignature controls, time delays, emergency pauses, recovery mechanisms and other administrative permissions. The exercise or failure of those controls may delay or prevent a transfer or affect represented assets.
 
-These Terms and any dispute arising out of or relating to them shall be governed by the laws of the **British Virgin Islands (BVI)**.
+Bridge transactions are subject to risks including:
 
-Exclusive jurisdiction rests with the courts of the British Virgin Islands.
+- smart-contract defects, exploits or configuration errors;
+- failures, delays or security incidents involving Chainlink CCIP or another messaging or execution dependency;
+- blockchain congestion, reorganisation, downtime, forks or finality failure;
+- delayed, incomplete, failed or recovery-state delivery;
+- minting, burning, staking, unstaking, rounding or accounting errors;
+- rate limits, pauses, upgrades, administrative controls and network limits;
+- temporary or permanent differences between represented-token supply and observable reserves, including during in-flight transactions;
+- loss caused by unsupported assets, routes, addresses or networks; and
+- inability to recover an asset or complete a transfer.
 
----
+Any reserve page is an on-chain balance comparison based on observations made at particular blocks and times. It is not an independent audit, financial statement, solvency opinion, insurance arrangement or guarantee of redemption or value.
 
-## **12\. Contact**
+### 4.2 Trading interface
 
-For legal or compliance inquiries, contact:
+The trading interface may display data and allow you to initiate transactions through third-party aggregators, pools, automated market makers or other protocols. Trades are initiated by you and are unsolicited. Tortoise Labs does not execute a trade, route an order as your broker, select a trade for you, determine whether it is suitable, or guarantee best execution or the best available price.
+
+Trading risks include volatility, slippage, price impact, maximal extractable value, front-running, failed transactions, low or withdrawn liquidity, manipulated markets, inaccurate data, malicious or counterfeit tokens, transfer restrictions, taxes or fees embedded in token contracts and failures of third-party routing or liquidity sources.
+
+The display, ordering, labelling or availability of a token, market or pool does not constitute verification, due diligence, recommendation or endorsement.
+
+### 4.3 Liquidity Manager
+
+Liquidity Manager vaults use smart contracts to hold and manage liquidity positions. You independently decide whether and how much to deposit and initiate the deposit from your wallet. When you deposit, those assets or positions leave your wallet and become subject to the applicable vault and third-party protocol contracts. Your interest, withdrawal rights and any fee entitlement are determined exclusively by the applicable contracts.
+
+The contracts may permit designated keeper, manager or administrator addresses to perform technical functions such as adjusting a position range, rebalancing, staking, unstaking, harvesting, pausing operations, updating permitted parameters or migrating a position, subject to the deployed code. These contract permissions are not custody of your wallet and do not create a discretionary investment-management, advisory, brokerage or fiduciary relationship. They nevertheless create material smart-contract and administrative-control risks that you accept by depositing.
+
+Liquidity provision and automated management involve substantial risk, including impermanent loss, loss of principal, adverse price movements, out-of-range positions, failed or disadvantageous rebalancing, smart-contract failure, oracle or market-data failure, pool failure, reward volatility, changes to third-party incentives and delayed or unavailable withdrawals. Automation does not guarantee profit, yield, preservation of principal or better performance than an unmanaged position.
+
+Withdrawal requests, claims, staking and unstaking remain subject to contract state, applicable time delays, liquidity, network conditions and third-party protocol availability. We do not promise that withdrawal will be immediate or continuously available.
+
+### 4.4 Multi-sig Interface
+
+The Multi-sig Interface provides access to Safe-based smart-contract accounts. Tortoise Labs does not serve as an owner, signer or custodian for your Safe unless expressly agreed in a separate written agreement.
+
+You are responsible for verifying every owner address and approval threshold and for ensuring that the account remains usable if an owner becomes unavailable. Incorrect owners, an unsuitable threshold, compromised owner wallets, malicious proposals, incorrect calldata or lost signing credentials may make assets inaccessible or cause permanent loss. We cannot recover an owner wallet or override the Safe’s approval requirements.
+
+### 4.5 SDK and MCP Service
+
+The SDK and MCP Service prepare unsigned transaction data and may perform read-only blockchain queries. They do not hold private keys, select your wallet account, sign or broadcast transactions.
+
+An application or AI agent using the SDK or MCP Service may misinterpret instructions, provide incorrect information, use stale state, call the wrong tool, omit a safety check or interact with a compromised local environment. A plan hash identifies particular plan contents; it is not your authorisation or signature. You must review and separately authorise every transaction.
+
+If you give a local application or agent access to wallet software, a key file or signing capability, that access occurs outside the MCP Service and at your own risk. Tortoise Labs is not responsible for the acts or omissions of your agent, software, device, wallet or local signing environment.
+
+### 4.6 Integrators and end users
+
+If you integrate, embed or make any Service available to another person, you are responsible for your integration and your relationship with that person. You must accurately present each transaction, fee, approval and material risk; obtain all legally required consents; comply with applicable law; and not represent that Tortoise Labs is your agent, partner, custodian, broker or service provider to your end users.
+
+You may not modify or present a transaction plan in a misleading manner or conceal its source account, chain, target, approval, recipient, native value, principal, fee or minimum output. Unless Tortoise Labs separately agrees in writing, we assume no contractual or support obligation to your end users, and you will not make a representation, warranty or commitment on our behalf.
+
+### 4.7 Information and audits
+
+Documentation, market data, charts, prices, transaction status, contract descriptions, security materials and other information may be incomplete, delayed or inaccurate. You must verify important information using independent sources and relevant blockchain records.
+
+An audit, review or source-code publication covers only the identified code, version, commit and scope. It does not guarantee security, economic soundness or the absence of defects, and it may not cover the Bridge, third-party dependencies, deployed configuration, frontend, later changes or all Services.
+
+## 5. Fees and Costs
+
+You are responsible for all costs associated with transactions you initiate, including blockchain gas, cross-chain messaging charges, token approval costs, pool or protocol fees, slippage and third-party service charges.
+
+As of the date of these Terms, Tortoise Labs does not charge a fee on Bridge transfers. You remain responsible for Chainlink CCIP charges, blockchain gas and other external costs. The Liquidity Manager charges a performance fee equal to 10% of LP trading fees earned by a managed position; it does not charge that performance fee on deposited principal. Swaps initiated through the trading interface include an interface fee of 0.5% of the swap amount, paid to an address designated by Tortoise Labs and shown in the transaction details before you sign. The applicable interface and documentation provide the current fee information.
+
+An integrator or third party may charge a separate fee. The applicable interface, quote or transaction details should disclose a fee before you sign the relevant transaction. You are responsible for reviewing the recipient and amount of every fee.
+
+Fee rates and structures may change prospectively. A quote is an estimate or time-sensitive statement, not a permanent commitment. Unless expressly stated, network and third-party fees are not paid to Tortoise Labs and are not controlled by us.
+
+## 6. Third-Party Services
+
+The Services rely on or link to independent blockchain networks, smart contracts, wallets, RPC providers, indexers, explorers, data sources and protocols, which may include Chainlink, Aerodrome, Safe and swap-routing or liquidity providers (**“Third-Party Services”**).
+
+Third-Party Services are not controlled by Tortoise Labs and may be governed by separate terms and privacy policies. We do not guarantee their security, availability, legality, accuracy, performance, fees or continued operation. Integration with, reference to or display of a Third-Party Service does not constitute endorsement.
+
+Your dealings with a Third-Party Service are between you and that third party. To the maximum extent permitted by law, Tortoise Labs is not responsible for loss caused by a Third-Party Service.
+
+## 7. No Advice, Recommendation or Guarantee
+
+The Services are provided for technical and informational purposes. Nothing in the Services is legal, financial, investment, tax or other professional advice; a recommendation or solicitation; a suitability determination; or a guarantee of value, liquidity, return, redemption, security or availability.
+
+You are responsible for conducting your own investigation and obtaining independent professional advice. You represent that each transaction is based on your own decision and not on a representation or recommendation by Tortoise Labs.
+
+Digital assets and decentralised-finance transactions are highly risky. You may lose some or all of the assets you use with the Services. The Services and assets accessible through them are not bank deposits, are not insured by Tortoise Labs and may not be protected by any deposit-insurance, investor-compensation or financial-ombudsman scheme.
+
+## 8. Prohibited Use
+
+You may not use or attempt to use the Services:
+
+- in violation of any applicable law, regulation, sanctions restriction or court order;
+- for money laundering, terrorist financing, proliferation financing, fraud, theft, ransomware, sanctions evasion or other unlawful activity;
+- to transact in property that you know or reasonably should know is stolen or unlawfully obtained;
+- to manipulate a market, engage in wash trading, execute a fraudulent scheme or mislead another person;
+- to exploit, attack, disrupt, overload or compromise the Services, a smart contract, network, system or user;
+- to introduce malicious code, scrape or access the Services in an abusive manner, or evade technical limits or access restrictions;
+- to infringe intellectual-property, privacy or other rights;
+- to conceal a transaction fee, approval, recipient, destination contract or other material transaction information from an end user; or
+- to help another person engage in prohibited conduct.
+
+We may investigate suspected misuse and may restrict access to interfaces, APIs, the SDK distribution, or the MCP Service. We may cooperate with lawful requests from competent authorities. We do not promise that we can block direct access to a public blockchain or autonomous smart contract.
+
+## 9. Intellectual Property and Licence
+
+### 9.1 Our materials
+
+Except for open-source software and third-party materials, the Services, branding, interface designs, documentation, text, graphics and other content are owned by Tortoise Labs or its licensors and are protected by applicable intellectual-property laws.
+
+Subject to these Terms, we grant you a limited, personal, revocable, non-exclusive, non-transferable licence to access and use the Services for their intended lawful purposes.
+
+### 9.2 Open-source software
+
+Software identified as open source is licensed under the applicable open-source licence, not under the licence in Section 9.1. If these Terms conflict with an applicable open-source licence, that open-source licence controls for the relevant software.
+
+### 9.3 Feedback
+
+If you voluntarily provide suggestions or feedback, you grant Tortoise Labs a worldwide, perpetual, irrevocable, royalty-free and transferable licence to use and commercialise it without restriction or compensation, provided that we do not identify you publicly as its source without permission.
+
+## 10. Privacy
+
+Our collection and use of personal data in connection with the Services is described in the [ForeverMoney Privacy Policy](/privacy) and our use of cookies and similar technologies is described in the [Cookie Policy](/cookie). Public blockchain transactions are generally visible and cannot be deleted or modified by Tortoise Labs.
+
+## 11. Changes, Availability and Protocol Events
+
+We may add, modify, suspend or discontinue any part of the Services, supported asset, network or integration at any time. We do not guarantee continued access, uptime, support, maintenance, compatibility or preservation of any feature. Unless we expressly agree otherwise in a separate signed agreement, we have no service-level, response-time, maintenance or support obligation.
+
+The Services may be affected by forks, upgrades, migrations, airdrops, governance decisions, emergency actions or other protocol events. We have no obligation to support a fork, replacement asset, airdrop or particular version of a network or protocol.
+
+We may take reasonable action in response to an actual, suspected or threatened exploit, vulnerability, oracle failure, abnormal on-chain activity, legal requirement, sanctions risk, breach of these Terms, network event, operational failure or Third-Party Service outage. Such action may include pausing, throttling, restricting or withdrawing an interface or route; suspending automation or rebalancing; declining to prepare a transaction; or using an available smart-contract safety control. To the maximum extent permitted by law, such action or a failure to take such action does not make us liable for resulting loss. It may not prevent direct blockchain interaction and may not protect assets already committed to a smart contract.
+
+## 12. Disclaimers
+
+To the maximum extent permitted by law, the Services are provided **“as is”** and **“as available.”** Tortoise Labs and its affiliates, officers, directors, employees, contractors and licensors disclaim all express, implied and statutory warranties, including warranties of merchantability, satisfactory quality, fitness for a particular purpose, title, non-infringement, accuracy, availability and security.
+
+We do not warrant that the Services will be uninterrupted, error-free, secure or free from harmful components; that defects will be corrected; that information or transaction plans will be complete or current; or that any transaction will achieve its intended result.
+
+The occurrence of a security incident, exploit, vulnerability, outage, transaction failure or loss of digital assets does not, by itself, establish that Tortoise Labs breached these Terms or failed to exercise any legally required standard of care.
+
+No communication from Tortoise Labs creates a warranty unless expressly included in a written agreement signed by an authorised representative of Tortoise Labs.
+
+## 13. Limitation of Liability
+
+To the maximum extent permitted by law, Tortoise Labs and its affiliates, officers, directors, employees, contractors and licensors will not be liable for any indirect, incidental, special, consequential, exemplary or punitive damages, or for any loss of profits, revenue, business, opportunity, goodwill, data, digital assets or use, arising out of or relating to the Services or these Terms, regardless of the theory of liability and even if advised of the possibility of such loss.
+
+Without limiting the preceding paragraph, we will not be liable for losses resulting from:
+
+- digital-asset price movements, slippage, impermanent loss or loss of liquidity;
+- a wallet, key, device, account, owner or signing environment;
+- a user error, incorrect address, approval or transaction;
+- a blockchain, smart contract, bridge, oracle, third-party protocol or Third-Party Service;
+- an exploit, attack, fork, reorganisation, congestion, outage or protocol event;
+- delayed, failed, duplicate, incomplete or irreversible transactions;
+- inaccurate, incomplete or delayed data, quotes, simulations or transaction plans; or
+- suspension, modification or discontinuation of a Service.
+
+To the maximum extent permitted by law, the aggregate liability of Tortoise Labs and the other persons identified above for all claims arising out of or relating to the Services or these Terms will not exceed the greater of: (a) the fees you paid directly to Tortoise Labs for the relevant Service during the 12 months preceding the event giving rise to the claim; or (b) USD 100.
+
+Nothing in these Terms excludes or limits liability to the extent it cannot lawfully be excluded or limited.
+
+You must take reasonable steps to avoid and mitigate any loss, including stopping use of an affected Service, revoking unnecessary approvals, securing a compromised wallet, preserving relevant transaction information and following a supported recovery process where one exists.
+
+## 14. Release and Assumption of Risk
+
+You knowingly and voluntarily assume all risks arising from or relating to digital assets, blockchains, smart contracts, wallets, the Services and Third-Party Services, including the risks specifically described in these Terms.
+
+To the maximum extent permitted by law, you release Tortoise Labs and its affiliates, officers, directors, employees, contractors and licensors from claims and causes of action, whether known or unknown, arising solely from risks you assumed under these Terms or from the acts or omissions of a blockchain, smart contract, wallet, other user or Third-Party Service. This release does not apply to liability that cannot lawfully be released.
+
+If you are a California resident, you waive California Civil Code section 1542, which provides in substance that a general release does not extend to claims the releasing party does not know or suspect to exist in its favour at the time of the release and that, if known, would have materially affected the settlement with the released party.
+
+## 15. Indemnification
+
+To the maximum extent permitted by law, you will indemnify, defend and hold harmless Tortoise Labs and its affiliates, officers, directors, employees and contractors from third-party claims, proceedings, losses, liabilities, damages, judgments, penalties, costs and reasonable legal fees arising from:
+
+- your unlawful or prohibited use of the Services;
+- your material breach of these Terms;
+- your infringement or violation of another person’s rights;
+- transactions or content submitted or authorised by you;
+- your integration, product, customer, user or representation concerning the Services; or
+- an allegation that an asset, token, pool, project or activity introduced or controlled by you is unlawful, regulated, misleading or infringes another person’s rights.
+
+We will give you reasonable notice of an indemnified claim. We may control its defence and settlement, and you will reasonably cooperate. You may not settle a claim in a manner that admits wrongdoing by or imposes an obligation on an indemnified party without our prior written consent. Where a subpoena, regulatory request or compulsory process results from conduct for which you owe indemnification, the recoverable costs include our reasonable costs and legal fees in responding.
+
+## 16. Suspension and Termination
+
+You may stop using the Services at any time.
+
+We may suspend or terminate your access to Services we control if we reasonably believe that you have breached these Terms, created legal or security risk, used the Services unlawfully, or if suspension is necessary for compliance, security or operational reasons.
+
+Termination does not reverse blockchain transactions or require us to modify a public smart contract. You remain responsible for withdrawing or otherwise managing assets committed to smart contracts where the contracts permit you to do so. Sections that by their nature should survive termination—including Sections 3 through 10 and 12 through 20—will survive.
+
+## 17. Changes to These Terms
+
+We may update these Terms prospectively. The revised Terms will state their effective date. Where reasonably practicable, we will provide notice of material changes through the Services.
+
+We may require you to affirmatively accept updated Terms before continuing to use transactional features. Your continued use after updated Terms take effect constitutes acceptance where permitted by law. Changes do not alter the terms governing a transaction already submitted to a blockchain.
+
+## 18. Governing Law and Arbitration
+
+These Terms and any non-contractual obligations or dispute arising out of or relating to them or the Services are governed by the laws of the British Virgin Islands, without regard to conflict-of-law principles.
+
+Except for a claim eligible for a small-claims court and an application for urgent interim or injunctive relief, any dispute, claim or controversy arising out of or relating to these Terms, the Services, or their breach, termination, enforcement, interpretation or validity—including the arbitrability of a dispute—will be finally resolved by confidential, binding arbitration administered by the BVI International Arbitration Centre under its rules then in force.
+
+The seat of arbitration will be the British Virgin Islands. The tribunal will consist of one arbitrator. The language will be English. Judgment on an award may be entered and enforced in any court of competent jurisdiction. Either party may seek provisional relief from a court of competent jurisdiction in aid of arbitration without waiving this Section.
+
+**You and Tortoise Labs agree to bring claims only in an individual capacity and not as a plaintiff or class member in a class, collective, consolidated, representative or private-attorney-general proceeding. The arbitrator may not consolidate claims of different persons or preside over a representative proceeding. To the maximum extent permitted by law, each party waives any right to trial by jury.**
+
+If a dispute is not subject to arbitration, the courts of the British Virgin Islands have exclusive jurisdiction, and each party submits to those courts.
+
+## 19. General
+
+### 19.1 Entire agreement
+
+These Terms and any additional terms expressly incorporated into them constitute the entire agreement between you and Tortoise Labs concerning the Services and supersede prior discussions or agreements concerning their subject matter.
+
+### 19.2 Additional terms
+
+A particular Service may have additional terms presented before use. If additional terms conflict with these Terms, the additional terms control for that Service to the extent of the conflict.
+
+### 19.3 Assignment
+
+You may not assign or transfer these Terms without our prior written consent. We may assign these Terms in connection with a merger, acquisition, corporate reorganisation or transfer of the relevant business or assets, or to an affiliate, subject to applicable law.
+
+### 19.4 Severability
+
+If a provision is held invalid or unenforceable, it will be enforced to the maximum extent permitted and the remaining provisions will remain effective.
+
+### 19.5 No waiver
+
+A failure or delay in exercising a right is not a waiver. A waiver must be in writing and applies only to the specific circumstance for which it is given.
+
+### 19.6 Force majeure
+
+We are not responsible for delay or failure caused by events beyond our reasonable control, including failures of blockchains, protocols, networks, hosting providers, telecommunications, utilities or third-party infrastructure; cyberattacks; government action; natural disasters; labour disputes; or widespread market disruption.
+
+### 19.7 No third-party rights
+
+Except for persons expressly entitled to rely on Sections 12 through 15, a person who is not a party to these Terms has no right to enforce them.
+
+### 19.8 Electronic communications
+
+You consent to receive agreements, disclosures and notices electronically, including by publication through the Services. Electronic communications satisfy any legal requirement that a communication be in writing, to the extent permitted by law.
+
+### 19.9 Headings
+
+Headings are for convenience only and do not affect interpretation.
+
+## 20. Contact
+
+Legal and compliance notices may be sent to:
 
 **Tortoise Labs Ltd.**  
-**[legal@forevermoney.ai](mailto:legal@forevermoney.ai)**
+Email: **legal@forevermoney.ai**
 

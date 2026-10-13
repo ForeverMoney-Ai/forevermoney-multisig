@@ -1,138 +1,52 @@
-# COOKIE POLICY \- ForeverMoney
+# ForeverMoney.ai Cookie Policy
 
-**Last Revised: Dec 10, 2025**	
+**Last updated: 13 October 2026**
 
-This Cookie Policy explains how **Tortoise Labs Ltd.** (“Tortoise Labs”, “we”, “us”, or “our”) uses cookies and similar technologies when you visit or interact with the Forevermoney website, interfaces, dashboards, or any related pages (collectively, the “Website”).  
- This policy should be read together with our **Privacy Policy** and **Terms of Service**.
+This Cookie Policy explains how **Tortoise Labs Ltd.** (**“Tortoise Labs,” “we,” “us,”** or **“our”**) uses cookies and similar technologies on https://forevermoney.ai and its subdomains (the **“Services”**). It should be read together with our [Privacy Policy](/privacy) and [Terms of Service](/terms).
 
-By continuing to browse the Website, you agree to our use of cookies as described below.
+## 1. What cookies and similar technologies are
 
----
+Cookies are small text files that a website stores in your browser. Similar technologies include browser local storage and session storage, which let a website remember information on your device.
 
-# **1\. What Are Cookies?**
+## 2. What we use
 
-Cookies are small text files placed on your device when you visit a website. They help websites function, improve performance, and provide analytics insights.  
- Cookies may be:
+We do not use advertising, marketing or cross-site tracking cookies.
 
-* **Session cookies** — deleted when you close your browser  
-* **Persistent cookies** — stored until they expire or are manually deleted  
-* **First-party cookies** — set by Forevermoney  
-* **Third-party cookies** — set by external service providers (e.g., analytics tools)
+### 2.1 Strictly necessary cookies
 
-We may also use similar technologies, such as pixels, local storage, and tags, which operate in a comparable manner.
+If you sign in by signing a message with your wallet, we set first-party, httpOnly cookies that keep your signed-in session:
 
----
+- **wallet-challenge**: holds the sign-in message you are asked to sign; expires after 10 minutes and is deleted once you sign in.
+- **session-token**: keeps you signed in; expires after 24 hours.
+- **refresh-token**: renews your session without signing again; expires after 30 days.
 
-# **2\. Types of Cookies We Use**
+These cookies are necessary for features you request and are not used for analytics or advertising. If you do not sign in, they are not set.
 
-The Website may use the following categories of cookies:
+### 2.2 Browser storage
 
-### **2.1. Strictly Necessary Cookies**
+The Services and the wallet-connection software you use may store information in your browser’s local or session storage to remember:
 
-These cookies are required for the Website to function properly. They:
+- wallet-connection state and selected network;
+- recent bridge transactions for the connected wallet, so you can track their status;
+- interface preferences, such as panels you have shown, hidden or dismissed.
 
-* enable basic navigation and page rendering,  
-* maintain session state,  
-* ensure security and access control.
+This information stays on your device. We do not read it on our servers.
 
-You cannot opt out of these cookies, as the Website cannot operate without them.
+### 2.3 Analytics
 
----
+We use **Umami Cloud** to measure general use of the Website. Our Umami configuration does not set cookies or use browser storage to identify you. See Section 2.4 of the [Privacy Policy](/privacy) for the data Umami processes.
 
-### **2.2. Performance & Analytics Cookies**
+## 3. Managing cookies and storage
 
-These cookies help us understand how visitors use the Website, including:
+You can delete cookies and browser storage, or block them, through your browser settings. If you block or delete the cookies in Section 2.1, you will need to sign in again. Clearing browser storage may disconnect your wallet or reset your preferences.
 
-* which pages are viewed,  
-* time spent on the site,  
-* browser and device information,  
-* any errors or load issues.
+## 4. Changes to this Policy
 
-We may use third-party analytics services (e.g., Google Analytics, Plausible, or similar tools). These providers may collect anonymized or pseudonymized data to help us improve the Website’s performance.
+We may update this Policy when our use of cookies or similar technologies changes. If we introduce non-essential cookies that require consent, we will ask for your choice before using them where required by law.
 
-Analytics cookies are used **only if you consent**, where required by applicable law.
+## 5. Contact
 
----
-
-### **2.3. Functionality Cookies**
-
-These cookies allow the Website to remember:
-
-* your preferences,  
-* language or region settings,  
-* UI states or dismissed banners.
-
-Functionality cookies improve your user experience but are not strictly necessary.
-
----
-
-### **2.4. Experimental / Beta Cookies**
-
-As Forevermoney is in an evolving pre-launch phase, we may use temporary cookies to:
-
-* test new UI features  
-* monitor prototype performance,  
-* run limited experiments or A/B tests.
-
-These cookies may change over time as we iterate on the Website.
-
----
-
-### **2.5. Third-Party Tools**
-
-The Website may embed third-party scripts or tools, such as:
-
-* analytics providers,  
-* content delivery networks (CDNs),  
-* code execution or infrastructure monitoring tools.
-
-These third parties may place cookies for security, analytics, or performance.  
- We do not control third-party cookies and encourage you to review their policies.
-
----
-
-# **3\. How We Use Cookies**
-
-We use cookies to:
-
-* operate, secure, and maintain the Website,  
-* understand usage patterns and improve features,  
-* ensure stability, debugging, and performance monitoring,  
-* support experimental or pre-launch testing environments.
-
-We **do not** use cookies to track users across third-party websites or to collect personal data beyond what is technically necessary or consented to.
-
----
-
-# **4\. Managing Cookie Preferences**
-
-You can manage or disable cookies at any time through your browser settings.
-
-Instructions for major browsers can be found at:  
- [https://allaboutcookies.org/](https://allaboutcookies.org/)
-
-Please note:
-
-* Disabling certain cookies may impair the Website’s functionality.  
-* Strictly necessary cookies cannot be disabled through our interface.
-
-If the Website offers a cookie banner or preferences tool, you may adjust your consent choices there.
-
----
-
-# **5\. Changes to This Cookie Policy**
-
-We may update this Cookie Policy from time to time to reflect changes in technology, legal requirements, or Website functionality.
-
-We will update the “Last Revised” date when changes are made.  
- Continued use of the Website constitutes acceptance of the updated policy.
-
----
-
-# **6\. Contact**
-
-If you have questions about this Cookie Policy or our use of cookies, contact:
+Questions about this Policy may be sent to:
 
 **Tortoise Labs Ltd.**  
- Email: **legal@forevermoney.ai**
-
+Email: **legal@forevermoney.ai**
