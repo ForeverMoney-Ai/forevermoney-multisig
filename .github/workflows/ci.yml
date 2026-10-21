@@ -41,6 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 ci/test_deploy.py
+      - run: python3 -m unittest discover -s infrastructure/deploy/rpc-guard -p 'test_*.py'
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: [build, deployment-checks, browser-smoke, cluster-preflight]

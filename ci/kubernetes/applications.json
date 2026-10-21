@@ -1418,6 +1418,136 @@
         },
         "type": "ClusterIP"
       }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "bittensor-safe"
+        },
+        "name": "rpc-guard",
+        "namespace": "bittensor-safe"
+      },
+      "spec": {
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+          "matchLabels": {
+            "app": "rpc-guard"
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "rpc-guard"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "enableServiceLinks": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "runAsGroup": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "rpc-guard",
+                "image": "python:3.12-alpine",
+                "imagePullPolicy": "IfNotPresent",
+                "command": [
+                  "python",
+                  "-B",
+                  "/code/rpc_guard.py"
+                ],
+                "ports": [
+                  {
+                    "containerPort": 8545,
+                    "protocol": "TCP"
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/healthz",
+                    "port": 8545
+                  },
+                  "periodSeconds": 10,
+                  "timeoutSeconds": 2
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "250m",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "20m",
+                    "memory": "48Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/code",
+                    "name": "code",
+                    "readOnly": true
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "secretRef": {
+                      "name": "rpc-guard"
+                    }
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "code",
+                "configMap": {
+                  "name": "rpc-guard-code"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "rpc-guard",
+        "namespace": "bittensor-safe"
+      },
+      "spec": {
+        "ports": [
+          {
+            "port": 8545,
+            "protocol": "TCP",
+            "targetPort": 8545
+          }
+        ],
+        "selector": {
+          "app": "rpc-guard"
+        },
+        "type": "ClusterIP"
+      }
     }
   ]
 }
