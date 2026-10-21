@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PRIMARY_URL = os.environ['PRIMARY_RPC_URL']
 FALLBACK_URL = os.environ.get('FALLBACK_RPC_URL', '')
-MAX_LAG_BLOCKS = int(os.environ.get('MAX_LAG_BLOCKS', '5'))
+MAX_LAG_BLOCKS = int(os.environ.get('MAX_LAG_BLOCKS', '10'))
 PRIMARY_ATTEMPTS = int(os.environ.get('PRIMARY_ATTEMPTS', '10'))
 # Safe's client times out regular calls at 15s; never start a retry past this point.
 RETRY_WINDOW_SECONDS = float(os.environ.get('RETRY_WINDOW_SECONDS', '8'))
@@ -88,13 +88,15 @@ class Guard:
 
         Returns ((fresh, head, replies), 200) on success, or (None, http_status) on failure (0 = no response).
         """
+        started = self.clock()
+        methods = ','.join(sorted({str(item.get('method')) for item in items}))
         try:
             status, body, _ = upstream.post(items + [{'jsonrpc': '2.0', 'id': HEAD_ID, 'method': 'eth_blockNumber', 'params': []}], timeout)
         except Exception as err:
-            print('[rpc-guard] %s request failed: %s' % (upstream.name, type(err).__name__), flush=True)
+            print('[rpc-guard] %s request failed: %s after %.1fs (%s)' % (upstream.name, type(err).__name__, self.clock() - started, methods), flush=True)
             return None, 0
         if status != 200 or not isinstance(body, list):
-            print('[rpc-guard] %s answered HTTP %s' % (upstream.name, status), flush=True)
+            print('[rpc-guard] %s answered HTTP %s after %.1fs (%s)' % (upstream.name, status, self.clock() - started, methods), flush=True)
             return None, status
         replies = {}
         head = None
