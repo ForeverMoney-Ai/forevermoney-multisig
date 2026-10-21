@@ -36,7 +36,8 @@
             "scheduler",
             "address-resolver",
             "governance-sync",
-            "price-proxy"
+            "price-proxy",
+            "rpc-guard"
           ],
           "verbs": [
             "get",
@@ -62,7 +63,8 @@
             "cfg",
             "cgw",
             "txs",
-            "price-proxy-code"
+            "price-proxy-code",
+            "rpc-guard-code"
           ],
           "verbs": [
             "get",
@@ -83,7 +85,8 @@
             "cfg",
             "txs",
             "address-resolver",
-            "price-proxy"
+            "price-proxy",
+            "rpc-guard"
           ],
           "verbs": [
             "get",

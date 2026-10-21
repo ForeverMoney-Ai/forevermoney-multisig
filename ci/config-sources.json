@@ -18,5 +18,8 @@
   },
   "price-proxy-code": {
     "price_proxy.py": "infrastructure/deploy/price-proxy/price_proxy.py"
+  },
+  "rpc-guard-code": {
+    "rpc_guard.py": "infrastructure/deploy/rpc-guard/rpc_guard.py"
   }
 }

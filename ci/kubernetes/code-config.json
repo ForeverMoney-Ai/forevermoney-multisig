@@ -49,6 +49,14 @@
         "name": "price-proxy-code",
         "namespace": "bittensor-safe"
       }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "rpc-guard-code",
+        "namespace": "bittensor-safe"
+      }
     }
   ]
 }

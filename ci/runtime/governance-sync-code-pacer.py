@@ -10,9 +10,9 @@ class RpcPacer:
         self.interval, self.next_request = interval, 0
 
     def __call__(self, session, request, **kwargs):
-        # Pace either supported archive provider; never pace unrelated services.
+        # Pace the archive providers and the in-cluster rpc-guard in front of them; never pace unrelated services.
         host = urlsplit(request.url).hostname or ''
-        if not (host.endswith('.onfinality.io') or host == 'archive.chain.opentensor.ai'):
+        if not (host.endswith('.onfinality.io') or host in ('archive.chain.opentensor.ai', 'rpc-guard')):
             return self.send(session, request, **kwargs)
         with self.lock:
             try:
