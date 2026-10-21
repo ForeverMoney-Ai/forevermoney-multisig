@@ -20,7 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 PRIMARY_URL = os.environ['PRIMARY_RPC_URL']
 FALLBACK_URL = os.environ.get('FALLBACK_RPC_URL', '')
 MAX_LAG_BLOCKS = int(os.environ.get('MAX_LAG_BLOCKS', '5'))
-PRIMARY_ATTEMPTS = int(os.environ.get('PRIMARY_ATTEMPTS', '6'))
+PRIMARY_ATTEMPTS = int(os.environ.get('PRIMARY_ATTEMPTS', '10'))
 # Safe's client times out regular calls at 15s; never start a retry past this point.
 RETRY_WINDOW_SECONDS = float(os.environ.get('RETRY_WINDOW_SECONDS', '8'))
 UPSTREAM_TIMEOUT_SECONDS = float(os.environ.get('UPSTREAM_TIMEOUT_SECONDS', '50'))
