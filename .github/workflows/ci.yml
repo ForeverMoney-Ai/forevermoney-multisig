@@ -45,7 +45,8 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: [build, deployment-checks, browser-smoke, cluster-preflight]
-    runs-on: ubuntu-24.04
+    # The cluster API firewall only admits allowlisted IPs; the Mac mini runner is one.
+    runs-on: [self-hosted, forevermoney-deploy]
     timeout-minutes: 35
     concurrency:
       group: production-deploy
@@ -105,7 +106,7 @@ jobs:
           retention-days: 7
   cluster-preflight:
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, forevermoney-deploy]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
